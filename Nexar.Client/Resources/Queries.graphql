@@ -1,0 +1,183 @@
+﻿query SearchMpn($mpn: String!) {
+  supSearchMpn(q: $mpn) {
+    results {
+      part {
+        mpn
+        shortDescription
+        manufacturer {
+          name
+        }
+      }
+    }
+  }
+}
+
+query GetWorkspaces {
+  desWorkspaces {
+    id
+    url
+    name
+    description
+  }
+}
+
+query GetProjectInfo($workspaceUrl: String!) {
+  desProjects(workspaceUrl: $workspaceUrl) {
+    totalCount
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
+    }
+  }
+}
+
+query GetProjects($workspaceUrl: String!, $cursor: String!) {
+  desProjects(workspaceUrl: $workspaceUrl, after: $cursor) {
+    totalCount
+    nodes {
+      id
+      name
+      description
+      projectId
+      previewUrl
+      updatedAt
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
+    }
+  }
+}
+
+query GetPcbModelInfo($id: ID!) {
+  desProjectById (id: $id) {
+    name
+    description
+    design {
+      workInProgress {
+        variants {
+          pcb {
+            designItems {
+              totalCount
+              pageInfo {
+                startCursor
+                hasNextPage
+                hasPreviousPage
+                endCursor
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query GetPcbModel($id: ID!) {
+  desProjectById (id: $id) {
+    name
+    description
+    design {
+      workInProgress {
+        variants {
+          pcb {
+            outline {
+              vertices {
+                xMm
+                yMm
+              }
+            }
+            pads {
+              designator
+              globalDesignator
+              padType
+              shape
+              net {
+                name
+              }
+              layer {
+                name
+              }
+              position {
+                xMm
+                yMm
+              }
+              rotation
+              size {
+                xMm
+                yMm
+              }
+              holeSize {
+                xMm
+              }
+            }
+            nets {
+              name
+              pads {
+                designator
+                globalDesignator
+                padType
+                shape
+                layer {
+                  name
+                }
+                position {
+                  xMm
+                  yMm
+                }
+                rotation
+                size {
+                  xMm
+                  yMm
+                }
+                holeSize {
+                  xMm
+                }
+              }
+              tracks {
+                layer {
+                  name
+                }
+                width {
+                  xMm
+                }
+                width {
+                  xMm
+                }
+                begin {
+                  xMm
+                  yMm
+                }
+                end {
+                  xMm
+                  yMm
+                }
+              }
+              vias {
+                shape
+                layer {
+                  name
+                }
+                position {
+                  xMm
+                  yMm
+                }
+                padDiameter {
+                  xMm
+                }
+                holeDiameter {
+                  xMm
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
