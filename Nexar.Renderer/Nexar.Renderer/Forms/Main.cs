@@ -25,7 +25,7 @@ namespace Nexar.Renderer.Forms
 
         private ThreadHelper? threadHelper;
 
-        private const int THREAD_PERIOD_MS = 100;
+        private const int THREAD_PERIOD_MS = 50;
 
         int glWidth = 800;
         int glHeight = 600;
@@ -119,7 +119,7 @@ namespace Nexar.Renderer.Forms
         {
             if (InvokeRequired)
             {
-                BeginInvoke(new MethodInvoker(delegate
+                Invoke(new MethodInvoker(delegate
                 {
                     RenderFrame();
                 }));
