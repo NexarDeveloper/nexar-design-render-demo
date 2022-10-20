@@ -14,6 +14,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.WinForms;
 using System.Security.Policy;
+using System.Runtime.CompilerServices;
 
 namespace Nexar.Renderer.Forms
 {
@@ -23,7 +24,7 @@ namespace Nexar.Renderer.Forms
 
         private PcbManager pcbManager;
 
-        private ThreadHelper? threadHelper;
+        private ThreadHelper? renderThreadHelper;
 
         private const int THREAD_PERIOD_MS = 50;
 
@@ -39,15 +40,17 @@ namespace Nexar.Renderer.Forms
             pcbRenderer = new GlRenderer(glWidth, glHeight, "Nexar Renderer");
             pcbManager = new PcbManager(pcbRenderer);
 
-            if (threadHelper == null)
+            if (renderThreadHelper == null)
             {
-                threadHelper = new ThreadHelper(
+                renderThreadHelper = new ThreadHelper(
                     "RenderThread",
                     THREAD_PERIOD_MS,
-                    new Action(RenderFrameThreadSafe),
-                    ThreadExceptionHandler);
+                    new Action<object>(RenderFrameThreadSafe),
+                    ThreadExceptionHandler,
+                    null, 
+                    CloseApplication);
 
-                threadHelper.StartThreads();
+                renderThreadHelper.StartThreads();
             }
         }
 
@@ -115,18 +118,21 @@ namespace Nexar.Renderer.Forms
             pcbRenderer.WindowReshape(Width, Height);
         }
 
-        private void RenderFrameThreadSafe()
+        private void RenderFrameThreadSafe(object threadLock)
         {
-            if (InvokeRequired)
+            lock (threadLock)
             {
-                Invoke(new MethodInvoker(delegate
+                if (InvokeRequired)
+                {
+                    Invoke(new MethodInvoker(delegate
+                    {
+                        RenderFrame();
+                    }));
+                }
+                else
                 {
                     RenderFrame();
-                }));
-            }
-            else
-            {
-                RenderFrame();
+                }
             }
         }
 
@@ -145,14 +151,37 @@ namespace Nexar.Renderer.Forms
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            if (threadHelper != null)
+            new Thread(() =>
             {
-                threadHelper.StopThreads();
-                threadHelper = null;
-            }
+                BeginShutdown();
+            }).Start();
 
             pcbRenderer.OnUnload();
-            base.OnClosing(e);
+            e.Cancel = true;
+        }
+
+        private void BeginShutdown()
+        {
+            if (renderThreadHelper != null)
+            {
+                renderThreadHelper.StopThreads();
+                renderThreadHelper = null;
+            }
+        }
+
+        private void CloseApplication()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new MethodInvoker(delegate
+                {
+                    Application.Exit();
+                }));
+            }
+            else
+            {
+                Application.Exit();
+            }
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

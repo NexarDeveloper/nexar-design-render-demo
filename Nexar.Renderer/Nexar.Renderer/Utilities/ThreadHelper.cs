@@ -33,7 +33,7 @@ namespace Nexar.Renderer.Utilities
         private string threadName;
         private int threadCount;
         private Thread? thread;
-        private Action? threadCallback;
+        private Action<object>? threadCallback;
         private Func<Task>? threadCallbackAsync;
         private Action<object>? multiThreadCallback;
         private Action<Exception>? exceptionCallback;
@@ -44,6 +44,7 @@ namespace Nexar.Renderer.Utilities
         private List<Thread> multiThreads = new List<Thread>();
         private List<Thread> startCallbacksExecuted = new List<Thread>();
         private bool isBackground;
+        private object threadLock = new object();
 
         private int ThreadSleepCountThreshold
         {
@@ -76,7 +77,7 @@ namespace Nexar.Renderer.Utilities
         public ThreadHelper(
             string threadName,
             int threadPeriodMS,
-            Action threadCallback,
+            Action<object> threadCallback,
             Action<Exception>? exceptionCallback = null,
             Action? threadStartCallback = null,
             Action? threadStopCallback = null,
@@ -183,8 +184,10 @@ namespace Nexar.Renderer.Utilities
             switch (threadConfiguration)
             {
                 case E_ThreadConfiguration.single:
+                {
+                    if (thread != null)
                     {
-                        if (thread != null)
+                        lock (threadLock)
                         {
                             if (thread.IsAlive)
                             {
@@ -193,33 +196,34 @@ namespace Nexar.Renderer.Utilities
                             thread = null;
                             threadStopCallback?.Invoke();
                         }
-
-                        break;
                     }
+
+                    break;
+                }
 
                 case E_ThreadConfiguration.multiple:
+                {
+                    if (multiThreads.Count > 0)
                     {
-                        if (multiThreads.Count > 0)
+                        foreach (Thread thread in multiThreads)
                         {
-                            foreach (Thread thread in multiThreads)
+                            if (thread.IsAlive)
                             {
-                                if (thread.IsAlive)
-                                {
-                                    thread.Join();
-                                }
+                                thread.Join();
                             }
                         }
-
-                        foreach (Thread thread in startCallbacksExecuted)
-                        {
-                            multiThreadStopCallback?.Invoke(multiThreads.IndexOf(thread));
-                        }
-
-                        startCallbacksExecuted.Clear();
-                        multiThreads.Clear();
-
-                        break;
                     }
+
+                    foreach (Thread thread in startCallbacksExecuted)
+                    {
+                        multiThreadStopCallback?.Invoke(multiThreads.IndexOf(thread));
+                    }
+
+                    startCallbacksExecuted.Clear();
+                    multiThreads.Clear();
+
+                    break;
+                }
             }
         }
 
@@ -259,7 +263,7 @@ namespace Nexar.Renderer.Utilities
                 {
                     if (threadCallback != null)
                     {
-                        threadCallback.Invoke();
+                        threadCallback.Invoke(threadLock);
                     }
                     else if (threadCallbackAsync != null)
                     {
@@ -270,7 +274,7 @@ namespace Nexar.Renderer.Utilities
                 {
                     if (multiThreadCallback != null)
                     {
-                        var asyncResult = threadCallback?.BeginInvoke(null, threadParameter);
+                        var asyncResult = threadCallback?.BeginInvoke(threadLock, null, threadParameter);
                         threadCallback?.EndInvoke(asyncResult);
                     }
                 }
