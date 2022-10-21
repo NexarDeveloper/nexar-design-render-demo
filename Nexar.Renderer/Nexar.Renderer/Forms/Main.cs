@@ -236,7 +236,7 @@ namespace Nexar.Renderer.Forms
             {
                 var workspace = new Workspace()
                 {
-                    Url = ActiveWorkspace.Url //Environment.GetEnvironmentVariable("NEXAR_WORKSPACE_URL") ?? throw new InvalidOperationException("Please set environment 'NEXAR_WORKSPACE_URL'")
+                    Url = ActiveWorkspace.Url
                 };
 
                 var projectsForm = new ProjectsForm();
