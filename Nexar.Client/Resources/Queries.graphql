@@ -18,6 +18,7 @@ query GetWorkspaces {
     url
     name
     description
+    isDefault
   }
 }
 

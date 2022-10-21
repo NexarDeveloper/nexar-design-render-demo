@@ -49,29 +49,32 @@ namespace Nexar.Renderer.Forms
                 {
                     var projects = await nexarClient.GetProjects.ExecuteAsync(workspace.Url, cursor);
 
-                    foreach (var project in projects?.Data?.DesProjects?.Nodes)
+                    if (projects?.Data?.DesProjects?.Nodes != null)
                     {
-                        var designProject = new Project()
+                        foreach (var project in projects.Data.DesProjects.Nodes)
                         {
-                            Id = project.Id,
-                            Description = project?.Description ?? string.Empty,
-                            Name = project?.Name ?? string.Empty,
-                            PreviewUrl = project?.PreviewUrl ?? string.Empty,
-                            UpdatedAt = project?.UpdatedAt?.UtcDateTime ?? DateTime.MinValue,
-                            Workspace = workspace
-                        };
+                            var designProject = new Project()
+                            {
+                                Id = project.Id,
+                                Description = project?.Description ?? string.Empty,
+                                Name = project?.Name ?? string.Empty,
+                                PreviewUrl = project?.PreviewUrl ?? string.Empty,
+                                UpdatedAt = project?.UpdatedAt?.UtcDateTime ?? DateTime.MinValue,
+                                Workspace = workspace
+                            };
 
-                        var projectCard = new ProjectCard(workspace, designProject);
-                        flowLayoutPanel.Controls.Add(projectCard);
+                            var projectCard = new ProjectCard(workspace, designProject);
+                            flowLayoutPanel.Controls.Add(projectCard);
 
-                        projectCard.OpenButtonClicked = OpenButtonClicked;
-                    }
-                     
-                    hasPage = projects.Data?.DesProjects?.PageInfo.HasNextPage;
+                            projectCard.OpenButtonClicked = OpenButtonClicked;
+                        }
 
-                    if (hasPage == true)
-                    {
-                        cursor = projects.Data?.DesProjects?.PageInfo.EndCursor ?? string.Empty;
+                        hasPage = projects.Data?.DesProjects?.PageInfo.HasNextPage;
+
+                        if (hasPage == true)
+                        {
+                            cursor = projects.Data?.DesProjects?.PageInfo.EndCursor ?? string.Empty;
+                        }
                     }
                 }
             }
