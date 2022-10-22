@@ -33,7 +33,7 @@ namespace Nexar.Renderer.Geometry
 
             ClipperOffset inflatedTrack = new();
 
-            inflatedTrack.AddPaths(subject, JoinType.Round, EndType.Joined);
+            inflatedTrack.AddPaths(subject, JoinType.Round, EndType.Round);
             var result = inflatedTrack.Execute(width * SCALING_FACTOR);
 
             rawVertices.Clear();
