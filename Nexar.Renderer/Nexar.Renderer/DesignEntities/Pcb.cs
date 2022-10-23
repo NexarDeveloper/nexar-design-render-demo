@@ -18,6 +18,10 @@ namespace Nexar.Renderer.DesignEntities
         private PrimitiveShader padShader = new PrimitiveShader();
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
 
+        public bool DisableTracks { get; set; } = false;
+        public bool DisablePads { get; set; } = false;
+        public bool DisableVias { get; set; } = false;
+
         public string GetStats()
         {
             var sb = new StringBuilder();
@@ -135,9 +139,21 @@ namespace Nexar.Renderer.DesignEntities
         public void Draw(Matrix4 view, Matrix4 projection)
         {
             boardOutlineShaders.ForEach(x => x.Draw(view, projection));
-            trackShader.Draw(view, projection);
-            padShader.Draw(view, projection);
-            viaShader.Draw(view, projection);
+
+            if (!DisableTracks)
+            {
+                trackShader.Draw(view, projection);
+            }
+
+            if (!DisablePads)
+            {
+                padShader.Draw(view, projection);
+            }
+
+            if (!DisableVias)
+            {
+                viaShader.Draw(view, projection);
+            }
         }
 
         public void Dispose()

@@ -44,6 +44,10 @@ namespace Nexar.Renderer.Forms
         {
             InitializeComponent();
 
+            tracksMenuItem.CheckedChanged += TracksMenuItem_CheckedChanged;
+            padsMenuItem.CheckedChanged += PadsMenuItem_CheckedChanged;
+            viasMenuItem.CheckedChanged += ViasMenuItem_CheckedChanged;
+
             NexarHelper = new NexarHelper();
 
             pcbRenderer = new GlRenderer(glWidth, glHeight, "Nexar Renderer");
@@ -324,6 +328,21 @@ namespace Nexar.Renderer.Forms
                 ActiveWorkspace = workspace;
                 Text = string.Format("Nexar.Renderer | {0}", ActiveWorkspace.Name);
             }
+        }
+
+        private void TracksMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbRenderer.Pcb.DisableTracks = (!tracksMenuItem.Checked);
+        }
+
+        private void PadsMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbRenderer.Pcb.DisablePads = (!padsMenuItem.Checked);
+        }
+
+        private void ViasMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbRenderer.Pcb.DisableVias = (!viasMenuItem.Checked);
         }
     }
 }
