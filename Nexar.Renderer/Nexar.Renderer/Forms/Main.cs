@@ -15,11 +15,18 @@ using OpenTK.Windowing.Common;
 using OpenTK.WinForms;
 using System.Security.Policy;
 using System.Runtime.CompilerServices;
+using Nexar.Renderer.Api;
+using StrawberryShake;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Nexar.Renderer.Forms
 {
     public partial class Main : Form
     {
+        private NexarHelper NexarHelper { get; }
+
+        private IGetWorkspaces_DesWorkspaces? ActiveWorkspace { get; set; }
+
         private GlRenderer pcbRenderer;
 
         private PcbManager pcbManager;
@@ -36,6 +43,8 @@ namespace Nexar.Renderer.Forms
         public Main()
         {
             InitializeComponent();
+
+            NexarHelper = new NexarHelper();
 
             pcbRenderer = new GlRenderer(glWidth, glHeight, "Nexar Renderer");
             pcbManager = new PcbManager(pcbRenderer);
@@ -219,22 +228,101 @@ namespace Nexar.Renderer.Forms
 
         private async void OpenMenuItem_Click(object sender, EventArgs e)
         {
-            var workspace = new Workspace()
+            if (ActiveWorkspace == null)
             {
-                Url = Environment.GetEnvironmentVariable("NEXAR_WORKSPACE_URL") ?? throw new InvalidOperationException("Please set environment 'NEXAR_WORKSPACE_URL'")
-            };
-
-            var projectsForm = new ProjectsForm();
-            await projectsForm.LoadProjectsAsync(workspace);
-            var result = projectsForm.ShowDialog();
-
-            if (result == DialogResult.OK)
+                MessageBox.Show("Please select a workspace");
+            }
+            else
             {
-                if (projectsForm.SelectedDesignProject != null)
+                var workspace = new Workspace()
                 {
-                    Text = string.Format("Nexar.Renderer - {0}", projectsForm.SelectedDesignProject.Name);
-                    await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
+                    Url = ActiveWorkspace.Url
+                };
+
+                var projectsForm = new ProjectsForm();
+                await projectsForm.LoadProjectsAsync(workspace);
+                var result = projectsForm.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    if (projectsForm.SelectedDesignProject != null)
+                    {
+                        Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
+                        await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
+                    }
                 }
+            }
+        }
+
+        private async void workspaceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await LoadWorkspacesAsync();
+        }
+
+        private async Task LoadWorkspacesAsync()
+        {
+            if ((workspaceToolStripMenuItem.DropDownItems != null) &&
+                (workspaceToolStripMenuItem.DropDownItems.Count == 0))
+            {
+                workspaceToolStripMenuItem.Text = "Loading...";
+
+                await NexarHelper.LoginAsync();
+                var nexarClient = NexarHelper.GetNexarClient();
+
+                var workspaces = await nexarClient.GetWorkspaces.ExecuteAsync();
+
+                workspaces.EnsureNoErrors();
+
+                if (workspaces?.Data != null)
+                {
+                    var items = new List<ToolStripMenuItem>();
+
+                    foreach (var workspace in workspaces.Data.DesWorkspaces)
+                    {
+                        var toolStripMenuItem = new ToolStripMenuItem();
+                        toolStripMenuItem.Name = workspace.Id;
+                        toolStripMenuItem.Text = workspace.Name;
+                        toolStripMenuItem.Tag = workspace;
+                        toolStripMenuItem.Click += ToolStripMenuItem_Click;
+                        items.Add(toolStripMenuItem);
+                    }
+
+                    workspaceToolStripMenuItem.DropDownItems.AddRange(items.ToArray());
+                }
+
+                workspaceToolStripMenuItem.Text = "Workspaces";
+
+                var defaultWorkspace = workspaces?.Data?.DesWorkspaces.FirstOrDefault(x => x.IsDefault == true);
+
+                if (defaultWorkspace != null)
+                {
+                    ActiveWorkspace = defaultWorkspace;
+                    Text = string.Format("Nexar.Renderer | {0}", (ActiveWorkspace?.Name ?? ""));
+                    var defaultWorkspaceToolItem = workspaceToolStripMenuItem.DropDownItems.Find(defaultWorkspace.Id, true).FirstOrDefault() as ToolStripMenuItem;
+
+                    if (defaultWorkspaceToolItem != null)
+                    {
+                        defaultWorkspaceToolItem.Checked = true;
+                    }
+                }
+            }
+        }
+
+        private void ToolStripMenuItem_Click(object? sender, EventArgs e)
+        {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            var workspace = toolStripMenuItem?.Tag as IGetWorkspaces_DesWorkspaces;
+
+            if ((toolStripMenuItem != null) && (workspace != null))
+            {
+                foreach (ToolStripMenuItem item in workspaceToolStripMenuItem.DropDownItems)
+                {
+                    item.Checked = false;
+                }
+
+                toolStripMenuItem.Checked = true;
+                ActiveWorkspace = workspace;
+                Text = string.Format("Nexar.Renderer | {0}", ActiveWorkspace.Name);
             }
         }
     }
