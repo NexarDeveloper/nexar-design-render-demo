@@ -18,7 +18,7 @@ This demo is intended for use cases that need to leverage PCB primitive informat
 
 The API does not currently support geometric primitives, so this approach uses the PCB primitives and constructs the geometry based on primitive data, a line inflation algorithm (to create approximate geometric polygons) and then a tesselator to create the required triangle primitives for the shaders.
 
-This demo is not intended as the basis on which anything is to be built, but to show what is possible with design primitive data in the API. This application is not optimized in any way, nor is it a good implementation when it comes to OpenTK (OpenGL). Its intent is to purely demonstrate how to access this type of data in the Nexar API and what is possible.
+This demo is not intended as the basis on which anything is to be built, but to show what is possible with design primitive data in the API. This application is not optimized in any way, nor is it a good implementation when it comes to OpenTK (OpenGL). **Its intention is to purely demonstrate how to access this type of data in the Nexar API and what is possible.**
 
 ## Prerequisites
 
@@ -27,17 +27,16 @@ Visual Studio 2019.
 You need your Altium Live credentials and have to be a member of at least one Altium 365 workspace.
 
 In addition, you need an application at [nexar.com] with the Design scope.
-If you have not done this already, please [register at nexar.com](https://github.com/NexarDeveloper/nexar-forum/discussions/4).
+If you have not done this already, please [register at nexar.com](https://portal.nexar.com/sign-up).
 
 Use the application client ID and secret and set environment variables `NEXAR_CLIENT_ID` and `NEXAR_CLIENT_SECRET`.
 
-You will also need to set the environment variable `NEXAR_WORKSPACE_URL` to an existing Altium 365 workspace (e.g. `https://some-workspace.365.altium.com/`
 
 ## Known bugs / limitations
 
 The only primitives that are currently supported are tracks, pads and vias. There are no component outlines, text, polygon pours, etc. It only supports top and bottom layers (and relies on those layers being named to contain such text).
 
-There is also a known issue with some track segments missing. There is no support for arcs, including any tracks constructed from arcs.
+There is also no support for arcs, including any tracks constructed from arcs.
 
 These will be fixed in future but in alignment with priorities based on use cases, etc. - so, if you are working on something innovative and need additional things that are not currently supported, please reach out to us at support@nexar.com - we'd love to hear from you!
 
@@ -53,9 +52,13 @@ The application window is activated and the workspace context automatically conf
 
 ### Load a PCB project
 
-Click on the `Open Project` menu option in the main window:
+Click on the "Click to Load Workspaces" menu option in the main window:
 
-![image](https://user-images.githubusercontent.com/623551/193965439-9603ddd0-f35c-43cb-8828-7a9524a2d47c.png)
+![clickToLoadWorkspaces](https://user-images.githubusercontent.com/75626416/197483955-caed26af-abd4-4ae3-b1ee-0fb45454195f.png)
+
+Select your workspace then click on the `Open Project` menu option:
+
+![clickToOpenProject](https://user-images.githubusercontent.com/75626416/197483971-404335ce-3bdc-4dfc-bb61-51c0edc04f0e.png)
 
 A dialog will open listing projects in the workspace along with thumbnails, names and descriptions. Click on the `Open` button on the project you want to open:
 
