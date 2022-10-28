@@ -31,7 +31,7 @@
             this.glControl = new OpenTK.WinForms.GLControl();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.workspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.layersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.primitivesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tracksMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,7 +63,7 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.workspaceToolStripMenuItem,
-            this.openMenuItem,
+            this.openProjectMenuItem,
             this.primitivesToolStripMenuItem,
             this.layersToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
@@ -81,10 +81,10 @@
             // 
             // openMenuItem
             // 
-            this.openMenuItem.Name = "openMenuItem";
-            this.openMenuItem.Size = new System.Drawing.Size(88, 20);
-            this.openMenuItem.Text = "Open Project";
-            this.openMenuItem.Click += new System.EventHandler(this.OpenMenuItem_Click);
+            this.openProjectMenuItem.Name = "openMenuItem";
+            this.openProjectMenuItem.Size = new System.Drawing.Size(88, 20);
+            this.openProjectMenuItem.Text = "Open Project";
+            this.openProjectMenuItem.Click += new System.EventHandler(this.OpenProjectMenuItem_Click);
             // 
             // layersToolStripMenuItem
             // 
@@ -152,7 +152,7 @@
 
         private OpenTK.WinForms.GLControl glControl;
         private MenuStrip menuStrip1;
-        private ToolStripMenuItem openMenuItem;
+        private ToolStripMenuItem openProjectMenuItem;
         private ToolStripMenuItem workspaceToolStripMenuItem;
         private ToolStripMenuItem layersToolStripMenuItem;
         private ToolStripMenuItem primitivesToolStripMenuItem;

@@ -86,6 +86,29 @@ query GetPcbModel($id: ID!) {
       workInProgress {
         variants {
           pcb {
+            layerStack {
+              stacks {
+                name
+                layers {
+                  name
+                  thickness {
+                    xMm
+                  }
+                  dielectricConstant
+                  copperWeight {
+                    gram
+                  }
+                  layerType
+                  layerProperties {
+                    name
+                    text
+                    size {
+                      xMm
+                    }
+                  }
+                }
+              }
+            }
             outline {
               vertices {
                 xMm
@@ -182,3 +205,40 @@ query GetPcbModel($id: ID!) {
   }
 }
 
+query GetPcbLayerStack($id: ID!) {
+  desProjectById (id: $id) {
+    name
+    description
+    design {
+      workInProgress {
+        variants {
+          pcb {
+            layerStack {
+              stacks {
+                name
+                layers {
+                  name
+                  thickness {
+                    xMm
+                  }
+                  dielectricConstant
+                  copperWeight {
+                    gram
+                  }
+                  layerType
+                  layerProperties {
+                    name
+                    text
+                    size {
+                      xMm
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

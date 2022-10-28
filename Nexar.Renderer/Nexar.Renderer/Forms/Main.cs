@@ -19,6 +19,8 @@ using Nexar.Renderer.Api;
 using StrawberryShake;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+
 namespace Nexar.Renderer.Forms
 {
     public partial class Main : Form
@@ -230,7 +232,7 @@ namespace Nexar.Renderer.Forms
             }
         }
 
-        private async void OpenMenuItem_Click(object sender, EventArgs e)
+        private async void OpenProjectMenuItem_Click(object sender, EventArgs e)
         {
             if (ActiveWorkspace == null)
             {
@@ -253,9 +255,34 @@ namespace Nexar.Renderer.Forms
                     {
                         Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
                         await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
+                        LoadLayers();
                     }
                 }
             }
+        }
+
+        private void LoadLayers()
+        {
+            layersToolStripMenuItem.DropDownItems.Clear();
+            var items = new List<ToolStripMenuItem>();
+
+            foreach (var layer in pcbManager.PcbLayers)
+            {
+                var toolStripMenuItem = new ToolStripMenuItem();
+                toolStripMenuItem.Name = layer.Name.Replace(" ", "_");
+                toolStripMenuItem.Text = layer.Name;
+                toolStripMenuItem.Tag = layer;
+                toolStripMenuItem.Click += ToolStripMenuItem_Click;
+                toolStripMenuItem.Checked = true;
+                toolStripMenuItem.CheckState = CheckState.Checked;
+                toolStripMenuItem.CheckOnClick = true;
+                toolStripMenuItem.CheckedChanged += LayerToolStripMenuItem_CheckedChanged;
+                items.Add(toolStripMenuItem);
+
+                pcbRenderer.Pcb.EnabledPcbLayers.Add(layer.Name);
+            }
+
+            layersToolStripMenuItem.DropDownItems.AddRange(items.ToArray());
         }
 
         private async void workspaceToolStripMenuItem_Click(object sender, EventArgs e)
@@ -329,6 +356,25 @@ namespace Nexar.Renderer.Forms
                 Text = string.Format("Nexar.Renderer | {0}", ActiveWorkspace.Name);
             }
         }
+
+        private void LayerToolStripMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            var layer = toolStripMenuItem?.Tag as IPcbLayer;
+
+            if ((toolStripMenuItem != null) && (layer != null))
+            {
+                if (toolStripMenuItem.Checked)
+                {
+                    pcbRenderer.Pcb.EnabledPcbLayers.Add(layer.Name);
+                }
+                else
+                {
+                    pcbRenderer.Pcb.EnabledPcbLayers.Remove(layer.Name);
+                }
+            }
+        }
+
 
         private void TracksMenuItem_CheckedChanged(object? sender, EventArgs e)
         {

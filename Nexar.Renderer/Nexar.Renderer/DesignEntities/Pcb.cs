@@ -14,9 +14,13 @@ namespace Nexar.Renderer.DesignEntities
     public class Pcb
     {
         private List<SingleLineShader> boardOutlineShaders = new List<SingleLineShader>();
-        private PrimitiveShader trackShader = new PrimitiveShader();
+        //private PrimitiveShader trackShader = new PrimitiveShader();
         private PrimitiveShader padShader = new PrimitiveShader();
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
+
+        private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
+
+        public List<string> EnabledPcbLayers { get; } = new List<string>();
 
         public bool DisableTracks { get; set; } = false;
         public bool DisablePads { get; set; } = false;
@@ -24,9 +28,12 @@ namespace Nexar.Renderer.DesignEntities
 
         public string GetStats()
         {
+            long trackShaderTriangleCount = 0;
+            layerMappedTrackShader.Values.ToList().ForEach(x => trackShaderTriangleCount += CountTriangles(x));
+
             var sb = new StringBuilder();
             sb.AppendLine("Geometry data");
-            sb.AppendLine(string.Format("Track Shader Triangle Count:    {0}", CountTriangles(trackShader)));
+            sb.AppendLine(string.Format("Track Shader Triangle Count:    {0}", trackShaderTriangleCount));
             sb.AppendLine(string.Format("Pad Shader Triangle Count:      {0}", CountTriangles(padShader)));
             sb.AppendLine(string.Format("Via Shader Triangle Count:      {0}",
                 CountTriangles(viaShader.TopLayerPrimitiveShader) +
@@ -56,7 +63,14 @@ namespace Nexar.Renderer.DesignEntities
                 new PointF(endXMm, endYMm),
                 width);
 
-            trackShader.AddPrimitive(track);
+            if (!layerMappedTrackShader.ContainsKey(layer))
+            {
+                layerMappedTrackShader.Add(layer, new PrimitiveShader());
+            }
+
+            layerMappedTrackShader[layer].AddPrimitive(track);
+
+            //trackShader.AddPrimitive(track);
         }
 
         public void AddPad(
@@ -123,7 +137,10 @@ namespace Nexar.Renderer.DesignEntities
             boardOutlineShaders.ForEach(x => x.Dispose());
             boardOutlineShaders.Clear();
 
-            trackShader.Reset();
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Reset());
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
+            layerMappedTrackShader.Clear();
+
             padShader.Reset();
             viaShader.Reset();
         }
@@ -131,7 +148,7 @@ namespace Nexar.Renderer.DesignEntities
         public void FinaliseSetup()
         {
             boardOutlineShaders.ForEach(x => x.Initialise());
-            trackShader.Initialise();
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Initialise());
             padShader.Initialise();
             viaShader.Initialise();
         }
@@ -142,7 +159,13 @@ namespace Nexar.Renderer.DesignEntities
 
             if (!DisableTracks)
             {
-                trackShader.Draw(view, projection);
+                foreach (var mappedLayer in layerMappedTrackShader)
+                {
+                    if (EnabledPcbLayers.Contains(mappedLayer.Key))
+                    {
+                        mappedLayer.Value.Draw(view, projection);
+                    }
+                }
             }
 
             if (!DisablePads)
@@ -159,7 +182,7 @@ namespace Nexar.Renderer.DesignEntities
         public void Dispose()
         {
             boardOutlineShaders.ForEach(x => x.Dispose());
-            trackShader.Dispose();
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
             padShader.Dispose();
             viaShader.Dispose();
         }

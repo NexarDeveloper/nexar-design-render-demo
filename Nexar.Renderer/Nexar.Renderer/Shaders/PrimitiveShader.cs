@@ -45,6 +45,12 @@ namespace Nexar.Renderer.Shaders
                 color);
         }
 
+        public override void Draw(Matrix4 view, Matrix4 projection)
+        {
+
+            base.Draw(view, projection);
+        }
+
         private Color4 GetColor(Primitive primitive)
         {
             if (primitive.Layer.ToLower().Contains("top"))
