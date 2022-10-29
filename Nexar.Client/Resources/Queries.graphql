@@ -183,7 +183,10 @@ query GetPcbModel($id: ID!) {
               }
               vias {
                 shape
-                layer {
+                beginLayer {
+                  name
+                }
+                endLayer {
                   name
                 }
                 position {

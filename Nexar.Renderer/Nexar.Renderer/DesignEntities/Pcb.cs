@@ -9,16 +9,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+
 namespace Nexar.Renderer.DesignEntities
 {
     public class Pcb
     {
         private List<SingleLineShader> boardOutlineShaders = new List<SingleLineShader>();
         //private PrimitiveShader trackShader = new PrimitiveShader();
-        private PrimitiveShader padShader = new PrimitiveShader();
+        private PrimitiveShader padShader = new PrimitiveShader(0.0F);
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
 
         private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
+
+        public List<IPcbLayer> PcbLayers { get; private set; } = new List<IPcbLayer>();
 
         public List<string> EnabledPcbLayers { get; } = new List<string>();
 
@@ -26,18 +30,24 @@ namespace Nexar.Renderer.DesignEntities
         public bool DisablePads { get; set; } = false;
         public bool DisableVias { get; set; } = false;
 
+        public void Initialise(List<IPcbLayer> pcbLayers)
+        {
+            PcbLayers = pcbLayers.ToList();
+        }
+
         public string GetStats()
         {
             long trackShaderTriangleCount = 0;
             layerMappedTrackShader.Values.ToList().ForEach(x => trackShaderTriangleCount += CountTriangles(x));
 
+            long viaShaderTriangleCount = 0;
+            viaShader.ViaLayerShaderMapping.Values.ToList().ForEach(x => viaShaderTriangleCount += CountTriangles(x));
+
             var sb = new StringBuilder();
             sb.AppendLine("Geometry data");
             sb.AppendLine(string.Format("Track Shader Triangle Count:    {0}", trackShaderTriangleCount));
             sb.AppendLine(string.Format("Pad Shader Triangle Count:      {0}", CountTriangles(padShader)));
-            sb.AppendLine(string.Format("Via Shader Triangle Count:      {0}",
-                CountTriangles(viaShader.TopLayerPrimitiveShader) +
-                CountTriangles(viaShader.BottomLayerPrimitiveShader)));
+            sb.AppendLine(string.Format("Via Shader Triangle Count:      {0}", viaShaderTriangleCount));
 
             return sb.ToString();
         }
@@ -50,7 +60,7 @@ namespace Nexar.Renderer.DesignEntities
         }
 
         public void AddTrack(
-            string layer,
+            IPcbLayer layer,
             float beginXMm,
             float beginYMm,
             float endXMm,
@@ -63,18 +73,18 @@ namespace Nexar.Renderer.DesignEntities
                 new PointF(endXMm, endYMm),
                 width);
 
-            if (!layerMappedTrackShader.ContainsKey(layer))
+            if (!layerMappedTrackShader.ContainsKey(layer.Name))
             {
-                layerMappedTrackShader.Add(layer, new PrimitiveShader());
+                layerMappedTrackShader.Add(layer.Name, new PrimitiveShader(0.0F));
             }
 
-            layerMappedTrackShader[layer].AddPrimitive(track);
+            layerMappedTrackShader[layer.Name].AddPrimitive(track);
 
             //trackShader.AddPrimitive(track);
         }
 
         public void AddPad(
-            string layer,
+            IPcbLayer layer,
             DesPrimitiveShape primitiveShape,
             DesPadType padType,
             float sizeXMm,
@@ -97,7 +107,7 @@ namespace Nexar.Renderer.DesignEntities
         }
 
         public void AddVia(
-            string layer,
+            IPcbLayer layer,
             DesPrimitiveShape primitiveShape,
             float positionXMm,
             float positionYMm,
@@ -111,7 +121,7 @@ namespace Nexar.Renderer.DesignEntities
                 padDiameterMm,
                 holeDiameterMm);
 
-            viaShader.AddPrimitive(via);
+            viaShader.AddPrimitive(layer, via);
         }
 
         public void AddOutline(
