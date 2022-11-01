@@ -23,7 +23,7 @@ namespace Nexar.Renderer.Managers
     {
         public List<IPcbLayer> PcbLayers { get; } = new List<IPcbLayer>();
 
-        private GlRenderer PcbRenderer { get; }
+        public GlRenderer PcbRenderer { get; }
 
         private Stopwatch GeneralStopwatch { get; }
 
@@ -60,25 +60,6 @@ namespace Nexar.Renderer.Managers
             await NexarHelper.LoginAsync();
             var nexarClient = NexarHelper.GetNexarClient();
 
-            /*
-            PcbLayerStack = await nexarClient.GetPcbLayerStack.ExecuteAsync(project.Id);
-            PcbLayerStack.EnsureNoErrors();
-
-            var layers = PcbLayerStack?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.LayerStack?.Stacks[0]?.Layers;
-
-            if (layers != null)
-            {
-                foreach (var layer in layers)
-                {
-                    if ((layer.LayerType == DesLayerType.Signal) ||
-                        (layer.LayerType == DesLayerType.Plane))
-                    {
-                        PcbLayers.Add(layer.Name);
-                    }
-                }
-            }
-            */
-
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);
             PcbModel.EnsureNoErrors();
 
@@ -95,6 +76,25 @@ namespace Nexar.Renderer.Managers
             Debug.WriteLine(PcbStats.ToString());
             Debug.WriteLine(PcbStats.NetToTrackDetail());
             Debug.WriteLine(PcbRenderer.Pcb.GetStats());
+        }
+
+        private void LoadLayerStack()
+        {
+            var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.LayerStack?.Stacks[0]?.Layers;
+
+            if (layers != null)
+            {
+                foreach (var layer in layers)
+                {
+                    if ((layer.LayerType == DesLayerType.Signal) ||
+                        (layer.LayerType == DesLayerType.Plane))
+                    {
+                        PcbLayers.Add(layer);
+                    }
+                }
+
+                PcbRenderer.Pcb.InitialiseLayerStack(PcbLayers);
+            }
         }
 
         private void LoadBoardOutline()
@@ -281,23 +281,6 @@ namespace Nexar.Renderer.Managers
                     }
                 }
             }
-        }
-
-        private void LoadLayerStack()
-        {
-            var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.LayerStack?.Stacks[0]?.Layers;
-
-            if (layers != null)
-            {
-                foreach (var layer in layers)
-                {
-                    if ((layer.LayerType == DesLayerType.Signal) ||
-                        (layer.LayerType == DesLayerType.Plane))
-                    {
-                        PcbLayers.Add(layer);
-                    }
-                }
-            }        
         }
 
         private float ScaleValue(decimal value, float offset, float divisor)

@@ -30,7 +30,7 @@ namespace Nexar.Renderer.DesignEntities
         public bool DisablePads { get; set; } = false;
         public bool DisableVias { get; set; } = false;
 
-        public void Initialise(List<IPcbLayer> pcbLayers)
+        public void InitialiseLayerStack(List<IPcbLayer> pcbLayers)
         {
             PcbLayers = pcbLayers.ToList();
         }
