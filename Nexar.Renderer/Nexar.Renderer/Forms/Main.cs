@@ -369,7 +369,10 @@ namespace Nexar.Renderer.Forms
             {
                 if (toolStripMenuItem.Checked)
                 {
-                    pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Add(layer.Name);
+                    if (!pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Contains(layer.Name))
+                    {
+                        pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Add(layer.Name);
+                    }
                 }
                 else
                 {
