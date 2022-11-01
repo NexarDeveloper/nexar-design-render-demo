@@ -15,6 +15,76 @@ namespace Nexar.Renderer.DesignEntities
 {
     public class Pcb
     {
+        private class LayerInfo
+        {
+            public float ZOffset { get; set; }
+            public Color4 Color { get; set; }
+        }
+
+        private readonly List<LayerInfo> TwoLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.01F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.01F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly List<LayerInfo> FourLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.03F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.01F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.01F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.03F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly List<LayerInfo> SixLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.05F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.03F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.01F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.01F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.03F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.05F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly LayerInfo unknownLayerInfo = new LayerInfo() { ZOffset = 0.0F, Color = new Color4(0.75F, 0.75F, 0.75F, 1.0F) };
+
+        private LayerInfo GetLayerInfo(IPcbLayer pcbLayer)
+        {
+            LayerInfo layerInfo;
+
+            try
+            {
+                switch (PcbLayers.Count)
+                {
+                    case 2:
+                    {
+                        layerInfo = TwoLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 4:
+                    {
+                        layerInfo = FourLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 6:
+                    {
+                        layerInfo = SixLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    default:
+                    {
+                        layerInfo = unknownLayerInfo;
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+                layerInfo = unknownLayerInfo;
+            }
+
+            return layerInfo;
+        }
+
         private List<SingleLineShader> boardOutlineShaders = new List<SingleLineShader>();
         //private PrimitiveShader trackShader = new PrimitiveShader();
         private PrimitiveShader padShader = new PrimitiveShader(0.0F);
@@ -78,9 +148,11 @@ namespace Nexar.Renderer.DesignEntities
                 layerMappedTrackShader.Add(layer.Name, new PrimitiveShader(0.0F));
             }
 
-            layerMappedTrackShader[layer.Name].AddPrimitive(track);
-
-            //trackShader.AddPrimitive(track);
+            var layerInfo = GetLayerInfo(layer);
+            layerMappedTrackShader[layer.Name].AddPrimitive(
+                track,
+                layerInfo.Color,
+                layerInfo.ZOffset);
         }
 
         public void AddPad(
@@ -103,7 +175,11 @@ namespace Nexar.Renderer.DesignEntities
                 rotation,
                 holeSizeMm);
 
-            padShader.AddPrimitive(pad);
+            var layerInfo = GetLayerInfo(layer);
+            padShader.AddPrimitive(
+                pad,
+                layerInfo.Color,
+                layerInfo.ZOffset);
         }
 
         public void AddVia(
@@ -121,7 +197,8 @@ namespace Nexar.Renderer.DesignEntities
                 padDiameterMm,
                 holeDiameterMm);
 
-            viaShader.AddPrimitive(layer, via);
+            var layerInfo = GetLayerInfo(layer);
+            viaShader.AddPrimitive(layer, via, layerInfo.ZOffset);
         }
 
         public void AddOutline(

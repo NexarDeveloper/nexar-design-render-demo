@@ -93,6 +93,10 @@ namespace Nexar.Renderer.Forms
                 {
                     pcbManager.PcbRenderer.Demo_MouseMove(sender, pt);
                 }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    pcbManager.PcbRenderer.MousePan(sender, pt);
+                }
             }
         }
 
@@ -265,7 +269,7 @@ namespace Nexar.Renderer.Forms
             layersToolStripMenuItem.DropDownItems.Clear();
             var items = new List<ToolStripMenuItem>();
 
-            foreach (var layer in pcbManager.PcbLayers)
+            foreach (var layer in pcbManager.PcbRenderer.Pcb.PcbLayers)
             {
                 var toolStripMenuItem = new ToolStripMenuItem();
                 toolStripMenuItem.Name = layer.Name.Replace(" ", "_");

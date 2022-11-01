@@ -21,8 +21,6 @@ namespace Nexar.Renderer.Managers
 {
     public class PcbManager
     {
-        public List<IPcbLayer> PcbLayers { get; } = new List<IPcbLayer>();
-
         public GlRenderer PcbRenderer { get; }
 
         private Stopwatch GeneralStopwatch { get; }
@@ -32,7 +30,6 @@ namespace Nexar.Renderer.Managers
         private PcbStats PcbStats { get; set; } = default!;
 
         private IOperationResult<IGetPcbModelResult> PcbModel { get; set; } = default!;
-        //private IOperationResult<IGetPcbLayerStackResult> PcbLayerStack { get; set; } = default!;
 
         static bool DisableDrawTracks = false;
         static bool DisableDrawPads = false;
@@ -84,16 +81,18 @@ namespace Nexar.Renderer.Managers
 
             if (layers != null)
             {
+                var pcbLayers = new List<IPcbLayer>();
+
                 foreach (var layer in layers)
                 {
                     if ((layer.LayerType == DesLayerType.Signal) ||
                         (layer.LayerType == DesLayerType.Plane))
                     {
-                        PcbLayers.Add(layer);
+                        pcbLayers.Add(layer);
                     }
                 }
 
-                PcbRenderer.Pcb.InitialiseLayerStack(PcbLayers);
+                PcbRenderer.Pcb.InitialiseLayerStack(pcbLayers);
             }
         }
 
@@ -168,7 +167,7 @@ namespace Nexar.Renderer.Managers
                             {
                                 trackStopwatch.Start();
 
-                                var layer = PcbLayers.First(x => x.Name == track.Layer.Name);
+                                var layer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == track.Layer.Name);
 
                                 PcbRenderer.Pcb.AddTrack(
                                     layer,
@@ -193,7 +192,7 @@ namespace Nexar.Renderer.Managers
                             {
                                 padStopwatch.Start();
 
-                                var layer = PcbLayers.First(x => x.Name == pad.Layer.Name);
+                                var layer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == pad.Layer.Name);
 
                                 PcbRenderer.Pcb.AddPad(
                                     layer,
@@ -220,7 +219,7 @@ namespace Nexar.Renderer.Managers
                             {
                                 viaStopwatch.Start();
 
-                                var beginLayer = PcbLayers.First(x => x.Name == via.BeginLayer.Name);
+                                var beginLayer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == via.BeginLayer.Name);
 
                                 PcbRenderer.Pcb.AddVia(
                                     beginLayer,
@@ -230,7 +229,7 @@ namespace Nexar.Renderer.Managers
                                     ScaleValue(via.PadDiameter.XMm, 0.0F, divisor),
                                     ScaleValue(via.HoleDiameter.XMm, 0.0F, divisor));
 
-                                var endLayer = PcbLayers.First(x => x.Name == via.EndLayer.Name);
+                                var endLayer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == via.EndLayer.Name);
 
                                 PcbRenderer.Pcb.AddVia(
                                     endLayer,
@@ -266,7 +265,7 @@ namespace Nexar.Renderer.Managers
                 {
                     if (pad.Layer != null)
                     {
-                        var layer = PcbLayers.First(x => x.Name == pad.Layer.Name);
+                        var layer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == pad.Layer.Name);
 
                         PcbRenderer.Pcb.AddPad(
                             layer,

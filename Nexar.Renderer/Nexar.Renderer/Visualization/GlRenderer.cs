@@ -97,6 +97,10 @@ namespace Nexar.Renderer.Visualization
             highlightBox.ResetHighlightBox();
         }
 
+        public void MousePan(object sender, Point location)
+        {
+
+        }
 
         public void OnLoad()
         {

@@ -24,14 +24,17 @@ namespace Nexar.Renderer.Shaders
             ViaLayerShaderMapping.Values.ToList().ForEach(x => x.Initialise());
         }
 
-        public void AddPrimitive(IPcbLayer layer, Primitive primitive)
+        public void AddPrimitive(IPcbLayer layer, Primitive primitive, float zOffset)
         {
             if (!ViaLayerShaderMapping.ContainsKey(layer.Name))
             {
                 ViaLayerShaderMapping.Add(layer.Name, new PrimitiveShader(0.0F));
             }
 
-            ViaLayerShaderMapping[layer.Name].AddPrimitive(primitive, forcedZOffset: 0.0001F);
+            ViaLayerShaderMapping[layer.Name].AddPrimitive(
+                primitive,
+                new Color4(0.75F, 0.75F, 0.75F, 1.0F),
+                (zOffset < 0.0F ? zOffset - 0.0001F : zOffset + 0.0001F));
         }
 
         public void Draw(Matrix4 view, Matrix4 projection)
