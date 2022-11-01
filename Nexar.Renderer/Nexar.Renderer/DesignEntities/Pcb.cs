@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+using System.Windows.Forms;
 
 namespace Nexar.Renderer.DesignEntities
 {
@@ -23,26 +24,26 @@ namespace Nexar.Renderer.DesignEntities
 
         private readonly List<LayerInfo> TwoLayerInfo = new()
         {
-            new LayerInfo() { ZOffset = 0.01F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
-            new LayerInfo() { ZOffset = -0.01F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
         };
 
         private readonly List<LayerInfo> FourLayerInfo = new()
         {
-            new LayerInfo() { ZOffset = 0.03F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
-            new LayerInfo() { ZOffset = 0.01F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
-            new LayerInfo() { ZOffset = -0.01F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
-            new LayerInfo() { ZOffset = -0.03F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
         };
 
         private readonly List<LayerInfo> SixLayerInfo = new()
         {
-            new LayerInfo() { ZOffset = 0.05F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
-            new LayerInfo() { ZOffset = 0.03F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
-            new LayerInfo() { ZOffset = 0.01F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
-            new LayerInfo() { ZOffset = -0.01F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
-            new LayerInfo() { ZOffset = -0.03F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
-            new LayerInfo() { ZOffset = -0.05F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+            new LayerInfo() { ZOffset = 0.005F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.005F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
         };
 
         private readonly LayerInfo unknownLayerInfo = new LayerInfo() { ZOffset = 0.0F, Color = new Color4(0.75F, 0.75F, 0.75F, 1.0F) };
@@ -87,10 +88,12 @@ namespace Nexar.Renderer.DesignEntities
 
         private List<SingleLineShader> boardOutlineShaders = new List<SingleLineShader>();
         //private PrimitiveShader trackShader = new PrimitiveShader();
-        private PrimitiveShader padShader = new PrimitiveShader(0.0F);
+        //private PrimitiveShader padShader = new PrimitiveShader(0.0F);
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
 
         private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
+        private Dictionary<string, PrimitiveShader> layerMappedPadShader = new Dictionary<string, PrimitiveShader>();
+        //private Dictionary<string, PrimitiveShader> layerMappedViaShader = new Dictionary<string, PrimitiveShader>();
 
         public List<IPcbLayer> PcbLayers { get; private set; } = new List<IPcbLayer>();
 
@@ -110,13 +113,16 @@ namespace Nexar.Renderer.DesignEntities
             long trackShaderTriangleCount = 0;
             layerMappedTrackShader.Values.ToList().ForEach(x => trackShaderTriangleCount += CountTriangles(x));
 
+            long padShaderTriangleCount = 0;
+            layerMappedPadShader.Values.ToList().ForEach(x => padShaderTriangleCount += CountTriangles(x));
+
             long viaShaderTriangleCount = 0;
             viaShader.ViaLayerShaderMapping.Values.ToList().ForEach(x => viaShaderTriangleCount += CountTriangles(x));
 
             var sb = new StringBuilder();
             sb.AppendLine("Geometry data");
             sb.AppendLine(string.Format("Track Shader Triangle Count:    {0}", trackShaderTriangleCount));
-            sb.AppendLine(string.Format("Pad Shader Triangle Count:      {0}", CountTriangles(padShader)));
+            sb.AppendLine(string.Format("Pad Shader Triangle Count:      {0}", padShaderTriangleCount));
             sb.AppendLine(string.Format("Via Shader Triangle Count:      {0}", viaShaderTriangleCount));
 
             return sb.ToString();
@@ -175,8 +181,13 @@ namespace Nexar.Renderer.DesignEntities
                 rotation,
                 holeSizeMm);
 
+            if (!layerMappedPadShader.ContainsKey(layer.Name))
+            {
+                layerMappedPadShader.Add(layer.Name, new PrimitiveShader(0.0F));
+            }
+
             var layerInfo = GetLayerInfo(layer);
-            padShader.AddPrimitive(
+            layerMappedPadShader[layer.Name].AddPrimitive(
                 pad,
                 layerInfo.Color,
                 layerInfo.ZOffset);
@@ -228,7 +239,10 @@ namespace Nexar.Renderer.DesignEntities
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
             layerMappedTrackShader.Clear();
 
-            padShader.Reset();
+            layerMappedPadShader.Values.ToList().ForEach(x => x.Reset());
+            layerMappedPadShader.Values.ToList().ForEach(x => x.Dispose());
+            layerMappedPadShader.Clear();
+
             viaShader.Reset();
         }
 
@@ -236,7 +250,7 @@ namespace Nexar.Renderer.DesignEntities
         {
             boardOutlineShaders.ForEach(x => x.Initialise());
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Initialise());
-            padShader.Initialise();
+            layerMappedPadShader.Values.ToList().ForEach(x => x.Initialise());
             viaShader.Initialise();
         }
 
@@ -246,18 +260,12 @@ namespace Nexar.Renderer.DesignEntities
 
             if (!DisableTracks)
             {
-                foreach (var mappedLayer in layerMappedTrackShader)
-                {
-                    if (EnabledPcbLayers.Contains(mappedLayer.Key))
-                    {
-                        mappedLayer.Value.Draw(view, projection);
-                    }
-                }
+                DrawLayerMappedPrimitives(view, projection, layerMappedTrackShader);
             }
 
             if (!DisablePads)
             {
-                padShader.Draw(view, projection);
+                DrawLayerMappedPrimitives(view, projection, layerMappedPadShader);
             }
 
             if (!DisableVias)
@@ -266,11 +274,24 @@ namespace Nexar.Renderer.DesignEntities
             }
         }
 
+        private void DrawLayerMappedPrimitives(
+            Matrix4 view, Matrix4 projection,
+            Dictionary<string, PrimitiveShader> layerMappedShader)
+        {
+            foreach (var mappedLayer in layerMappedShader)
+            {
+                if (EnabledPcbLayers.Contains(mappedLayer.Key))
+                {
+                    mappedLayer.Value.Draw(view, projection);
+                }
+            }
+        }
+
         public void Dispose()
         {
             boardOutlineShaders.ForEach(x => x.Dispose());
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
-            padShader.Dispose();
+            layerMappedPadShader.Values.ToList().ForEach(x => x.Dispose());
             viaShader.Dispose();
         }
     }
