@@ -268,6 +268,7 @@ namespace Nexar.Renderer.Forms
         {
             layersToolStripMenuItem.DropDownItems.Clear();
             var items = new List<ToolStripMenuItem>();
+            pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Clear();
 
             foreach (var layer in pcbManager.PcbRenderer.Pcb.PcbLayers)
             {
