@@ -87,13 +87,10 @@ namespace Nexar.Renderer.DesignEntities
         }
 
         private List<SingleLineShader> boardOutlineShaders = new List<SingleLineShader>();
-        //private PrimitiveShader trackShader = new PrimitiveShader();
-        //private PrimitiveShader padShader = new PrimitiveShader(0.0F);
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
 
         private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
         private Dictionary<string, PrimitiveShader> layerMappedPadShader = new Dictionary<string, PrimitiveShader>();
-        //private Dictionary<string, PrimitiveShader> layerMappedViaShader = new Dictionary<string, PrimitiveShader>();
 
         public List<IPcbLayer> PcbLayers { get; private set; } = new List<IPcbLayer>();
 

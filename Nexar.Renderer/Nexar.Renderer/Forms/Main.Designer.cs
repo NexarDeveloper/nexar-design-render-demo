@@ -32,11 +32,11 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.workspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.layersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.primitivesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tracksMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.padsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viasMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.layersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,8 +64,8 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.workspaceToolStripMenuItem,
             this.openProjectMenuItem,
-            this.primitivesToolStripMenuItem,
-            this.layersToolStripMenuItem});
+            this.layersToolStripMenuItem,
+            this.primitivesToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(984, 24);
@@ -79,18 +79,12 @@
             this.workspaceToolStripMenuItem.Text = "Click to Load Workspaces";
             this.workspaceToolStripMenuItem.Click += new System.EventHandler(this.workspaceToolStripMenuItem_Click);
             // 
-            // openMenuItem
+            // openProjectMenuItem
             // 
-            this.openProjectMenuItem.Name = "openMenuItem";
+            this.openProjectMenuItem.Name = "openProjectMenuItem";
             this.openProjectMenuItem.Size = new System.Drawing.Size(88, 20);
             this.openProjectMenuItem.Text = "Open Project";
             this.openProjectMenuItem.Click += new System.EventHandler(this.OpenProjectMenuItem_Click);
-            // 
-            // layersToolStripMenuItem
-            // 
-            this.layersToolStripMenuItem.Name = "layersToolStripMenuItem";
-            this.layersToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
-            this.layersToolStripMenuItem.Text = "Layers";
             // 
             // primitivesToolStripMenuItem
             // 
@@ -120,14 +114,20 @@
             this.padsMenuItem.Size = new System.Drawing.Size(180, 22);
             this.padsMenuItem.Text = "Pads";
             // 
-            // viaMenuItem
+            // viasMenuItem
             // 
             this.viasMenuItem.Checked = true;
             this.viasMenuItem.CheckOnClick = true;
             this.viasMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.viasMenuItem.Name = "viaMenuItem";
+            this.viasMenuItem.Name = "viasMenuItem";
             this.viasMenuItem.Size = new System.Drawing.Size(180, 22);
             this.viasMenuItem.Text = "Vias";
+            // 
+            // layersToolStripMenuItem
+            // 
+            this.layersToolStripMenuItem.Name = "layersToolStripMenuItem";
+            this.layersToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            this.layersToolStripMenuItem.Text = "Layers";
             // 
             // Main
             // 
