@@ -86,6 +86,29 @@ query GetPcbModel($id: ID!) {
       workInProgress {
         variants {
           pcb {
+            layerStack {
+              stacks {
+                name
+                layers {
+                  name
+                  thickness {
+                    xMm
+                  }
+                  dielectricConstant
+                  copperWeight {
+                    gram
+                  }
+                  layerType
+                  layerProperties {
+                    name
+                    text
+                    size {
+                      xMm
+                    }
+                  }
+                }
+              }
+            }
             outline {
               vertices {
                 xMm
@@ -160,7 +183,10 @@ query GetPcbModel($id: ID!) {
               }
               vias {
                 shape
-                layer {
+                beginLayer {
+                  name
+                }
+                endLayer {
                   name
                 }
                 position {
@@ -181,4 +207,3 @@ query GetPcbModel($id: ID!) {
     }
   }
 }
-

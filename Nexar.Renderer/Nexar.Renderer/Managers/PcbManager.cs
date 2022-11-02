@@ -14,11 +14,15 @@ using Nexar.Renderer.Api;
 using Nexar.Renderer.Visualization;
 using Nexar.Renderer.Geometry;
 
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using System.Reflection.Emit;
+
 namespace Nexar.Renderer.Managers
 {
     public class PcbManager
     {
-        private GlRenderer PcbRenderer { get; }
+        public GlRenderer PcbRenderer { get; }
 
         private Stopwatch GeneralStopwatch { get; }
 
@@ -43,9 +47,8 @@ namespace Nexar.Renderer.Managers
             GeneralStopwatch = new Stopwatch();
         }
 
-
         public async Task OpenPcbDesignAsync(Project project)
-        {
+        {            
             PcbRenderer.Pcb.Reset();
 
             PcbStats = new PcbStats();
@@ -54,11 +57,14 @@ namespace Nexar.Renderer.Managers
 
             await NexarHelper.LoginAsync();
             var nexarClient = NexarHelper.GetNexarClient();
+
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);
+            PcbModel.EnsureNoErrors();
 
             GeneralStopwatch.Stop();
             PcbStats.TimeToLoadPcbFromNexar = GeneralStopwatch.ElapsedMilliseconds;
 
+            LoadLayerStack();
             LoadBoardOutline();
             LoadNetsAndAssociatedPrimitives();
             LoadNoNetPads();
@@ -68,6 +74,27 @@ namespace Nexar.Renderer.Managers
             Debug.WriteLine(PcbStats.ToString());
             Debug.WriteLine(PcbStats.NetToTrackDetail());
             Debug.WriteLine(PcbRenderer.Pcb.GetStats());
+        }
+
+        private void LoadLayerStack()
+        {
+            var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.LayerStack?.Stacks[0]?.Layers;
+
+            if (layers != null)
+            {
+                var pcbLayers = new List<IPcbLayer>();
+
+                foreach (var layer in layers)
+                {
+                    if ((layer.LayerType == DesLayerType.Signal) ||
+                        (layer.LayerType == DesLayerType.Plane))
+                    {
+                        pcbLayers.Add(layer);
+                    }
+                }
+
+                PcbRenderer.Pcb.InitialiseLayerStack(pcbLayers);
+            }
         }
 
         private void LoadBoardOutline()
@@ -137,13 +164,14 @@ namespace Nexar.Renderer.Managers
                     {
                         foreach (var track in net.Tracks)
                         {
-                            if ((track.Layer?.Name.ToLower().Contains("top")) == true ||
-                                (track.Layer?.Name.ToLower().Contains("bottom")) == true)
+                            if (track.Layer != null)
                             {
                                 trackStopwatch.Start();
 
+                                var layer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == track.Layer.Name);
+
                                 PcbRenderer.Pcb.AddTrack(
-                                    track.Layer?.Name ?? "No Layer",
+                                    layer,
                                     ScaleValue(track.Begin.XMm, xOffset, divisor),
                                     ScaleValue(track.Begin.YMm, yOffset, divisor),
                                     ScaleValue(track.End.XMm, xOffset, divisor),
@@ -161,24 +189,27 @@ namespace Nexar.Renderer.Managers
                     {
                         foreach (var pad in net.Pads)
                         {
-                            if ((pad.Layer?.Name.ToLower().Contains("top")) == true ||
-                                (pad.Layer?.Name.ToLower().Contains("bottom")) == true)
+                            if (pad.Layer != null)
                             {
                                 padStopwatch.Start();
 
-                                PcbRenderer.Pcb.AddPad(
-                                    pad.Layer?.Name ?? "No Layer",
-                                    pad.Shape ?? DesPrimitiveShape.Rectangle,
-                                    pad.PadType,
-                                    ScaleValue(pad.Size.XMm, 0.0F, divisor),
-                                    ScaleValue(pad.Size.YMm, 0.0F, divisor),
-                                    ScaleValue(pad.Position.XMm, xOffset, divisor),
-                                    ScaleValue(pad.Position.YMm, yOffset, divisor),
-                                    pad.Rotation ?? 0.0M,
-                                    ScaleValue(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
-
+                                var layer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == pad.Layer.Name);
+                                AddPad(pad, layer);
                                 padStopwatch.Stop();
                                 PcbStats.TotalPads++;
+                            }
+                            else
+                            {
+                                // Hack, if layer is null we will assume it is multi layer top and bottom (needs fix on API side)
+                                padStopwatch.Start();
+
+                                PcbRenderer.Pcb.PcbLayers.ToList().ForEach(x =>
+                                {
+                                    AddPad(pad, x);
+                                    PcbStats.TotalPads++;
+                                });
+
+                                padStopwatch.Stop();
                             }
                         }
                     }
@@ -187,18 +218,33 @@ namespace Nexar.Renderer.Managers
                     {
                         foreach (var via in net.Vias)
                         {
-                            viaStopwatch.Start();
+                            if ((via.BeginLayer != null) && (via.EndLayer != null))
+                            {
+                                viaStopwatch.Start();
 
-                            PcbRenderer.Pcb.AddVia(
-                                via.Layer?.Name ?? "Multi Layer",
-                                via.Shape ?? DesPrimitiveShape.Round,
-                                ScaleValue(via.Position.XMm, xOffset, divisor),
-                                ScaleValue(via.Position.YMm, yOffset, divisor),
-                                ScaleValue(via.PadDiameter.XMm, 0.0F, divisor),
-                                ScaleValue(via.HoleDiameter.XMm, 0.0F, divisor));
+                                var beginLayer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == via.BeginLayer.Name);
 
-                            viaStopwatch.Stop();
-                            PcbStats.TotalVias++;
+                                PcbRenderer.Pcb.AddVia(
+                                    beginLayer,
+                                    via.Shape ?? DesPrimitiveShape.Round,
+                                    ScaleValue(via.Position.XMm, xOffset, divisor),
+                                    ScaleValue(via.Position.YMm, yOffset, divisor),
+                                    ScaleValue(via.PadDiameter.XMm, 0.0F, divisor),
+                                    ScaleValue(via.HoleDiameter.XMm, 0.0F, divisor));
+
+                                var endLayer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == via.EndLayer.Name);
+
+                                PcbRenderer.Pcb.AddVia(
+                                    endLayer,
+                                    via.Shape ?? DesPrimitiveShape.Round,
+                                    ScaleValue(via.Position.XMm, xOffset, divisor),
+                                    ScaleValue(via.Position.YMm, yOffset, divisor),
+                                    ScaleValue(via.PadDiameter.XMm, 0.0F, divisor),
+                                    ScaleValue(via.HoleDiameter.XMm, 0.0F, divisor));
+
+                                viaStopwatch.Stop();
+                                PcbStats.TotalVias++;
+                            }
                         }
                     }
                 }
@@ -220,18 +266,51 @@ namespace Nexar.Renderer.Managers
             {
                 foreach (var pad in noNetPads)
                 {
-                    PcbRenderer.Pcb.AddPad(
-                        pad.Layer?.Name ?? "No Layer",
-                        pad.Shape ?? DesPrimitiveShape.Rectangle,
-                        pad.PadType,
-                        ScaleValue(pad.Size.XMm, 0.0F, divisor),
-                        ScaleValue(pad.Size.YMm, 0.0F, divisor),
-                        ScaleValue(pad.Position.XMm, xOffset, divisor),
-                        ScaleValue(pad.Position.YMm, yOffset, divisor),
-                        pad.Rotation ?? 0.0M,
-                        ScaleValue(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
+                    if (pad.Layer != null)
+                    {
+                        var layer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == pad.Layer.Name);
+                        AddPad(pad, layer);
+                        PcbStats.TotalPads++;
+                    }
+                    else
+                    {
+                        // Hack, if layer is null we will assume it is multi layer top and bottom (needs fix on API side)
+                        PcbRenderer.Pcb.PcbLayers.ToList().ForEach(x =>
+                        {
+                            AddPad(pad, x);
+                            PcbStats.TotalPads++;
+                        });
+                    }
                 }
             }
+        }
+
+        private void AddPad(IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_Nets_Pads pad, IPcbLayer layer)
+        {
+            PcbRenderer.Pcb.AddPad(
+                layer,
+                pad.Shape ?? DesPrimitiveShape.Rectangle,
+                pad.PadType,
+                ScaleValue(pad.Size.XMm, 0.0F, divisor),
+                ScaleValue(pad.Size.YMm, 0.0F, divisor),
+                ScaleValue(pad.Position.XMm, xOffset, divisor),
+                ScaleValue(pad.Position.YMm, yOffset, divisor),
+                pad.Rotation ?? 0.0M,
+                ScaleValue(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
+        }
+
+        private void AddPad(IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_Pads pad, IPcbLayer layer)
+        {
+            PcbRenderer.Pcb.AddPad(
+                layer,
+                pad.Shape ?? DesPrimitiveShape.Rectangle,
+                pad.PadType,
+                ScaleValue(pad.Size.XMm, 0.0F, divisor),
+                ScaleValue(pad.Size.YMm, 0.0F, divisor),
+                ScaleValue(pad.Position.XMm, xOffset, divisor),
+                ScaleValue(pad.Position.YMm, yOffset, divisor),
+                pad.Rotation ?? 0.0M,
+                ScaleValue(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
         }
 
         private float ScaleValue(decimal value, float offset, float divisor)

@@ -9,24 +9,118 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+using System.Windows.Forms;
+
 namespace Nexar.Renderer.DesignEntities
 {
     public class Pcb
     {
+        private class LayerInfo
+        {
+            public float ZOffset { get; set; }
+            public Color4 Color { get; set; }
+        }
+
+        private readonly List<LayerInfo> TwoLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly List<LayerInfo> FourLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly List<LayerInfo> SixLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.005F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.005F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly LayerInfo unknownLayerInfo = new LayerInfo() { ZOffset = 0.0F, Color = new Color4(0.75F, 0.75F, 0.75F, 1.0F) };
+
+        private LayerInfo GetLayerInfo(IPcbLayer pcbLayer)
+        {
+            LayerInfo layerInfo;
+
+            try
+            {
+                switch (PcbLayers.Count)
+                {
+                    case 2:
+                    {
+                        layerInfo = TwoLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 4:
+                    {
+                        layerInfo = FourLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 6:
+                    {
+                        layerInfo = SixLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    default:
+                    {
+                        layerInfo = unknownLayerInfo;
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+                layerInfo = unknownLayerInfo;
+            }
+
+            return layerInfo;
+        }
+
         private List<SingleLineShader> boardOutlineShaders = new List<SingleLineShader>();
-        private PrimitiveShader trackShader = new PrimitiveShader();
-        private PrimitiveShader padShader = new PrimitiveShader();
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
+
+        private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
+        private Dictionary<string, PrimitiveShader> layerMappedPadShader = new Dictionary<string, PrimitiveShader>();
+
+        public List<IPcbLayer> PcbLayers { get; private set; } = new List<IPcbLayer>();
+
+        public List<string> EnabledPcbLayers { get; } = new List<string>();
+
+        public bool DisableTracks { get; set; } = false;
+        public bool DisablePads { get; set; } = false;
+        public bool DisableVias { get; set; } = false;
+
+        public void InitialiseLayerStack(List<IPcbLayer> pcbLayers)
+        {
+            PcbLayers = pcbLayers.ToList();
+        }
 
         public string GetStats()
         {
+            long trackShaderTriangleCount = 0;
+            layerMappedTrackShader.Values.ToList().ForEach(x => trackShaderTriangleCount += CountTriangles(x));
+
+            long padShaderTriangleCount = 0;
+            layerMappedPadShader.Values.ToList().ForEach(x => padShaderTriangleCount += CountTriangles(x));
+
+            long viaShaderTriangleCount = 0;
+            viaShader.ViaLayerShaderMapping.Values.ToList().ForEach(x => viaShaderTriangleCount += CountTriangles(x));
+
             var sb = new StringBuilder();
             sb.AppendLine("Geometry data");
-            sb.AppendLine(string.Format("Track Shader Triangle Count:    {0}", CountTriangles(trackShader)));
-            sb.AppendLine(string.Format("Pad Shader Triangle Count:      {0}", CountTriangles(padShader)));
-            sb.AppendLine(string.Format("Via Shader Triangle Count:      {0}",
-                CountTriangles(viaShader.TopLayerPrimitiveShader) +
-                CountTriangles(viaShader.BottomLayerPrimitiveShader)));
+            sb.AppendLine(string.Format("Track Shader Triangle Count:    {0}", trackShaderTriangleCount));
+            sb.AppendLine(string.Format("Pad Shader Triangle Count:      {0}", padShaderTriangleCount));
+            sb.AppendLine(string.Format("Via Shader Triangle Count:      {0}", viaShaderTriangleCount));
 
             return sb.ToString();
         }
@@ -39,7 +133,7 @@ namespace Nexar.Renderer.DesignEntities
         }
 
         public void AddTrack(
-            string layer,
+            IPcbLayer layer,
             float beginXMm,
             float beginYMm,
             float endXMm,
@@ -52,11 +146,20 @@ namespace Nexar.Renderer.DesignEntities
                 new PointF(endXMm, endYMm),
                 width);
 
-            trackShader.AddPrimitive(track);
+            if (!layerMappedTrackShader.ContainsKey(layer.Name))
+            {
+                layerMappedTrackShader.Add(layer.Name, new PrimitiveShader(0.0F));
+            }
+
+            var layerInfo = GetLayerInfo(layer);
+            layerMappedTrackShader[layer.Name].AddPrimitive(
+                track,
+                layerInfo.Color,
+                layerInfo.ZOffset);
         }
 
         public void AddPad(
-            string layer,
+            IPcbLayer layer,
             DesPrimitiveShape primitiveShape,
             DesPadType padType,
             float sizeXMm,
@@ -75,11 +178,20 @@ namespace Nexar.Renderer.DesignEntities
                 rotation,
                 holeSizeMm);
 
-            padShader.AddPrimitive(pad);
+            if (!layerMappedPadShader.ContainsKey(layer.Name))
+            {
+                layerMappedPadShader.Add(layer.Name, new PrimitiveShader(0.0F));
+            }
+
+            var layerInfo = GetLayerInfo(layer);
+            layerMappedPadShader[layer.Name].AddPrimitive(
+                pad,
+                layerInfo.Color,
+                layerInfo.ZOffset);
         }
 
         public void AddVia(
-            string layer,
+            IPcbLayer layer,
             DesPrimitiveShape primitiveShape,
             float positionXMm,
             float positionYMm,
@@ -93,7 +205,8 @@ namespace Nexar.Renderer.DesignEntities
                 padDiameterMm,
                 holeDiameterMm);
 
-            viaShader.AddPrimitive(via);
+            var layerInfo = GetLayerInfo(layer);
+            viaShader.AddPrimitive(layer, via, layerInfo.ZOffset);
         }
 
         public void AddOutline(
@@ -119,32 +232,63 @@ namespace Nexar.Renderer.DesignEntities
             boardOutlineShaders.ForEach(x => x.Dispose());
             boardOutlineShaders.Clear();
 
-            trackShader.Reset();
-            padShader.Reset();
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Reset());
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
+            layerMappedTrackShader.Clear();
+
+            layerMappedPadShader.Values.ToList().ForEach(x => x.Reset());
+            layerMappedPadShader.Values.ToList().ForEach(x => x.Dispose());
+            layerMappedPadShader.Clear();
+
             viaShader.Reset();
         }
 
         public void FinaliseSetup()
         {
             boardOutlineShaders.ForEach(x => x.Initialise());
-            trackShader.Initialise();
-            padShader.Initialise();
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Initialise());
+            layerMappedPadShader.Values.ToList().ForEach(x => x.Initialise());
             viaShader.Initialise();
         }
 
         public void Draw(Matrix4 view, Matrix4 projection)
         {
             boardOutlineShaders.ForEach(x => x.Draw(view, projection));
-            trackShader.Draw(view, projection);
-            padShader.Draw(view, projection);
-            viaShader.Draw(view, projection);
+
+            if (!DisableTracks)
+            {
+                DrawLayerMappedPrimitives(view, projection, layerMappedTrackShader);
+            }
+
+            if (!DisablePads)
+            {
+                DrawLayerMappedPrimitives(view, projection, layerMappedPadShader);
+            }
+
+            if (!DisableVias)
+            {
+                viaShader.Draw(view, projection);
+            }
+        }
+
+        private void DrawLayerMappedPrimitives(
+            Matrix4 view, Matrix4 projection,
+            Dictionary<string, PrimitiveShader> layerMappedShader)
+        {
+            foreach (var mappedLayer in layerMappedShader)
+            {
+                if (EnabledPcbLayers.Contains(mappedLayer.Key))
+                {
+                    mappedLayer.Value.Draw(view, projection);
+                }
+            }
         }
 
         public void Dispose()
         {
             boardOutlineShaders.ForEach(x => x.Dispose());
-            trackShader.Dispose();
-            padShader.Dispose();
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
+            layerMappedPadShader.Values.ToList().ForEach(x => x.Dispose());
             viaShader.Dispose();
         }
     }
