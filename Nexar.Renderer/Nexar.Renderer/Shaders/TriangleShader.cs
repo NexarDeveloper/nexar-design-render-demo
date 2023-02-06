@@ -109,7 +109,7 @@ namespace Nexar.Renderer.Shaders
             }
         }
 
-        public void Draw(Matrix4 view, Matrix4 projection)
+        public virtual void Draw(Matrix4 view, Matrix4 projection)
         {
             if (initComplete)
             {

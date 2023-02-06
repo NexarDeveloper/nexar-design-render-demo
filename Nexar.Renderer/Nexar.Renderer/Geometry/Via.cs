@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+
 namespace Nexar.Renderer.Geometry
 {
     public class Via : Primitive
@@ -17,7 +19,7 @@ namespace Nexar.Renderer.Geometry
         public List<float> rawVertices { get; } = new List<float>();
 
         public Via(
-            string layer,
+            IPcbLayer layer,
             DesPrimitiveShape primitiveShape,
             PointF positionMm,
             float padDiameterMm,

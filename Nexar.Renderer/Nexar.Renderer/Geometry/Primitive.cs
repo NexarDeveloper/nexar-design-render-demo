@@ -7,12 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+
 namespace Nexar.Renderer.Geometry
 {
     public abstract class Primitive
     {
         public const int SCALING_FACTOR = 10000;
-        public string Layer { get; protected set; } = "None";
+        public IPcbLayer Layer { get; protected set; } = default!;
 
         public List<Triangle> TessellatedTriangles { get; } = new List<Triangle>();
 

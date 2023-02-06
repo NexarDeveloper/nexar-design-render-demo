@@ -20,6 +20,8 @@ using Nexar.Renderer.Api;
 using StrawberryShake;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+
 namespace Nexar.Renderer.Forms
 {
     public partial class Main : Form
@@ -30,7 +32,7 @@ namespace Nexar.Renderer.Forms
 
         private IGetWorkspaces_DesWorkspaces? ActiveWorkspace { get; set; }
 
-        private GlRenderer pcbRenderer;
+        //private GlRenderer pcbManager.PcbRenderer;
 
         private PcbManager pcbManager;
 
@@ -61,11 +63,13 @@ namespace Nexar.Renderer.Forms
             glControl.PreviewKeyDown += GlControl_PreviewKeyDown;
 
             Controls.Add(glControl);
+            tracksMenuItem.CheckedChanged += TracksMenuItem_CheckedChanged;
+            padsMenuItem.CheckedChanged += PadsMenuItem_CheckedChanged;
+            viasMenuItem.CheckedChanged += ViasMenuItem_CheckedChanged;
 
             NexarHelper = new NexarHelper();
 
-            pcbRenderer = new GlRenderer(glWidth, glHeight, "Nexar Renderer");
-            pcbManager = new PcbManager(pcbRenderer);
+            pcbManager = new PcbManager(new GlRenderer(glWidth, glHeight, "Nexar Renderer"));
 
             if (renderThreadHelper == null)
             {
@@ -87,7 +91,7 @@ namespace Nexar.Renderer.Forms
             // we update our projection matrix or re-render its contents, respectively.
             glControl.Resize += GlControl_Resize;
 
-            pcbRenderer.OnLoad();
+            pcbManager.PcbRenderer.OnLoad();
 
             // Ensure that the viewport and projection matrix are set correctly initially.
             GlControl_Resize(glControl, EventArgs.Empty);
@@ -104,7 +108,11 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbRenderer.Demo_MouseMove(control, pt);
+                    pcbManager.PcbRenderer.Demo_MouseMove(sender, pt);
+                }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    pcbManager.PcbRenderer.MousePan(sender, pt);
                 }
             }
         }
@@ -120,7 +128,7 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbRenderer.Demo_MouseDown(control, pt);
+                    pcbManager.PcbRenderer.Demo_MouseDown(sender, pt);
                 }
             }
         }
@@ -135,14 +143,14 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbRenderer.Demo_MouseUp(control, pt);
+                    pcbManager.PcbRenderer.Demo_MouseUp(sender, pt);
                 }
             }
         }
 
         private void GlControl_Resize(object? sender, EventArgs e)
         {
-            pcbRenderer.WindowReshape(Width, Height);
+            pcbManager.PcbRenderer.WindowReshape(Width, Height);
         }
 
         private void RenderFrameThreadSafe(object threadLock)
@@ -166,7 +174,7 @@ namespace Nexar.Renderer.Forms
         private void RenderFrame()
         {
             glControl.MakeCurrent();
-            pcbRenderer.OnUpdateFrame(new FrameEventArgs(THREAD_PERIOD_MS / 1000.0F));
+            pcbManager.PcbRenderer.OnUpdateFrame(new FrameEventArgs(THREAD_PERIOD_MS / 1000.0F));
             glControl.Invalidate();
             glControl.SwapBuffers();
         }
@@ -183,7 +191,7 @@ namespace Nexar.Renderer.Forms
                 BeginShutdown();
             }).Start();
 
-            pcbRenderer.OnUnload();
+            pcbManager.PcbRenderer.OnUnload();
             e.Cancel = true;
         }
 
@@ -213,9 +221,9 @@ namespace Nexar.Renderer.Forms
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (!pcbRenderer.ActiveKeys.Contains(e.KeyData))
+            if (!pcbManager.PcbRenderer.ActiveKeys.Contains(e.KeyData))
             {
-                pcbRenderer.ActiveKeys.Add(e.KeyData);
+                pcbManager.PcbRenderer.ActiveKeys.Add(e.KeyData);
             }
 
             base.OnKeyDown(e);
@@ -223,11 +231,11 @@ namespace Nexar.Renderer.Forms
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
-            Keys? activeKey = pcbRenderer.ActiveKeys.FirstOrDefault(x => x.Equals(e.KeyData));
+            Keys? activeKey = pcbManager.PcbRenderer.ActiveKeys.FirstOrDefault(x => x.Equals(e.KeyData));
 
             if (activeKey.HasValue)
             {
-                pcbRenderer.ActiveKeys.Remove(activeKey.Value);
+                pcbManager.PcbRenderer.ActiveKeys.Remove(activeKey.Value);
             }
 
             base.OnKeyUp(e);
@@ -244,7 +252,7 @@ namespace Nexar.Renderer.Forms
             }
         }
 
-        private async void OpenMenuItem_Click(object sender, EventArgs e)
+        private async void OpenProjectMenuItem_Click(object sender, EventArgs e)
         {
             if (ActiveWorkspace == null)
             {
@@ -267,9 +275,35 @@ namespace Nexar.Renderer.Forms
                     {
                         Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
                         await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
+                        LoadLayers();
                     }
                 }
             }
+        }
+
+        private void LoadLayers()
+        {
+            layersToolStripMenuItem.DropDownItems.Clear();
+            var items = new List<ToolStripMenuItem>();
+            pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Clear();
+
+            foreach (var layer in pcbManager.PcbRenderer.Pcb.PcbLayers)
+            {
+                var toolStripMenuItem = new ToolStripMenuItem();
+                toolStripMenuItem.Name = layer.Name.Replace(" ", "_");
+                toolStripMenuItem.Text = layer.Name;
+                toolStripMenuItem.Tag = layer;
+                toolStripMenuItem.Click += ToolStripMenuItem_Click;
+                toolStripMenuItem.Checked = true;
+                toolStripMenuItem.CheckState = CheckState.Checked;
+                toolStripMenuItem.CheckOnClick = true;
+                toolStripMenuItem.CheckedChanged += LayerToolStripMenuItem_CheckedChanged;
+                items.Add(toolStripMenuItem);
+
+                pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Add(layer.Name);
+            }
+
+            layersToolStripMenuItem.DropDownItems.AddRange(items.ToArray());
         }
 
         private async void workspaceToolStripMenuItem_Click(object sender, EventArgs e)
@@ -342,6 +376,43 @@ namespace Nexar.Renderer.Forms
                 ActiveWorkspace = workspace;
                 Text = string.Format("Nexar.Renderer | {0}", ActiveWorkspace.Name);
             }
+        }
+
+        private void LayerToolStripMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            var layer = toolStripMenuItem?.Tag as IPcbLayer;
+
+            if ((toolStripMenuItem != null) && (layer != null))
+            {
+                if (toolStripMenuItem.Checked)
+                {
+                    if (!pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Contains(layer.Name))
+                    {
+                        pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Add(layer.Name);
+                    }
+                }
+                else
+                {
+                    pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Remove(layer.Name);
+                }
+            }
+        }
+
+
+        private void TracksMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbManager.PcbRenderer.Pcb.DisableTracks = (!tracksMenuItem.Checked);
+        }
+
+        private void PadsMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbManager.PcbRenderer.Pcb.DisablePads = (!padsMenuItem.Checked);
+        }
+
+        private void ViasMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbManager.PcbRenderer.Pcb.DisableVias = (!viasMenuItem.Checked);
         }
     }
 }
