@@ -139,7 +139,7 @@ namespace Nexar.Renderer.Visualization
 
             //DrawAxisLines();
             DrawPcb();
-            //DrawHighlightBox();
+            DrawHighlightBox();
 
             if (ActiveKeys != null)
             {
@@ -149,8 +149,8 @@ namespace Nexar.Renderer.Visualization
                 }
 
                 // Camera speed
-                speed = 10.0f;
-                speed2 = 100.0f;
+                speed = 15.0f;
+                speed2 = 150.0f;
 
                 if (ActiveKeys.Any(x => x == Keys.LShiftKey))
                 {

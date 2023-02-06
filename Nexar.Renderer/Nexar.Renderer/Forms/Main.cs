@@ -9,6 +9,7 @@ using Nexar.Renderer.Visualization;
 using Microsoft.Extensions.DependencyInjection;
 using Nexar.Client;
 using Nexar.Client.Login;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -23,6 +24,8 @@ namespace Nexar.Renderer.Forms
 {
     public partial class Main : Form
     {
+        private GLControl glControl;
+
         private NexarHelper NexarHelper { get; }
 
         private IGetWorkspaces_DesWorkspaces? ActiveWorkspace { get; set; }
@@ -33,16 +36,31 @@ namespace Nexar.Renderer.Forms
 
         private ThreadHelper? renderThreadHelper;
 
-        private const int THREAD_PERIOD_MS = 50;
+        private const int THREAD_PERIOD_MS = 10;
 
-        int glWidth = 800;
-        int glHeight = 600;
+        int glWidth = 1000;
+        int glHeight = 800;
 
         //private INativeInput nativeInput;
 
         public Main()
         {
             InitializeComponent();
+
+            glControl = new GLControl();
+
+            glControl.Size = new Size(glWidth, glHeight);
+            glControl.Anchor = AnchorStyles.Bottom | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Left;
+            glControl.Location = new Point(0, 0);
+            glControl.Load += GlControl_Load;
+            glControl.Resize += GlControl_Resize;
+
+            glControl.MouseDown += GlControl_MouseDown;
+            glControl.MouseMove += GlControl_MouseMove;
+            glControl.MouseUp += GlControl_MouseUp;
+            glControl.PreviewKeyDown += GlControl_PreviewKeyDown;
+
+            Controls.Add(glControl);
 
             NexarHelper = new NexarHelper();
 
@@ -75,7 +93,7 @@ namespace Nexar.Renderer.Forms
             GlControl_Resize(glControl, EventArgs.Empty);
         }
 
-        private void GlControl_MouseMove(object sender, MouseEventArgs e)
+        private void GlControl_MouseMove(object? sender, MouseEventArgs e)
         {
             Control? control = sender as Control;
 
@@ -86,12 +104,12 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbRenderer.Demo_MouseMove(sender, pt);
+                    pcbRenderer.Demo_MouseMove(control, pt);
                 }
             }
         }
 
-        private void GlControl_MouseDown(object sender, MouseEventArgs e)
+        private void GlControl_MouseDown(object? sender, MouseEventArgs e)
         {
             Control? control = sender as Control;
 
@@ -102,12 +120,12 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbRenderer.Demo_MouseDown(sender, pt);
+                    pcbRenderer.Demo_MouseDown(control, pt);
                 }
             }
         }
 
-        private void GlControl_MouseUp(object sender, MouseEventArgs e)
+        private void GlControl_MouseUp(object? sender, MouseEventArgs e)
         {
             Control? control = sender as Control;
 
@@ -117,7 +135,7 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbRenderer.Demo_MouseUp(sender, pt);
+                    pcbRenderer.Demo_MouseUp(control, pt);
                 }
             }
         }

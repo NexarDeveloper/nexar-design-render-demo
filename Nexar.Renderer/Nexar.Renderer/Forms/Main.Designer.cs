@@ -28,31 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.glControl = new OpenTK.WinForms.GLControl();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.workspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // glControl
-            // 
-            this.glControl.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
-            this.glControl.APIVersion = new System.Version(3, 3, 0, 0);
-            this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.glControl.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
-            this.glControl.IsEventDriven = true;
-            this.glControl.Location = new System.Drawing.Point(0, 24);
-            this.glControl.Name = "glControl";
-            this.glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Any;
-            this.glControl.Size = new System.Drawing.Size(984, 737);
-            this.glControl.TabIndex = 0;
-            this.glControl.Text = "glControl1";
-            this.glControl.Load += new System.EventHandler(this.GlControl_Load);
-            this.glControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GlControl_MouseDown);
-            this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GlControl_MouseMove);
-            this.glControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.GlControl_MouseUp);
-            this.glControl.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.GlControl_PreviewKeyDown);
             // 
             // menuStrip1
             // 
@@ -84,7 +64,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 761);
-            this.Controls.Add(this.glControl);
             this.Controls.Add(this.menuStrip1);
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
@@ -99,8 +78,6 @@
         }
 
         #endregion
-
-        private OpenTK.WinForms.GLControl glControl;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem openMenuItem;
         private ToolStripMenuItem workspaceToolStripMenuItem;

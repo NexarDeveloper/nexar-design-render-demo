@@ -46,7 +46,7 @@ namespace OpenTk.Tutorial.Tools
         {
             highlightLineShader = new LineShader(
                 highlightBoxVertices,
-                Color4.Purple,
+                Color4.White,
                 "dottedLineShader.vert",
                 "dottedLineShader.frag");
 
