@@ -6,47 +6,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+
 namespace Nexar.Renderer.Shaders
 {
     public class ViaShaderWrapper
     {
-        public PrimitiveShader TopLayerPrimitiveShader { get; }
-        public PrimitiveShader BottomLayerPrimitiveShader { get; }
-
-        public ViaShaderWrapper()
-        {
-            TopLayerPrimitiveShader = new PrimitiveShader();
-            BottomLayerPrimitiveShader = new PrimitiveShader();
-        }
+        public Dictionary<string, PrimitiveShader> ViaLayerShaderMapping { get; } = new Dictionary<string, PrimitiveShader>();
 
         public void Reset()
         {
-            TopLayerPrimitiveShader.Reset();
-            BottomLayerPrimitiveShader.Reset();
+            ViaLayerShaderMapping.Values.ToList().ForEach(x => x.Reset());
         }
 
         public void Initialise()
         {
-            TopLayerPrimitiveShader.Initialise();
-            BottomLayerPrimitiveShader.Initialise();
+            ViaLayerShaderMapping.Values.ToList().ForEach(x => x.Initialise());
         }
 
-        public void AddPrimitive(Primitive primitive)
+        public void AddPrimitive(IPcbLayer layer, Primitive primitive, float zOffset)
         {
-            TopLayerPrimitiveShader.AddPrimitive(primitive, "top layer", 0.0001F);
-            BottomLayerPrimitiveShader.AddPrimitive(primitive, "bottom layer", 0.0001F);
+            if (!ViaLayerShaderMapping.ContainsKey(layer.Name))
+            {
+                ViaLayerShaderMapping.Add(layer.Name, new PrimitiveShader(0.0F));
+            }
+
+            ViaLayerShaderMapping[layer.Name].AddPrimitive(
+                primitive,
+                new Color4(0.75F, 0.75F, 0.75F, 1.0F),
+                (zOffset < 0.0F ? zOffset - 0.0001F : zOffset + 0.0001F));
         }
 
         public void Draw(Matrix4 view, Matrix4 projection)
         {
-            TopLayerPrimitiveShader.Draw(view, projection);
-            BottomLayerPrimitiveShader.Draw(view, projection);
+            ViaLayerShaderMapping.Values.ToList().ForEach(x => x.Draw(view, projection));
         }
 
         public void Dispose()
         {
-            TopLayerPrimitiveShader.Dispose();
-            BottomLayerPrimitiveShader.Dispose();
+            ViaLayerShaderMapping.Values.ToList().ForEach(x => x.Dispose());
         }
     }
 }
