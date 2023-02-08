@@ -62,10 +62,11 @@ namespace Nexar.Renderer.Forms
             glControl.MouseUp += GlControl_MouseUp;
             glControl.PreviewKeyDown += GlControl_PreviewKeyDown;
 
-            Controls.Add(glControl);
+            splitContainer.Panel1.Controls.Add(glControl);
             tracksMenuItem.CheckedChanged += TracksMenuItem_CheckedChanged;
             padsMenuItem.CheckedChanged += PadsMenuItem_CheckedChanged;
             viasMenuItem.CheckedChanged += ViasMenuItem_CheckedChanged;
+            showCommentsMenuItem.CheckedChanged += CommentsMenuItem_CheckedChanged;
 
             NexarHelper = new NexarHelper();
 
@@ -241,7 +242,7 @@ namespace Nexar.Renderer.Forms
             base.OnKeyUp(e);
         }
 
-        private void GlControl_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        private void GlControl_PreviewKeyDown(object? sender, PreviewKeyDownEventArgs e)
         {
             if (e.KeyData == Keys.Left ||
                 e.KeyData == Keys.Right ||
@@ -413,6 +414,11 @@ namespace Nexar.Renderer.Forms
         private void ViasMenuItem_CheckedChanged(object? sender, EventArgs e)
         {
             pcbManager.PcbRenderer.Pcb.DisableVias = (!viasMenuItem.Checked);
+        }
+
+        private void CommentsMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            splitContainer.Panel2Collapsed = (!showCommentsMenuItem.Checked);
         }
     }
 }
