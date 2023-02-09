@@ -155,11 +155,21 @@ namespace Nexar.Renderer.Forms
 
         private void GlControl_MouseWheel(object? sender, MouseEventArgs e)
         {
+            pcbManager.PcbRenderer.ZoomRequest = -e.Delta;
         }
 
         private void GlControl_Resize(object? sender, EventArgs e)
         {
-            pcbManager.PcbRenderer.WindowReshape(Width, Height);
+            if (splitContainer.Panel2Collapsed)
+            {
+                pcbManager.PcbRenderer.WindowReshape(Width, Height);
+            }
+            else
+            {
+                pcbManager.PcbRenderer.WindowReshape(
+                    splitContainer.Panel1.Width,
+                    Height);
+            }
         }
 
         private void RenderFrameThreadSafe(object threadLock)

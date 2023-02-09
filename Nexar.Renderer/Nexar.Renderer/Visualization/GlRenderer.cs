@@ -127,6 +127,8 @@ namespace Nexar.Renderer.Visualization
 
         public List<Keys> ActiveKeys { get; } = new List<Keys>();
 
+        public int ZoomRequest { get; set; } = 0;
+
         public void OnUpdateFrame(FrameEventArgs e)
         {
             time += 12.0 * 0.008; // e.Time;
@@ -184,6 +186,15 @@ namespace Nexar.Renderer.Visualization
                 {
                     cameraDistance += speed * (float)e.Time;
                     cameraPosition -= front * speed * (float)e.Time;
+                }
+
+                // Forward or backward
+                if (ZoomRequest != 0)
+                {
+                    float scaledRequest = ZoomRequest * 0.01f;
+                    cameraDistance += scaledRequest;
+                    cameraPosition -= front * scaledRequest;
+                    ZoomRequest = 0;
                 }
 
                 // Up
