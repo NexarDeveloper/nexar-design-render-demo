@@ -39,9 +39,14 @@
             this.commentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.currentProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
+            this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -141,6 +146,7 @@
             // splitContainer.Panel1
             // 
             this.splitContainer.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.splitContainer.Panel1.Controls.Add(this.statusStrip);
             // 
             // splitContainer.Panel2
             // 
@@ -151,6 +157,30 @@
             this.splitContainer.SplitterWidth = 8;
             this.splitContainer.TabIndex = 2;
             this.splitContainer.TabStop = false;
+            // 
+            // statusStrip
+            // 
+            this.statusStrip.BackColor = System.Drawing.SystemColors.Control;
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusLabel,
+            this.currentProgressBar});
+            this.statusStrip.Location = new System.Drawing.Point(0, 715);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(984, 22);
+            this.statusStrip.TabIndex = 0;
+            this.statusStrip.Text = "statusStrip1";
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(39, 17);
+            this.statusLabel.Text = "Ready";
+            // 
+            // currentProgressBar
+            // 
+            this.currentProgressBar.Name = "currentProgressBar";
+            this.currentProgressBar.Size = new System.Drawing.Size(100, 16);
+            this.currentProgressBar.Visible = false;
             // 
             // Main
             // 
@@ -166,8 +196,12 @@
             this.Text = "Nexar.Renderer";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.splitContainer.Panel1.ResumeLayout(false);
+            this.splitContainer.Panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -185,5 +219,8 @@
         private SplitContainer splitContainer;
         private ToolStripMenuItem commentsMenuItem;
         private ToolStripMenuItem showCommentsMenuItem;
+        private StatusStrip statusStrip;
+        private ToolStripProgressBar currentProgressBar;
+        private ToolStripStatusLabel statusLabel;
     }
 }

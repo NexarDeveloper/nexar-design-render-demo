@@ -293,7 +293,9 @@ namespace Nexar.Renderer.Forms
                     if (projectsForm.SelectedDesignProject != null)
                     {
                         Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
+                        StatusBusy(string.Format("Opening '{0}'...", projectsForm.SelectedDesignProject.Name));
                         await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
+                        StatusReady();
                         LoadLayers();
                     }
                 }
@@ -336,6 +338,7 @@ namespace Nexar.Renderer.Forms
                 (workspaceToolStripMenuItem.DropDownItems.Count == 0))
             {
                 workspaceToolStripMenuItem.Text = "Loading...";
+                StatusBusy("Loading workspace list...");
 
                 await NexarHelper.LoginAsync();
                 var nexarClient = NexarHelper.GetNexarClient();
@@ -360,8 +363,9 @@ namespace Nexar.Renderer.Forms
 
                     workspaceToolStripMenuItem.DropDownItems.AddRange(items.ToArray());
                 }
-
+                
                 workspaceToolStripMenuItem.Text = "Workspaces";
+                StatusReady();
 
                 var defaultWorkspace = workspaces?.Data?.DesWorkspaces.FirstOrDefault(x => x.IsDefault == true);
 
@@ -437,6 +441,21 @@ namespace Nexar.Renderer.Forms
         private void CommentsMenuItem_CheckedChanged(object? sender, EventArgs e)
         {
             splitContainer.Panel2Collapsed = (!showCommentsMenuItem.Checked);
+        }
+
+        private void StatusBusy(string comment)
+        {
+            statusLabel.Text = comment;
+            currentProgressBar.Visible = true;
+            currentProgressBar.Style = ProgressBarStyle.Marquee;
+            statusStrip.Refresh();
+        }
+
+        private void StatusReady()
+        {
+            statusLabel.Text = "Ready";
+            currentProgressBar.Visible = false;
+            statusStrip.Refresh();
         }
     }
 }

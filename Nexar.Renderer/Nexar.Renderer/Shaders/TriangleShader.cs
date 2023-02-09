@@ -66,7 +66,6 @@ namespace Nexar.Renderer.Shaders
             }
 
             vertices.AddRange(shaderVertices);
-            _vertices = vertices.ToArray();
         }
 
         public void Reset()
@@ -83,6 +82,8 @@ namespace Nexar.Renderer.Shaders
         {
             if (vertices.Count > 0)
             {
+                _vertices = vertices.ToArray();
+
                 buffer.VertexArray = GL.GenVertexArray();
                 GL.BindVertexArray(buffer.VertexArray);
 
