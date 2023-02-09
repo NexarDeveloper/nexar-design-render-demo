@@ -132,6 +132,27 @@ namespace Nexar.Renderer.DesignEntities
             return triangleCount;
         }
 
+        public void AddTestPrimitive()
+        {
+            var track = new Track(
+                null!,
+                new PointF(-1.0F, -1.0F),
+                new PointF(1.0F, 1.0F),
+                0.1F);
+
+            if (!layerMappedTrackShader.ContainsKey("Test"))
+            {
+                layerMappedTrackShader.Add("Test", new PrimitiveShader(0.0F));
+            }
+
+            layerMappedTrackShader["Test"].AddPrimitive(
+                track,
+                Color.Red,
+                0.0F);
+
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Initialise());
+        }
+
         public void AddTrack(
             IPcbLayer layer,
             float beginXMm,

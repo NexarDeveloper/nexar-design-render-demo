@@ -32,18 +32,16 @@ namespace Nexar.Renderer.Forms
 
         private IGetWorkspaces_DesWorkspaces? ActiveWorkspace { get; set; }
 
-        //private GlRenderer pcbManager.PcbRenderer;
-
         private PcbManager pcbManager;
 
         private ThreadHelper? renderThreadHelper;
 
         private const int THREAD_PERIOD_MS = 10;
 
-        int glWidth = 1000;
-        int glHeight = 800;
+        private int glWidth = 1000;
+        private int glHeight = 800;
 
-        //private INativeInput nativeInput;
+        private bool testPrimitiveEnabled = false;
 
         public Main()
         {
@@ -60,6 +58,7 @@ namespace Nexar.Renderer.Forms
             glControl.MouseDown += GlControl_MouseDown;
             glControl.MouseMove += GlControl_MouseMove;
             glControl.MouseUp += GlControl_MouseUp;
+            glControl.MouseWheel += GlControl_MouseWheel;
             glControl.PreviewKeyDown += GlControl_PreviewKeyDown;
 
             splitContainer.Panel1.Controls.Add(glControl);
@@ -94,6 +93,12 @@ namespace Nexar.Renderer.Forms
 
             pcbManager.PcbRenderer.OnLoad();
 
+            if (testPrimitiveEnabled)
+            {
+                pcbManager.PcbRenderer.Pcb.AddTestPrimitive();
+                pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
+            }
+
             // Ensure that the viewport and projection matrix are set correctly initially.
             GlControl_Resize(glControl, EventArgs.Empty);
         }
@@ -109,11 +114,11 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbManager.PcbRenderer.Demo_MouseMove(sender, pt);
+                    pcbManager.PcbRenderer.Demo_MouseMove(control, pt);
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
-                    pcbManager.PcbRenderer.MousePan(sender, pt);
+                    pcbManager.PcbRenderer.MousePan(control, pt);
                 }
             }
         }
@@ -125,11 +130,10 @@ namespace Nexar.Renderer.Forms
             if (control != null)
             {
                 Point pt = control.PointToClient(Control.MousePosition);
-                Point pt2 = new Point(pt.X, control.Height - pt.Y);
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbManager.PcbRenderer.Demo_MouseDown(sender, pt);
+                    pcbManager.PcbRenderer.Demo_MouseDown(control, pt);
                 }
             }
         }
@@ -144,9 +148,13 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbManager.PcbRenderer.Demo_MouseUp(sender, pt);
+                    pcbManager.PcbRenderer.Demo_MouseUp(control, pt);
                 }
             }
+        }
+
+        private void GlControl_MouseWheel(object? sender, MouseEventArgs e)
+        {
         }
 
         private void GlControl_Resize(object? sender, EventArgs e)

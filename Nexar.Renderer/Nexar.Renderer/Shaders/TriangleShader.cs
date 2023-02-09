@@ -40,8 +40,7 @@ namespace Nexar.Renderer.Shaders
             string? shaderGeom = null)
             : base(
                   shaderVert ?? "triangleShader.vert",
-                  shaderFrag ?? "triangleShader.frag",
-                  shaderGeom ?? "triangleShader.geom")
+                  shaderFrag ?? "triangleShader.frag")
         {
         }
 
