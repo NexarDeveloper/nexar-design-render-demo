@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.workspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.layersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -42,26 +42,26 @@
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.currentProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.menuStrip1.SuspendLayout();
+            this.mainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
-            this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
-            // menuStrip1
+            // mainMenu
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.workspaceToolStripMenuItem,
             this.openProjectMenuItem,
             this.layersToolStripMenuItem,
             this.primitivesToolStripMenuItem,
             this.commentsMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(984, 24);
-            this.menuStrip1.TabIndex = 1;
-            this.menuStrip1.Text = "menuStrip1";
+            this.mainMenu.Location = new System.Drawing.Point(0, 0);
+            this.mainMenu.Name = "mainMenu";
+            this.mainMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
+            this.mainMenu.Size = new System.Drawing.Size(1184, 24);
+            this.mainMenu.TabIndex = 1;
+            this.mainMenu.Text = "mainMenu";
             // 
             // workspaceToolStripMenuItem
             // 
@@ -146,13 +146,12 @@
             // splitContainer.Panel1
             // 
             this.splitContainer.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.splitContainer.Panel1.Controls.Add(this.statusStrip);
             // 
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.splitContainer.Panel2Collapsed = true;
-            this.splitContainer.Size = new System.Drawing.Size(984, 737);
+            this.splitContainer.Size = new System.Drawing.Size(1184, 737);
             this.splitContainer.SplitterDistance = 788;
             this.splitContainer.SplitterWidth = 8;
             this.splitContainer.TabIndex = 2;
@@ -164,10 +163,10 @@
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusLabel,
             this.currentProgressBar});
-            this.statusStrip.Location = new System.Drawing.Point(0, 715);
+            this.statusStrip.Location = new System.Drawing.Point(0, 739);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(984, 22);
-            this.statusStrip.TabIndex = 0;
+            this.statusStrip.Size = new System.Drawing.Size(1184, 22);
+            this.statusStrip.TabIndex = 3;
             this.statusStrip.Text = "statusStrip1";
             // 
             // statusLabel
@@ -186,18 +185,17 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 761);
+            this.ClientSize = new System.Drawing.Size(1184, 761);
+            this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.splitContainer);
-            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.mainMenu);
             this.KeyPreview = true;
-            this.MainMenuStrip = this.menuStrip1;
+            this.MainMenuStrip = this.mainMenu;
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Nexar.Renderer";
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.splitContainer.Panel1.ResumeLayout(false);
-            this.splitContainer.Panel1.PerformLayout();
+            this.mainMenu.ResumeLayout(false);
+            this.mainMenu.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             this.statusStrip.ResumeLayout(false);
@@ -208,7 +206,7 @@
         }
 
         #endregion
-        private MenuStrip menuStrip1;
+        private MenuStrip mainMenu;
         private ToolStripMenuItem openProjectMenuItem;
         private ToolStripMenuItem workspaceToolStripMenuItem;
         private ToolStripMenuItem layersToolStripMenuItem;
@@ -220,7 +218,7 @@
         private ToolStripMenuItem commentsMenuItem;
         private ToolStripMenuItem showCommentsMenuItem;
         private StatusStrip statusStrip;
-        private ToolStripProgressBar currentProgressBar;
         private ToolStripStatusLabel statusLabel;
+        private ToolStripProgressBar currentProgressBar;
     }
 }

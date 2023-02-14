@@ -30,7 +30,7 @@ namespace Nexar.Renderer.Managers
 
         private PcbStats PcbStats { get; set; } = default!;
 
-        private IOperationResult<IGetPcbModelResult> PcbModel { get; set; } = default!;
+        public IOperationResult<IGetPcbModelResult> PcbModel { get; private set; } = default!;
 
         static bool DisableDrawTracks = false;
         static bool DisableDrawPads = false;

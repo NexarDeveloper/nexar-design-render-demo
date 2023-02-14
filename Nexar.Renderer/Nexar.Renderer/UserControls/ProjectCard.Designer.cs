@@ -39,6 +39,7 @@
             // 
             this.thumbnail.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.thumbnail.InitialImage = global::Nexar.Renderer.Properties.Resources.loading;
             this.thumbnail.Location = new System.Drawing.Point(3, 3);
             this.thumbnail.Name = "thumbnail";
             this.thumbnail.Size = new System.Drawing.Size(294, 189);

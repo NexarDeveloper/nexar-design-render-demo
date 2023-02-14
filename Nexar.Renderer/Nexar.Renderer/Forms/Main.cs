@@ -21,6 +21,7 @@ using StrawberryShake;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+using Microsoft.VisualBasic.Devices;
 
 namespace Nexar.Renderer.Forms
 {
@@ -36,9 +37,11 @@ namespace Nexar.Renderer.Forms
 
         private ThreadHelper? renderThreadHelper;
 
+        private CommentThreads commentThreads;
+
         private const int THREAD_PERIOD_MS = 10;
 
-        private int glWidth = 1000;
+        private int glWidth = 1200;
         private int glHeight = 800;
 
         private bool testPrimitiveEnabled = false;
@@ -54,6 +57,7 @@ namespace Nexar.Renderer.Forms
             glControl.Location = new Point(0, 0);
             glControl.Load += GlControl_Load;
             glControl.Resize += GlControl_Resize;
+            glControl.Click += GlControl_Click;
 
             glControl.MouseDown += GlControl_MouseDown;
             glControl.MouseMove += GlControl_MouseMove;
@@ -83,6 +87,25 @@ namespace Nexar.Renderer.Forms
 
                 renderThreadHelper.StartThreads();
             }
+
+            commentThreads = new CommentThreads()
+            {
+                Dock = DockStyle.Fill
+                //Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right
+            };
+
+            splitContainer.Panel2.Controls.Add(commentThreads);
+
+            /*splitContainer.Panel2.Controls.Add(new CommentElement()
+            {
+                Dock = DockStyle.Top
+                //Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right
+            });*/
+        }
+
+        private void GlControl_Click(object? sender, EventArgs e)
+        {
+            splitContainer.Panel1.Focus();
         }
 
         private void GlControl_Load(object? sender, EventArgs e)
@@ -240,9 +263,12 @@ namespace Nexar.Renderer.Forms
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (!pcbManager.PcbRenderer.ActiveKeys.Contains(e.KeyData))
+            if (!splitContainer.Panel2.ContainsFocus)
             {
-                pcbManager.PcbRenderer.ActiveKeys.Add(e.KeyData);
+                if (!pcbManager.PcbRenderer.ActiveKeys.Contains(e.KeyData))
+                {
+                    pcbManager.PcbRenderer.ActiveKeys.Add(e.KeyData);
+                }
             }
 
             base.OnKeyDown(e);
@@ -271,34 +297,122 @@ namespace Nexar.Renderer.Forms
             }
         }
 
-        private async void OpenProjectMenuItem_Click(object sender, EventArgs e)
+        private async void workspaceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (ActiveWorkspace == null)
-            {
-                MessageBox.Show("Please select a workspace");
-            }
-            else
-            {
-                var workspace = new Workspace()
-                {
-                    Url = ActiveWorkspace.Url
-                };
+            await LoadWorkspacesAsync();
+        }
 
-                var projectsForm = new ProjectsForm();
-                await projectsForm.LoadProjectsAsync(workspace);
-                var result = projectsForm.ShowDialog();
+        private async Task LoadWorkspacesAsync()
+        {
+            try
+            {
+                mainMenu.Enabled = false;
 
-                if (result == DialogResult.OK)
+                if ((workspaceToolStripMenuItem.DropDownItems != null) &&
+                    (workspaceToolStripMenuItem.DropDownItems.Count == 0))
                 {
-                    if (projectsForm.SelectedDesignProject != null)
+                    workspaceToolStripMenuItem.Text = "Loading...";
+                    StatusBusy("Loading workspace list...");
+
+                    await NexarHelper.LoginAsync();
+                    var nexarClient = NexarHelper.GetNexarClient();
+
+                    var workspaces = await nexarClient.GetWorkspaces.ExecuteAsync();
+
+                    workspaces.EnsureNoErrors();
+
+                    if (workspaces?.Data != null)
                     {
-                        Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
-                        StatusBusy(string.Format("Opening '{0}'...", projectsForm.SelectedDesignProject.Name));
-                        await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
-                        StatusReady();
-                        LoadLayers();
+                        var items = new List<ToolStripMenuItem>();
+
+                        foreach (var workspace in workspaces.Data.DesWorkspaces)
+                        {
+                            var toolStripMenuItem = new ToolStripMenuItem();
+                            toolStripMenuItem.Name = workspace.Id;
+                            toolStripMenuItem.Text = workspace.Name;
+                            toolStripMenuItem.Tag = workspace;
+                            toolStripMenuItem.Click += ToolStripMenuItem_Click;
+                            items.Add(toolStripMenuItem);
+                        }
+
+                        workspaceToolStripMenuItem.DropDownItems.AddRange(items.ToArray());
+                    }
+
+                    workspaceToolStripMenuItem.Text = "Workspaces";
+                    StatusReady();
+
+                    var defaultWorkspace = workspaces?.Data?.DesWorkspaces.FirstOrDefault(x => x.IsDefault == true);
+
+                    if (defaultWorkspace != null)
+                    {
+                        ActiveWorkspace = defaultWorkspace;
+                        Text = string.Format("Nexar.Renderer | {0}", (ActiveWorkspace?.Name ?? ""));
+                        var defaultWorkspaceToolItem = workspaceToolStripMenuItem.DropDownItems.Find(defaultWorkspace.Id, true).FirstOrDefault() as ToolStripMenuItem;
+
+                        if (defaultWorkspaceToolItem != null)
+                        {
+                            defaultWorkspaceToolItem.Checked = true;
+                        }
                     }
                 }
+            }
+            finally
+            {
+                mainMenu.Enabled = true;
+            }
+        }
+
+        private async void OpenProjectMenuItem_Click(object sender, EventArgs e)
+        {
+            await LoadProjectsAsync();
+        }
+
+        private async Task LoadProjectsAsync()
+        {
+            try
+            {
+                mainMenu.Enabled = false;
+
+                if (ActiveWorkspace == null)
+                {
+                    MessageBox.Show("Please select a workspace");
+                }
+                else
+                {
+                    var workspace = new Workspace()
+                    {
+                        Url = ActiveWorkspace.Url
+                    };
+
+                    StatusBusy(string.Format("Loading projects in workspace '{0}'...", ActiveWorkspace.Name));
+                    var projectsForm = new ProjectsForm();
+                    await projectsForm.LoadProjectsAsync(workspace);
+                    var result = projectsForm.ShowDialog();
+                    StatusReady();
+
+                    if (result == DialogResult.OK)
+                    {
+                        if (projectsForm.SelectedDesignProject != null)
+                        {
+                            Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
+                            StatusBusy(string.Format("Opening '{0}'...", projectsForm.SelectedDesignProject.Name));
+                            await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
+                            StatusReady();
+                            LoadLayers();
+
+                            // TODO: Fix this
+                            commentThreads.PcbModel = pcbManager.PcbModel;
+                            commentThreads.LoadCommentThreadsThreadSafe();
+
+                            splitContainer.Panel2Collapsed =
+                                (pcbManager.PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.CommentThreads?.Count == 0);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                mainMenu.Enabled = true;
             }
         }
 
@@ -325,62 +439,6 @@ namespace Nexar.Renderer.Forms
             }
 
             layersToolStripMenuItem.DropDownItems.AddRange(items.ToArray());
-        }
-
-        private async void workspaceToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            await LoadWorkspacesAsync();
-        }
-
-        private async Task LoadWorkspacesAsync()
-        {
-            if ((workspaceToolStripMenuItem.DropDownItems != null) &&
-                (workspaceToolStripMenuItem.DropDownItems.Count == 0))
-            {
-                workspaceToolStripMenuItem.Text = "Loading...";
-                StatusBusy("Loading workspace list...");
-
-                await NexarHelper.LoginAsync();
-                var nexarClient = NexarHelper.GetNexarClient();
-
-                var workspaces = await nexarClient.GetWorkspaces.ExecuteAsync();
-
-                workspaces.EnsureNoErrors();
-
-                if (workspaces?.Data != null)
-                {
-                    var items = new List<ToolStripMenuItem>();
-
-                    foreach (var workspace in workspaces.Data.DesWorkspaces)
-                    {
-                        var toolStripMenuItem = new ToolStripMenuItem();
-                        toolStripMenuItem.Name = workspace.Id;
-                        toolStripMenuItem.Text = workspace.Name;
-                        toolStripMenuItem.Tag = workspace;
-                        toolStripMenuItem.Click += ToolStripMenuItem_Click;
-                        items.Add(toolStripMenuItem);
-                    }
-
-                    workspaceToolStripMenuItem.DropDownItems.AddRange(items.ToArray());
-                }
-                
-                workspaceToolStripMenuItem.Text = "Workspaces";
-                StatusReady();
-
-                var defaultWorkspace = workspaces?.Data?.DesWorkspaces.FirstOrDefault(x => x.IsDefault == true);
-
-                if (defaultWorkspace != null)
-                {
-                    ActiveWorkspace = defaultWorkspace;
-                    Text = string.Format("Nexar.Renderer | {0}", (ActiveWorkspace?.Name ?? ""));
-                    var defaultWorkspaceToolItem = workspaceToolStripMenuItem.DropDownItems.Find(defaultWorkspace.Id, true).FirstOrDefault() as ToolStripMenuItem;
-
-                    if (defaultWorkspaceToolItem != null)
-                    {
-                        defaultWorkspaceToolItem.Checked = true;
-                    }
-                }
-            }
         }
 
         private void ToolStripMenuItem_Click(object? sender, EventArgs e)

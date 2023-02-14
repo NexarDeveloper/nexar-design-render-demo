@@ -1,6 +1,6 @@
-﻿namespace Nexar.Renderer.UserControls
+﻿namespace Nexar.Renderer.Forms
 {
-    partial class CommentElement
+    partial class CommentThreads
     {
         /// <summary> 
         /// Required designer variable.
@@ -30,12 +30,14 @@
         {
             this.SuspendLayout();
             // 
-            // CommentElement
+            // CommentThreads
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Name = "CommentElement";
-            this.Size = new System.Drawing.Size(397, 183);
+            this.AutoScroll = true;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.Name = "CommentThreads";
+            this.Size = new System.Drawing.Size(252, 64);
             this.ResumeLayout(false);
 
         }
