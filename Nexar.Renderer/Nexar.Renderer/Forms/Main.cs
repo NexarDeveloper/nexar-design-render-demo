@@ -173,6 +173,13 @@ namespace Nexar.Renderer.Forms
                 {
                     pcbManager.PcbRenderer.Demo_MouseUp(control, pt);
                 }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+                    ToolStripItem createCommentThread = new ToolStripMenuItem("Add Comment");
+                    contextMenuStrip.Items.Add(createCommentThread);
+                    contextMenuStrip.Show(MousePosition);
+                }
             }
         }
 
