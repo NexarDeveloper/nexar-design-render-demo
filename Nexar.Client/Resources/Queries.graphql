@@ -54,7 +54,7 @@ query GetProjects($workspaceUrl: String!, $cursor: String!) {
   }
 }
 
-query GetPcbModelInfo($id: ID!) {
+query GetDesignItemInfo($id: ID!) {
   desProjectById (id: $id) {
     name
     description
@@ -71,6 +71,49 @@ query GetPcbModelInfo($id: ID!) {
                 endCursor
               }
             }
+          }
+        }
+      }
+    }
+  }
+}
+
+query GetDesignItems($id: ID!, $cursor: String!, $count: Int!) {
+  desProjectById (id: $id) {
+    name
+    description
+    design {
+      workInProgress {
+        variants {
+          pcb {
+            designItems (after: $cursor, first: $count) {
+              totalCount
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
+              }            
+              nodes {
+                designator
+                description
+                comment
+                area {
+                  pos1 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                  pos2 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                }
+              }
+            }           
           }
         }
       }
@@ -151,34 +194,6 @@ query GetPcbModel($id: ID!) {
                   lastName
                   email
                   pictureUrl                
-                }
-              }
-            }
-            designItems {
-              totalCount
-              pageInfo {
-                hasNextPage
-                hasPreviousPage
-                startCursor
-                endCursor
-              }            
-              nodes {
-                designator
-                description
-                comment
-                area {
-                  pos1 {
-                    x
-                    y
-                    xMm
-                    yMm
-                  }
-                  pos2 {
-                    x
-                    y
-                    xMm
-                    yMm
-                  }
                 }
               }
             }

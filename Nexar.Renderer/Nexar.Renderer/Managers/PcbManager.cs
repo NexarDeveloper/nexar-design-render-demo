@@ -17,6 +17,7 @@ using Nexar.Renderer.Geometry;
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using System.Reflection.Emit;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Nexar.Renderer.Managers
 {
@@ -40,6 +41,10 @@ namespace Nexar.Renderer.Managers
         private float xOffset = 0.0F;
         private float yOffset = 0.0F;
 
+        private NexarClient nexarClient = default!;
+
+        private Project ActiveProject { get; set; } = default!;
+
         public PcbManager(GlRenderer renderer)
         {
             PcbRenderer = renderer;
@@ -48,7 +53,9 @@ namespace Nexar.Renderer.Managers
         }
 
         public async Task OpenPcbDesignAsync(Project project)
-        {            
+        {
+            ActiveProject = project;
+
             PcbRenderer.Pcb.Reset();
 
             PcbStats = new PcbStats();
@@ -56,7 +63,7 @@ namespace Nexar.Renderer.Managers
             GeneralStopwatch.Restart();
 
             await NexarHelper.LoginAsync();
-            var nexarClient = NexarHelper.GetNexarClient();
+            nexarClient = NexarHelper.GetNexarClient();
 
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);
             PcbModel.EnsureNoErrors();
@@ -66,7 +73,7 @@ namespace Nexar.Renderer.Managers
 
             LoadLayerStack();
             LoadBoardOutline();
-            LoadDesignItems();
+            await LoadDesignItemsAsync();
             LoadNetsAndAssociatedPrimitives();
             LoadNoNetPads();
 
@@ -160,7 +167,7 @@ namespace Nexar.Renderer.Managers
             return AllComponents.FirstOrDefault(x => x.HitTest(location));
         }
 
-        private void LoadDesignItems()
+        private async Task LoadDesignItemsAsync()
         {
             GeneralStopwatch.Restart();
 
@@ -168,33 +175,71 @@ namespace Nexar.Renderer.Managers
 
             Stopwatch componentStopwatch = new Stopwatch();
 
-            var designItems = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0].Pcb?.DesignItems;
+            var infoResult = await nexarClient.GetDesignItemInfo.ExecuteAsync(ActiveProject.Id);
+            infoResult.EnsureNoErrors();
 
-            if (designItems != null && designItems.Nodes != null)
+            var designItemInfo = infoResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.DesignItems;
+
+            if (designItemInfo != null)
             {
-                componentStopwatch.Start();
+                bool hasPage = designItemInfo.TotalCount != 0;
 
-                foreach (var designItem in designItems.Nodes)
+                // Hack for page count
+                int pageFraction = designItemInfo.TotalCount % 10;
+                int pageTotal = ((designItemInfo.TotalCount - pageFraction) / 10);
+
+                if (pageFraction > 0)
                 {
-                    if (designItem.Area != null)
-                    {
-                        PcbStats.TotalDesignItems++;
-
-                        AllComponents.Add(
-                            new Component(
-                                designItem.Designator,
-                                designItem.Description,
-                                designItem.Comment,
-                                (float)designItem.Area.Pos1.XMm,
-                                (float)designItem.Area.Pos1.YMm,
-                                (float)designItem.Area.Pos2.XMm,
-                                (float)designItem.Area.Pos2.YMm));
-                    }
+                    pageTotal++;
                 }
 
-                componentStopwatch.Stop();
-            }
+                string? cursor = "LTE="; // Start cursor at -1 to select after  variantInfo.Pcb.DesignItems.PageInfo.StartCursor;
+                //string? cursor = "MTk="; // designItemInfo.PageInfo.StartCursor; // Start cursor at -1 to select after  variantInfo.Pcb.DesignItems.PageInfo.StartCursor;
 
+                while (hasPage && cursor != null)
+                {
+                    var itemResult = await nexarClient.GetDesignItems.ExecuteAsync(ActiveProject.Id, cursor, 10);
+
+                    try
+                    {
+                        itemResult.EnsureNoErrors();
+                    }
+                    catch (GraphQLClientException)
+                    {
+                    }
+                    
+                    var designItems = itemResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.DesignItems;
+
+                    if (designItems?.Nodes != null)
+                    {
+                        componentStopwatch.Start();
+
+                        foreach (var designItem in designItems.Nodes)
+                        {
+                            if (designItem.Area != null)
+                            {
+                                PcbStats.TotalDesignItems++;
+
+                                AllComponents.Add(
+                                    new Component(
+                                        designItem.Designator,
+                                        designItem.Description,
+                                        designItem.Comment,
+                                        (float)designItem.Area.Pos1.XMm,
+                                        (float)designItem.Area.Pos1.YMm,
+                                        (float)designItem.Area.Pos2.XMm,
+                                        (float)designItem.Area.Pos2.YMm));
+                            }
+                        }
+
+                        componentStopwatch.Stop();
+                    }
+
+                    cursor = designItems?.PageInfo.EndCursor;
+                    hasPage = designItems?.PageInfo.HasNextPage ?? false;
+                }
+            }
+            
             GeneralStopwatch.Stop();
 
             PcbStats.TimeToCreateComponents = componentStopwatch.ElapsedMilliseconds;
