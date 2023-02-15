@@ -96,7 +96,6 @@ query GetDesignItems($id: ID!, $cursor: String!, $count: Int!) {
               }            
               nodes {
                 designator
-                description
                 comment
                 area {
                   pos1 {

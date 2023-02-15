@@ -10,7 +10,6 @@ namespace Nexar.Renderer.DesignEntities
     public class Component
     {
         public string Designator { get; }
-        public string Description { get; }
         public string Comment { get; }
 
         public List<PointF> PolygonVertices { get; } = new List<PointF>();
@@ -19,7 +18,6 @@ namespace Nexar.Renderer.DesignEntities
 
         public Component(
             string designator, 
-            string description, 
             string comment,
             float pos1X,
             float pos1Y,
@@ -27,7 +25,6 @@ namespace Nexar.Renderer.DesignEntities
             float pos2Y)
         {
             Designator = designator;
-            Description = description;
             Comment = comment;
 
             float minX = Math.Min(pos1X, pos2X);

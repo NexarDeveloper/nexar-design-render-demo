@@ -194,19 +194,11 @@ namespace Nexar.Renderer.Managers
                 }
 
                 string? cursor = "LTE="; // Start cursor at -1 to select after  variantInfo.Pcb.DesignItems.PageInfo.StartCursor;
-                //string? cursor = "MTk="; // designItemInfo.PageInfo.StartCursor; // Start cursor at -1 to select after  variantInfo.Pcb.DesignItems.PageInfo.StartCursor;
 
                 while (hasPage && cursor != null)
                 {
                     var itemResult = await nexarClient.GetDesignItems.ExecuteAsync(ActiveProject.Id, cursor, 10);
-
-                    try
-                    {
-                        itemResult.EnsureNoErrors();
-                    }
-                    catch (GraphQLClientException)
-                    {
-                    }
+                    itemResult.EnsureNoErrors();
                     
                     var designItems = itemResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.DesignItems;
 
@@ -223,7 +215,6 @@ namespace Nexar.Renderer.Managers
                                 AllComponents.Add(
                                     new Component(
                                         designItem.Designator,
-                                        designItem.Description,
                                         designItem.Comment,
                                         (float)designItem.Area.Pos1.XMm,
                                         (float)designItem.Area.Pos1.YMm,
