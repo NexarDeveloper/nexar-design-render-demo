@@ -414,6 +414,9 @@ namespace Nexar.Renderer.Forms
                             await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
                             StatusReady();
                             LoadLayers();
+                            StatusBusy("Loading additional design data...");
+                            await pcbManager.LoadAdditionalDesignDataAsync();
+                            StatusReady();
 
                             // TODO: Fix this
                             commentThreads.PcbModel = pcbManager.PcbModel;

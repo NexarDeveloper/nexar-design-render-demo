@@ -73,7 +73,6 @@ namespace Nexar.Renderer.Managers
 
             LoadLayerStack();
             LoadBoardOutline();
-            await LoadDesignItemsAsync();
             LoadNetsAndAssociatedPrimitives();
             LoadNoNetPads();
 
@@ -82,6 +81,11 @@ namespace Nexar.Renderer.Managers
             Debug.WriteLine(PcbStats.ToString());
             Debug.WriteLine(PcbStats.NetToTrackDetail());
             Debug.WriteLine(PcbRenderer.Pcb.GetStats());
+        }
+
+        public async Task LoadAdditionalDesignDataAsync()
+        {
+            await LoadDesignItemsAsync();
         }
 
         private void LoadLayerStack()
