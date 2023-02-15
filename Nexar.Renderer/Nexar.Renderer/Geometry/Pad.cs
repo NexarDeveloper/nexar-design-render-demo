@@ -16,7 +16,6 @@ namespace Nexar.Renderer.Geometry
         public DesPadType PadType { get; }
         public decimal Rotation { get; }
         public float HoleSizeM { get; }
-        public List<PointF> PolygonVertices { get; } = new List<PointF>();
         public List<float> rawVertices { get; } = new List<float>();
 
         public Pad(

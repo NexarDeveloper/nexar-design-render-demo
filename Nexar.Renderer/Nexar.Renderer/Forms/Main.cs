@@ -175,10 +175,18 @@ namespace Nexar.Renderer.Forms
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
-                    ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
-                    ToolStripItem createCommentThread = new ToolStripMenuItem("Add Comment");
-                    contextMenuStrip.Items.Add(createCommentThread);
-                    contextMenuStrip.Show(MousePosition);
+                    var glCoord = pcbManager.PcbRenderer.GetXYOnZeroZPlane(pt);
+                    var mmCoord = pcbManager.ConvertGlCoordToMm(glCoord);
+
+                    var component = pcbManager.GetComponentForLocation(mmCoord);
+
+                    if (component != null)
+                    {
+                        ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+                        ToolStripItem createCommentThread = new ToolStripMenuItem(String.Format("Add Comment to '{0}'", component.Designator));
+                        contextMenuStrip.Items.Add(createCommentThread);
+                        contextMenuStrip.Show(MousePosition);
+                    }
                 }
             }
         }

@@ -82,6 +82,12 @@ namespace Nexar.Renderer.Visualization
             Height = height;
         }
 
+        public PointF GetXYOnZeroZPlane(Point location)
+        {
+            var xy = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
+            return new PointF(xy.Item1, xy.Item2);
+        }
+
         public void Demo_MouseDown(object sender, Point location)
         {
             highlightBox.XYStart = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);

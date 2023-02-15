@@ -154,6 +154,34 @@ query GetPcbModel($id: ID!) {
                 }
               }
             }
+            designItems {
+              totalCount
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
+              }            
+              nodes {
+                designator
+                description
+                comment
+                area {
+                  pos1 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                  pos2 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                }
+              }
+            }
             pads {
               designator
               globalDesignator
@@ -177,7 +205,7 @@ query GetPcbModel($id: ID!) {
               holeSize {
                 xMm
               }
-            }
+            }              
             nets {
               name
               pads {
@@ -239,7 +267,7 @@ query GetPcbModel($id: ID!) {
                   xMm
                 }
               }
-            }
+            }            
           }
         }
       }

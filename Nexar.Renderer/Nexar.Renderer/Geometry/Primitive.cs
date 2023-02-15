@@ -16,7 +16,16 @@ namespace Nexar.Renderer.Geometry
         public const int SCALING_FACTOR = 10000;
         public IPcbLayer Layer { get; protected set; } = default!;
 
+        public List<PointF> PolygonVertices { get; } = new List<PointF>();
+
         public List<Triangle> TessellatedTriangles { get; } = new List<Triangle>();
+
+        private readonly RayCasting rayCasting = new RayCasting();
+
+        public bool HitTest(PointF location)
+        {
+            return rayCasting.IsPointInPolygon(location, PolygonVertices);
+        }
 
         protected void Tessellate(float[] inputData)
         {

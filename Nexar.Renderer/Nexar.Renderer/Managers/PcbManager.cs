@@ -66,6 +66,7 @@ namespace Nexar.Renderer.Managers
 
             LoadLayerStack();
             LoadBoardOutline();
+            LoadDesignItems();
             LoadNetsAndAssociatedPrimitives();
             LoadNoNetPads();
 
@@ -124,10 +125,10 @@ namespace Nexar.Renderer.Managers
                     if (lastVertice != null)
                     {
                         PcbRenderer.Pcb.AddOutline(
-                            ScaleValue(lastVertice.XMm, xOffset, divisor),
-                            ScaleValue(lastVertice.YMm, yOffset, divisor),
-                            ScaleValue(vertice.XMm, xOffset, divisor),
-                            ScaleValue(vertice.YMm, yOffset, divisor));
+                            ScaleValueMmToGl(lastVertice.XMm, xOffset, divisor),
+                            ScaleValueMmToGl(lastVertice.YMm, yOffset, divisor),
+                            ScaleValueMmToGl(vertice.XMm, xOffset, divisor),
+                            ScaleValueMmToGl(vertice.YMm, yOffset, divisor));
                     }
 
                     lastVertice = vertice;
@@ -136,12 +137,67 @@ namespace Nexar.Renderer.Managers
                 if (lastVertice != null && firstVertice != null)
                 {
                     PcbRenderer.Pcb.AddOutline(
-                        ScaleValue(lastVertice.XMm, xOffset, divisor),
-                        ScaleValue(lastVertice.YMm, yOffset, divisor),
-                        ScaleValue(firstVertice.XMm, xOffset, divisor),
-                        ScaleValue(firstVertice.YMm, yOffset, divisor));
+                        ScaleValueMmToGl(lastVertice.XMm, xOffset, divisor),
+                        ScaleValueMmToGl(lastVertice.YMm, yOffset, divisor),
+                        ScaleValueMmToGl(firstVertice.XMm, xOffset, divisor),
+                        ScaleValueMmToGl(firstVertice.YMm, yOffset, divisor));
                 }
             }
+        }
+
+        private List<Component> AllComponents { get; } = new List<Component>();
+
+        public PointF ConvertGlCoordToMm(PointF glValue)
+        {
+            float scaledX = ScaleValueGlToMm((decimal)glValue.X, xOffset, divisor);
+            float scaledY = ScaleValueGlToMm((decimal)glValue.Y, yOffset, divisor);
+
+            return new PointF(scaledX, scaledY);
+        }
+
+        public Component? GetComponentForLocation(PointF location)
+        {
+            return AllComponents.FirstOrDefault(x => x.HitTest(location));
+        }
+
+        private void LoadDesignItems()
+        {
+            GeneralStopwatch.Restart();
+
+            AllComponents.Clear();
+
+            Stopwatch componentStopwatch = new Stopwatch();
+
+            var designItems = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0].Pcb?.DesignItems;
+
+            if (designItems != null && designItems.Nodes != null)
+            {
+                componentStopwatch.Start();
+
+                foreach (var designItem in designItems.Nodes)
+                {
+                    if (designItem.Area != null)
+                    {
+                        PcbStats.TotalDesignItems++;
+
+                        AllComponents.Add(
+                            new Component(
+                                designItem.Designator,
+                                designItem.Description,
+                                designItem.Comment,
+                                (float)designItem.Area.Pos1.XMm,
+                                (float)designItem.Area.Pos1.YMm,
+                                (float)designItem.Area.Pos2.XMm,
+                                (float)designItem.Area.Pos2.YMm));
+                    }
+                }
+
+                componentStopwatch.Stop();
+            }
+
+            GeneralStopwatch.Stop();
+
+            PcbStats.TimeToCreateComponents = componentStopwatch.ElapsedMilliseconds;
         }
 
         private void LoadNetsAndAssociatedPrimitives()
@@ -172,11 +228,11 @@ namespace Nexar.Renderer.Managers
 
                                 PcbRenderer.Pcb.AddTrack(
                                     layer,
-                                    ScaleValue(track.Begin.XMm, xOffset, divisor),
-                                    ScaleValue(track.Begin.YMm, yOffset, divisor),
-                                    ScaleValue(track.End.XMm, xOffset, divisor),
-                                    ScaleValue(track.End.YMm, yOffset, divisor),
-                                    ScaleValue(track.Width.XMm, 0.0F, divisor));
+                                    ScaleValueMmToGl(track.Begin.XMm, xOffset, divisor),
+                                    ScaleValueMmToGl(track.Begin.YMm, yOffset, divisor),
+                                    ScaleValueMmToGl(track.End.XMm, xOffset, divisor),
+                                    ScaleValueMmToGl(track.End.YMm, yOffset, divisor),
+                                    ScaleValueMmToGl(track.Width.XMm, 0.0F, divisor));
 
                                 trackStopwatch.Stop();
                                 PcbStats.TotalTracks++;
@@ -227,20 +283,20 @@ namespace Nexar.Renderer.Managers
                                 PcbRenderer.Pcb.AddVia(
                                     beginLayer,
                                     via.Shape ?? DesPrimitiveShape.Round,
-                                    ScaleValue(via.Position.XMm, xOffset, divisor),
-                                    ScaleValue(via.Position.YMm, yOffset, divisor),
-                                    ScaleValue(via.PadDiameter.XMm, 0.0F, divisor),
-                                    ScaleValue(via.HoleDiameter.XMm, 0.0F, divisor));
+                                    ScaleValueMmToGl(via.Position.XMm, xOffset, divisor),
+                                    ScaleValueMmToGl(via.Position.YMm, yOffset, divisor),
+                                    ScaleValueMmToGl(via.PadDiameter.XMm, 0.0F, divisor),
+                                    ScaleValueMmToGl(via.HoleDiameter.XMm, 0.0F, divisor));
 
                                 var endLayer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == via.EndLayer.Name);
 
                                 PcbRenderer.Pcb.AddVia(
                                     endLayer,
                                     via.Shape ?? DesPrimitiveShape.Round,
-                                    ScaleValue(via.Position.XMm, xOffset, divisor),
-                                    ScaleValue(via.Position.YMm, yOffset, divisor),
-                                    ScaleValue(via.PadDiameter.XMm, 0.0F, divisor),
-                                    ScaleValue(via.HoleDiameter.XMm, 0.0F, divisor));
+                                    ScaleValueMmToGl(via.Position.XMm, xOffset, divisor),
+                                    ScaleValueMmToGl(via.Position.YMm, yOffset, divisor),
+                                    ScaleValueMmToGl(via.PadDiameter.XMm, 0.0F, divisor),
+                                    ScaleValueMmToGl(via.HoleDiameter.XMm, 0.0F, divisor));
 
                                 viaStopwatch.Stop();
                                 PcbStats.TotalVias++;
@@ -291,12 +347,12 @@ namespace Nexar.Renderer.Managers
                 layer,
                 pad.Shape ?? DesPrimitiveShape.Rectangle,
                 pad.PadType,
-                ScaleValue(pad.Size.XMm, 0.0F, divisor),
-                ScaleValue(pad.Size.YMm, 0.0F, divisor),
-                ScaleValue(pad.Position.XMm, xOffset, divisor),
-                ScaleValue(pad.Position.YMm, yOffset, divisor),
+                ScaleValueMmToGl(pad.Size.XMm, 0.0F, divisor),
+                ScaleValueMmToGl(pad.Size.YMm, 0.0F, divisor),
+                ScaleValueMmToGl(pad.Position.XMm, xOffset, divisor),
+                ScaleValueMmToGl(pad.Position.YMm, yOffset, divisor),
                 pad.Rotation ?? 0.0M,
-                ScaleValue(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
+                ScaleValueMmToGl(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
         }
 
         private void AddPad(IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_Pads pad, IPcbLayer layer)
@@ -305,17 +361,22 @@ namespace Nexar.Renderer.Managers
                 layer,
                 pad.Shape ?? DesPrimitiveShape.Rectangle,
                 pad.PadType,
-                ScaleValue(pad.Size.XMm, 0.0F, divisor),
-                ScaleValue(pad.Size.YMm, 0.0F, divisor),
-                ScaleValue(pad.Position.XMm, xOffset, divisor),
-                ScaleValue(pad.Position.YMm, yOffset, divisor),
+                ScaleValueMmToGl(pad.Size.XMm, 0.0F, divisor),
+                ScaleValueMmToGl(pad.Size.YMm, 0.0F, divisor),
+                ScaleValueMmToGl(pad.Position.XMm, xOffset, divisor),
+                ScaleValueMmToGl(pad.Position.YMm, yOffset, divisor),
                 pad.Rotation ?? 0.0M,
-                ScaleValue(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
+                ScaleValueMmToGl(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
         }
 
-        private float ScaleValue(decimal value, float offset, float divisor)
+        private float ScaleValueMmToGl(decimal value, float offset, float divisor)
         {
             return (((float)value) - offset) / divisor;
+        }
+
+        private float ScaleValueGlToMm(decimal value, float offset, float divisor)
+        {
+            return (((float)value) * divisor) + offset;
         }
     }
 }

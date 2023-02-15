@@ -11,9 +11,11 @@ namespace Nexar.Renderer.Managers
     {
         public long TimeToLoadPcbFromNexar { get; set; } = 0;
         public long TimeToCreateAllPrimitives { get; set; } = 0;
+        public long TimeToCreateComponents { get; set; } = 0;
         public long TimeToCreateTracks { get; set; } = 0;
         public long TimeToCreatePads { get; set; } = 0;
         public long TimeToCreateVias { get; set; } = 0;
+        public int TotalDesignItems { get; set; } = 0;
         public int TotalNets { get; set; } = 0;
         public int TotalTracks { get; set; } = 0;
         public int TotalPads { get; set; } = 0;
@@ -38,15 +40,17 @@ namespace Nexar.Renderer.Managers
                 "Time To Create Tracks: {2}" + Environment.NewLine +
                 "Time To Create Pads: {3}" + Environment.NewLine +
                 "Time To Create Vias: {4}" + Environment.NewLine +
-                "Total Nets: {5}" + Environment.NewLine +
-                "Total Tracks: {6}" + Environment.NewLine +
-                "Total Pads: {7}" + Environment.NewLine +
-                "Total Vias: {8}" + Environment.NewLine,
+                "Total Components: {5}" + Environment.NewLine +
+                "Total Nets: {6}" + Environment.NewLine +
+                "Total Tracks: {7}" + Environment.NewLine +
+                "Total Pads: {8}" + Environment.NewLine +
+                "Total Vias: {9}" + Environment.NewLine,
                 FormattedTime(TimeToLoadPcbFromNexar),
                 FormattedTime(TimeToCreateAllPrimitives),
                 FormattedTime(TimeToCreateTracks),
                 FormattedTime(TimeToCreatePads),
                 FormattedTime(TimeToCreateVias),
+                TotalDesignItems,
                 TotalNets,
                 TotalTracks,
                 TotalPads,

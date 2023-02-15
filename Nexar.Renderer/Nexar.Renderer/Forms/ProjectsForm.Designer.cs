@@ -49,7 +49,7 @@
             this.Controls.Add(this.flowLayoutPanel);
             this.Name = "ProjectsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "WorkspaceProjects";
+            this.Text = "Projects";
             this.ResumeLayout(false);
 
         }
