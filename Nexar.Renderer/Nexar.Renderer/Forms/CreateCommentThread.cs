@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -77,6 +78,8 @@ namespace Nexar.Renderer.Forms
             area.Pos1 = new DesPosition2DInput() { X = Area.Item1.X, Y = Area.Item1.Y };
             area.Pos2 = new DesPosition2DInput() { X = Area.Item2.X, Y = Area.Item2.Y };
 
+            commentThreadInput.DocumentType = DocumentType.Pcb;
+            commentThreadInput.AssociationType = (CommentType == E_CommentType.Component ? AssociationType.Component : AssociationType.Area);
             commentThreadInput.EntityId = PcbManager.ActiveProject.Id;
             commentThreadInput.DocumentId = PcbManager.DocumentId;
             commentThreadInput.ObjectId = (Id != null ? DecodeNodeId(Id).PcbUniqueId : string.Empty);
