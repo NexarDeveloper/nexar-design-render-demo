@@ -78,10 +78,11 @@ namespace Nexar.Renderer.Forms
             area.Pos1 = new DesPosition2DInput() { X = Area.Item1.X, Y = Area.Item1.Y };
             area.Pos2 = new DesPosition2DInput() { X = Area.Item2.X, Y = Area.Item2.Y };
 
-            commentThreadInput.DocumentType = DocumentType.Pcb;
-            commentThreadInput.AssociationType = (CommentType == E_CommentType.Component ? AssociationType.Component : AssociationType.Area);
+            commentThreadInput.DocumentType = DesDocumentType.Pcb;
+            commentThreadInput.CommentContextType = (CommentType == E_CommentType.Component ? DesCommentContextType.Component : DesCommentContextType.Area);
             commentThreadInput.EntityId = PcbManager.ActiveProject.Id;
             commentThreadInput.DocumentId = PcbManager.DocumentId;
+            commentThreadInput.DocumentName = PcbManager.DocumentName;
             commentThreadInput.ObjectId = (Id != null ? DecodeNodeId(Id).PcbUniqueId : string.Empty);
             commentThreadInput.Text = commentTextBox.Text.Trim();
             commentThreadInput.Area = area;

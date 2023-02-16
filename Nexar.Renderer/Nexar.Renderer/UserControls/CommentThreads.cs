@@ -117,7 +117,7 @@ namespace Nexar.Renderer.UserControls
                     ResumeLayout();
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 //AppLogger.Error(string.Format("Exception loading comment threads: {0}", ex.Message));
             }
@@ -139,7 +139,7 @@ namespace Nexar.Renderer.UserControls
 
                 UpdateLocalModel();
             }
-            catch (Exception ex)
+            catch
             {
                 //AppLogger.Error(string.Format("Exception updating comment threads: {0}", ex.Message));
             }
@@ -208,15 +208,15 @@ namespace Nexar.Renderer.UserControls
 
                 foreach (var comment in deletedComments)
                 {
-                    var commentElement = commentElementUCs.FirstOrDefault(x => x.Comment.CommentId == comment.CommentId);
+                    var commentElement = commentElementUCs.FirstOrDefault(x => x.Comment!.CommentId == comment.CommentId);
                     threadToPanelMapping[thread.CommentThreadId].Controls.Remove(commentElement);
                     threadToPanelMapping[thread.CommentThreadId].RowStyles.RemoveAt(threadToPanelMapping[thread.CommentThreadId].RowStyles.Count - 1);
                 }
 
                 foreach (var comment in updatedComments)
                 {
-                    var commentElement = commentElementUCs.FirstOrDefault(x => x.Comment.CommentId == comment.CommentId);
-                    commentElement.LoadComment(thread, comment, true);
+                    var commentElement = commentElementUCs.FirstOrDefault(x => x.Comment!.CommentId == comment.CommentId);
+                    commentElement!.LoadComment(thread, comment, true);
                 }
 
                 threadToPanelMapping[thread.CommentThreadId].Controls.Add(createCommentUCs[thread.CommentThreadId]);

@@ -51,6 +51,8 @@ namespace Nexar.Renderer.Managers
 
         public string DocumentId { get; set; } = string.Empty;
 
+        public string DocumentName { get; set; } = string.Empty;
+
         public PcbManager(GlRenderer renderer)
         {
             PcbRenderer = renderer;
@@ -74,7 +76,12 @@ namespace Nexar.Renderer.Managers
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);
             PcbModel.EnsureNoErrors();
 
-            DocumentId = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DocumentId ?? string.Empty;
+            var pcb = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb;
+            if (pcb is not null)
+            {
+                DocumentId = pcb.DocumentId ?? string.Empty;
+                DocumentName = pcb.DocumentName ?? string.Empty;
+            }
 
             GeneralStopwatch.Stop();
             PcbStats.TimeToLoadPcbFromNexar = GeneralStopwatch.ElapsedMilliseconds;

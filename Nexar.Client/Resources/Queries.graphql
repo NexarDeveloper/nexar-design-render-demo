@@ -115,6 +115,7 @@ query GetPcbModel($id: ID!) {
         variants {
           pcb {
             documentId
+            documentName
             layerStack {
               stacks {
                 name
