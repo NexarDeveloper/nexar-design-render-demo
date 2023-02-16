@@ -8,6 +8,8 @@ scalar Map
 
 scalar Time
 
+scalar Any
+
 type Query {
   "Fetches an object given its ID."
   node("ID of the object." id: ID!): Node
@@ -3589,6 +3591,8 @@ input AdmEvtSendAppNotificationInput {
   destinationApplicationId: String!
   "Identifier of object the event is generate for (project, workspace, part, etc)."
   subject: String
+  "customData is destination application specified extra data."
+  customData: Any
 }
 
 enum AdmEventType {
