@@ -219,7 +219,7 @@ namespace Nexar.Renderer.Managers
 
                                 var component = new Component(
                                         designItem.Designator,
-                                        designItem.Comment,
+                                        "", //designItem.Comment,
                                         (float)designItem.Area.Pos1.XMm,
                                         (float)designItem.Area.Pos1.YMm,
                                         (float)designItem.Area.Pos2.XMm,
