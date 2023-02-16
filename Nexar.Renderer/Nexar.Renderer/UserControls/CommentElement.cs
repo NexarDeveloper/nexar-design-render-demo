@@ -11,7 +11,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 
-namespace Nexar.Renderer.Forms
+namespace Nexar.Renderer.UserControls
 {
     public partial class CommentElement : UserControl
     {

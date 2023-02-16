@@ -1,4 +1,4 @@
-﻿namespace Nexar.Renderer.Forms
+﻿namespace Nexar.Renderer.UserControls
 {
     partial class CommentThreads
     {

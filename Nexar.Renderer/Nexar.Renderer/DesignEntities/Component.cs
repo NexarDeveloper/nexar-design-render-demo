@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Nexar.Renderer.DesignEntities
 {
-    public class Component
+    public class DesignItem
     {
+        public string Id { get; }
         public string Designator { get; }
         public string Comment { get; }
 
@@ -16,7 +17,8 @@ namespace Nexar.Renderer.DesignEntities
 
         private readonly RayCasting rayCasting = new RayCasting();
 
-        public Component(
+        public DesignItem(
+            string id,
             string designator, 
             string comment,
             float pos1X,
@@ -24,6 +26,7 @@ namespace Nexar.Renderer.DesignEntities
             float pos2X,
             float pos2Y)
         {
+            Id = id;
             Designator = designator;
             Comment = comment;
 

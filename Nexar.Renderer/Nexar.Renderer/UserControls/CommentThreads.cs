@@ -13,7 +13,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
 
-namespace Nexar.Renderer.Forms
+namespace Nexar.Renderer.UserControls
 {
     public partial class CommentThreads : UserControl
     {

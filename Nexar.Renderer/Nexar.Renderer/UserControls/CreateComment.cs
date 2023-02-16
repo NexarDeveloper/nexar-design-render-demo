@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Nexar.Renderer.Forms
+namespace Nexar.Renderer.UserControls
 {
     public partial class CreateComment : UserControl
     {

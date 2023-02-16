@@ -1,6 +1,6 @@
 ﻿using Terpsichore.AddIn.PnP.App;
 
-namespace Nexar.Renderer.Forms
+namespace Nexar.Renderer.UserControls
 {
     partial class CommentElement
     {

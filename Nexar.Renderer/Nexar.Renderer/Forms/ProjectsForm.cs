@@ -56,6 +56,7 @@ namespace Nexar.Renderer.Forms
                             var designProject = new Project()
                             {
                                 Id = project.Id,
+                                ProjectId = project.ProjectId,
                                 Description = project?.Description ?? string.Empty,
                                 Name = project?.Name ?? string.Empty,
                                 PreviewUrl = project?.PreviewUrl ?? string.Empty,

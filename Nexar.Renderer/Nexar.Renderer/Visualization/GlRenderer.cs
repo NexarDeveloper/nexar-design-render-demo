@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using Nexar.Renderer.DesignEntities;
+using Nexar.Renderer.Forms;
+using Nexar.Renderer.Managers;
 using Nexar.Renderer.Tools;
 using OpenTk.Tutorial.Tools;
 using OpenTK;
@@ -47,6 +49,8 @@ namespace Nexar.Renderer.Visualization
 
         private int Width;
         private int Height;
+
+        public PcbManager? PcbManager { get; set; }
 
         // TODO: Come back to native input (commented out as reminder)
         //private INativeInput nativeInput;
@@ -100,6 +104,13 @@ namespace Nexar.Renderer.Visualization
 
         public void Demo_MouseUp(object sender, Point location)
         {
+            var createCommentThread = new CreateCommentThread(
+                E_CommentType.Area,
+                PcbManager);
+
+            createCommentThread.Location = Cursor.Position;
+            createCommentThread.ShowDialog();
+
             highlightBox.ResetHighlightBox();
         }
 

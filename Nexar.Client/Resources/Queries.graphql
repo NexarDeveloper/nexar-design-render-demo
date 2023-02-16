@@ -95,6 +95,7 @@ query GetDesignItems($id: ID!, $cursor: String!, $count: Int!) {
                 endCursor
               }            
               nodes {
+                id
                 designator
                 area {
                   pos1 {
@@ -127,6 +128,7 @@ query GetPcbModel($id: ID!) {
       workInProgress {
         variants {
           pcb {
+            documentId
             layerStack {
               stacks {
                 name

@@ -10,6 +10,7 @@ namespace Nexar.Renderer.DesignEntities
     {
         public string Name { get; set; } = default!;
         public string Id { get; set; } = default!;
+        public string ProjectId { get; set; } = default!;
         public string Description { get; set; } = default!;
         public string PreviewUrl { get; set; } = default!;
         public Workspace? Workspace { get; set; }

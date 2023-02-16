@@ -22,6 +22,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
 using Microsoft.VisualBasic.Devices;
+using Nexar.Renderer.UserControls;
 
 namespace Nexar.Renderer.Forms
 {
@@ -45,6 +46,8 @@ namespace Nexar.Renderer.Forms
         private int glHeight = 800;
 
         private bool testPrimitiveEnabled = false;
+
+        private DesignItem? SelectedComponent { get; set; }
 
         public Main()
         {
@@ -74,7 +77,10 @@ namespace Nexar.Renderer.Forms
 
             NexarHelper = new NexarHelper();
 
-            pcbManager = new PcbManager(new GlRenderer(glWidth, glHeight, "Nexar Renderer"));
+            // Very hacky circular reference
+            var glRenderer = new GlRenderer(glWidth, glHeight, "Nexar Renderer");
+            pcbManager = new PcbManager(glRenderer);
+            glRenderer.PcbManager = pcbManager;
 
             if (renderThreadHelper == null)
             {
@@ -179,17 +185,28 @@ namespace Nexar.Renderer.Forms
                     var glCoord = pcbManager.PcbRenderer.GetXYOnZeroZPlane(pt);
                     var mmCoord = pcbManager.ConvertGlCoordToMm(glCoord);
 
-                    var component = pcbManager.GetComponentForLocation(mmCoord);
+                    SelectedComponent = pcbManager.GetComponentForLocation(mmCoord);
 
-                    if (component != null)
+                    if (SelectedComponent != null)
                     {
                         ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
-                        ToolStripItem createCommentThread = new ToolStripMenuItem(String.Format("Add Comment to '{0}'", component.Designator));
+                        ToolStripItem createCommentThread = new ToolStripMenuItem(string.Format("Add Comment to '{0}'", SelectedComponent.Designator));
+                        createCommentThread.Click += CreateCommentThread_Click;
                         contextMenuStrip.Items.Add(createCommentThread);
                         contextMenuStrip.Show(MousePosition);
                     }
                 }
             }
+        }
+
+        private void CreateCommentThread_Click(object? sender, EventArgs e)
+        {
+            var createCommentThread = new CreateCommentThread(
+                E_CommentType.Component, 
+                pcbManager,
+                SelectedComponent.Id);
+            createCommentThread.Location = Cursor.Position;
+            createCommentThread.ShowDialog();
         }
 
         private void GlControl_MouseWheel(object? sender, MouseEventArgs e)

@@ -18,6 +18,7 @@ using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using System.Reflection.Emit;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Reflection.Metadata;
 
 namespace Nexar.Renderer.Managers
 {
@@ -43,7 +44,9 @@ namespace Nexar.Renderer.Managers
 
         private NexarClient nexarClient = default!;
 
-        private Project ActiveProject { get; set; } = default!;
+        public Project ActiveProject { get; set; } = default!;
+
+        public string DocumentId { get; set; } = string.Empty;
 
         public PcbManager(GlRenderer renderer)
         {
@@ -68,6 +71,8 @@ namespace Nexar.Renderer.Managers
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);
             PcbModel.EnsureNoErrors();
 
+            DocumentId = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DocumentId ?? string.Empty;
+
             GeneralStopwatch.Stop();
             PcbStats.TimeToLoadPcbFromNexar = GeneralStopwatch.ElapsedMilliseconds;
 
@@ -91,7 +96,7 @@ namespace Nexar.Renderer.Managers
 
         private void LoadLayerStack()
         {
-            var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.LayerStack?.Stacks[0]?.Layers;
+            var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.LayerStack?.Stacks.FirstOrDefault()?.Layers;
 
             if (layers != null)
             {
@@ -112,7 +117,7 @@ namespace Nexar.Renderer.Managers
 
         private void LoadBoardOutline()
         {
-            var vertices = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0].Pcb?.Outline?.Vertices;
+            var vertices = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.Outline?.Vertices;
 
             if ((vertices != null) && (vertices.Count > 0))
             {
@@ -157,7 +162,7 @@ namespace Nexar.Renderer.Managers
             }
         }
 
-        private List<Component> AllComponents { get; } = new List<Component>();
+        private List<DesignItem> AllComponents { get; } = new List<DesignItem>();
 
         public PointF ConvertGlCoordToMm(PointF glValue)
         {
@@ -167,7 +172,7 @@ namespace Nexar.Renderer.Managers
             return new PointF(scaledX, scaledY);
         }
 
-        public Component? GetComponentForLocation(PointF location)
+        public DesignItem? GetComponentForLocation(PointF location)
         {
             return AllComponents.FirstOrDefault(x => x.HitTest(location));
         }
@@ -183,7 +188,7 @@ namespace Nexar.Renderer.Managers
             var infoResult = await nexarClient.GetDesignItemInfo.ExecuteAsync(ActiveProject.Id);
             infoResult.EnsureNoErrors();
 
-            var designItemInfo = infoResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.DesignItems;
+            var designItemInfo = infoResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DesignItems;
 
             if (designItemInfo != null)
             {
@@ -205,7 +210,7 @@ namespace Nexar.Renderer.Managers
                     var itemResult = await nexarClient.GetDesignItems.ExecuteAsync(ActiveProject.Id, cursor, 10);
                     itemResult.EnsureNoErrors();
                     
-                    var designItems = itemResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.DesignItems;
+                    var designItems = itemResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DesignItems;
 
                     if (designItems?.Nodes != null)
                     {
@@ -217,7 +222,8 @@ namespace Nexar.Renderer.Managers
                             {
                                 PcbStats.TotalDesignItems++;
 
-                                var component = new Component(
+                                var component = new DesignItem(
+                                        designItem.Id,
                                         designItem.Designator,
                                         "", //designItem.Comment,
                                         (float)designItem.Area.Pos1.XMm,
@@ -389,7 +395,7 @@ namespace Nexar.Renderer.Managers
 
         private void LoadNoNetPads()
         {
-            var noNetPads = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0].Pcb?.Pads.Where(x => x.Net?.Name == null);
+            var noNetPads = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.Pads.Where(x => x.Net?.Name == null);
 
             if (noNetPads != null)
             {
