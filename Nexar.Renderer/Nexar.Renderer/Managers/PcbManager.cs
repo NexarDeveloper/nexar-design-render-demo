@@ -86,6 +86,7 @@ namespace Nexar.Renderer.Managers
         public async Task LoadAdditionalDesignDataAsync()
         {
             await LoadDesignItemsAsync();
+            PcbRenderer.Pcb.FinaliseAdditionalDataSetup();
         }
 
         private void LoadLayerStack()
@@ -135,7 +136,7 @@ namespace Nexar.Renderer.Managers
 
                     if (lastVertice != null)
                     {
-                        PcbRenderer.Pcb.AddOutline(
+                        PcbRenderer.Pcb.AddBoardOutline(
                             ScaleValueMmToGl(lastVertice.XMm, xOffset, divisor),
                             ScaleValueMmToGl(lastVertice.YMm, yOffset, divisor),
                             ScaleValueMmToGl(vertice.XMm, xOffset, divisor),
@@ -147,7 +148,7 @@ namespace Nexar.Renderer.Managers
 
                 if (lastVertice != null && firstVertice != null)
                 {
-                    PcbRenderer.Pcb.AddOutline(
+                    PcbRenderer.Pcb.AddBoardOutline(
                         ScaleValueMmToGl(lastVertice.XMm, xOffset, divisor),
                         ScaleValueMmToGl(lastVertice.YMm, yOffset, divisor),
                         ScaleValueMmToGl(firstVertice.XMm, xOffset, divisor),
@@ -197,7 +198,7 @@ namespace Nexar.Renderer.Managers
                     pageTotal++;
                 }
 
-                string? cursor = "LTE="; // Start cursor at -1 to select after  variantInfo.Pcb.DesignItems.PageInfo.StartCursor;
+                string? cursor = "LTE="; // Start cursor at -1
 
                 while (hasPage && cursor != null)
                 {
@@ -216,14 +217,46 @@ namespace Nexar.Renderer.Managers
                             {
                                 PcbStats.TotalDesignItems++;
 
-                                AllComponents.Add(
-                                    new Component(
+                                var component = new Component(
                                         designItem.Designator,
                                         designItem.Comment,
                                         (float)designItem.Area.Pos1.XMm,
                                         (float)designItem.Area.Pos1.YMm,
                                         (float)designItem.Area.Pos2.XMm,
-                                        (float)designItem.Area.Pos2.YMm));
+                                        (float)designItem.Area.Pos2.YMm);
+
+                                AllComponents.Add(component);
+
+                                PointF? firstVertice = null;
+                                PointF? lastVertice = null;
+
+                                foreach (var vertice in component.PolygonVertices)
+                                {
+                                    if (firstVertice == null)
+                                    {
+                                        firstVertice = vertice;
+                                    }
+
+                                    if (lastVertice != null)
+                                    {
+                                        PcbRenderer.Pcb.AddComponentOutline(
+                                            ScaleValueMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
+                                            ScaleValueMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
+                                            ScaleValueMmToGl((decimal)vertice.X, xOffset, divisor),
+                                            ScaleValueMmToGl((decimal)vertice.Y, yOffset, divisor));
+                                    }
+
+                                    lastVertice = vertice;
+                                }
+
+                                if (lastVertice != null && firstVertice != null)
+                                {
+                                    PcbRenderer.Pcb.AddComponentOutline(
+                                        ScaleValueMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
+                                        ScaleValueMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
+                                        ScaleValueMmToGl((decimal)firstVertice.Value.X, xOffset, divisor),
+                                        ScaleValueMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor));
+                                }
                             }
                         }
 

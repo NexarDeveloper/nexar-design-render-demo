@@ -42,6 +42,7 @@
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.currentProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.componentOutlinesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.SuspendLayout();
@@ -88,7 +89,8 @@
             this.primitivesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tracksMenuItem,
             this.padsMenuItem,
-            this.viasMenuItem});
+            this.viasMenuItem,
+            this.componentOutlinesMenuItem});
             this.primitivesToolStripMenuItem.Name = "primitivesToolStripMenuItem";
             this.primitivesToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
             this.primitivesToolStripMenuItem.Text = "Primitives";
@@ -99,7 +101,7 @@
             this.tracksMenuItem.CheckOnClick = true;
             this.tracksMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.tracksMenuItem.Name = "tracksMenuItem";
-            this.tracksMenuItem.Size = new System.Drawing.Size(106, 22);
+            this.tracksMenuItem.Size = new System.Drawing.Size(185, 22);
             this.tracksMenuItem.Text = "Tracks";
             // 
             // padsMenuItem
@@ -108,7 +110,7 @@
             this.padsMenuItem.CheckOnClick = true;
             this.padsMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.padsMenuItem.Name = "padsMenuItem";
-            this.padsMenuItem.Size = new System.Drawing.Size(106, 22);
+            this.padsMenuItem.Size = new System.Drawing.Size(185, 22);
             this.padsMenuItem.Text = "Pads";
             // 
             // viasMenuItem
@@ -117,7 +119,7 @@
             this.viasMenuItem.CheckOnClick = true;
             this.viasMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.viasMenuItem.Name = "viasMenuItem";
-            this.viasMenuItem.Size = new System.Drawing.Size(106, 22);
+            this.viasMenuItem.Size = new System.Drawing.Size(185, 22);
             this.viasMenuItem.Text = "Vias";
             // 
             // commentsMenuItem
@@ -181,6 +183,15 @@
             this.currentProgressBar.Size = new System.Drawing.Size(100, 16);
             this.currentProgressBar.Visible = false;
             // 
+            // componentOutlinesMenuItem
+            // 
+            this.componentOutlinesMenuItem.Checked = true;
+            this.componentOutlinesMenuItem.CheckOnClick = true;
+            this.componentOutlinesMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.componentOutlinesMenuItem.Name = "componentOutlinesMenuItem";
+            this.componentOutlinesMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.componentOutlinesMenuItem.Text = "Component Outlines";
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -220,5 +231,6 @@
         private StatusStrip statusStrip;
         private ToolStripStatusLabel statusLabel;
         private ToolStripProgressBar currentProgressBar;
+        private ToolStripMenuItem componentOutlinesMenuItem;
     }
 }

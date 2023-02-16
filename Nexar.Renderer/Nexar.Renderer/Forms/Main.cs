@@ -69,6 +69,7 @@ namespace Nexar.Renderer.Forms
             tracksMenuItem.CheckedChanged += TracksMenuItem_CheckedChanged;
             padsMenuItem.CheckedChanged += PadsMenuItem_CheckedChanged;
             viasMenuItem.CheckedChanged += ViasMenuItem_CheckedChanged;
+            componentOutlinesMenuItem.CheckedChanged += ComponentOutlinesMenuItem_CheckedChanged;
             showCommentsMenuItem.CheckedChanged += CommentsMenuItem_CheckedChanged;
 
             NexarHelper = new NexarHelper();
@@ -512,6 +513,11 @@ namespace Nexar.Renderer.Forms
         private void ViasMenuItem_CheckedChanged(object? sender, EventArgs e)
         {
             pcbManager.PcbRenderer.Pcb.DisableVias = (!viasMenuItem.Checked);
+        }
+
+        private void ComponentOutlinesMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbManager.PcbRenderer.Pcb.DisableComponentOutlines = (!componentOutlinesMenuItem.Checked);
         }
 
         private void CommentsMenuItem_CheckedChanged(object? sender, EventArgs e)
