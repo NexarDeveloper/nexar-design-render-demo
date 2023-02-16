@@ -14,6 +14,7 @@ namespace Nexar.Renderer.DesignEntities
         public string Comment { get; }
 
         public List<PointF> PolygonVertices { get; } = new List<PointF>();
+        public Tuple<Point, Point> BoundingRectangleCoords { get; }
 
         private readonly RayCasting rayCasting = new RayCasting();
 
@@ -21,6 +22,7 @@ namespace Nexar.Renderer.DesignEntities
             string id,
             string designator, 
             string comment,
+            Tuple<Point, Point> boundingRectangleCoords,
             float pos1X,
             float pos1Y,
             float pos2X,
@@ -29,6 +31,7 @@ namespace Nexar.Renderer.DesignEntities
             Id = id;
             Designator = designator;
             Comment = comment;
+            BoundingRectangleCoords = boundingRectangleCoords;
 
             float minX = Math.Min(pos1X, pos2X);
             float maxX = Math.Max(pos1X, pos2X);

@@ -28,7 +28,7 @@ namespace Nexar.Renderer.Visualization
         private Stopwatch timer;
 
         private Axis axis = default!;
-        private HighlightBox highlightBox = default!;
+        public HighlightBox HighlightBox = default!;
 
         public Pcb Pcb { get; set; } = default!;
 
@@ -50,7 +50,7 @@ namespace Nexar.Renderer.Visualization
         private int Width;
         private int Height;
 
-        public PcbManager? PcbManager { get; set; }
+        public Action<Point>? MouseUpCallback { get; set; }
 
         // TODO: Come back to native input (commented out as reminder)
         //private INativeInput nativeInput;
@@ -94,24 +94,18 @@ namespace Nexar.Renderer.Visualization
 
         public void Demo_MouseDown(object sender, Point location)
         {
-            highlightBox.XYStart = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
+            HighlightBox.XyStartVertices = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
         }
 
         public void Demo_MouseMove(object sender, Point location)
         {
-            highlightBox.XYEnd = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
+            HighlightBox.XyEndVertices = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
         }
 
         public void Demo_MouseUp(object sender, Point location)
         {
-            var createCommentThread = new CreateCommentThread(
-                E_CommentType.Area,
-                PcbManager);
-
-            createCommentThread.Location = Cursor.Position;
-            createCommentThread.ShowDialog();
-
-            highlightBox.ResetHighlightBox();
+            MouseUpCallback?.Invoke(location);
+            HighlightBox.ResetHighlightBox();
         }
 
         public void MousePan(object sender, Point location)
@@ -124,7 +118,7 @@ namespace Nexar.Renderer.Visualization
             GL.ClearColor(0.117f, 0.117f, 0.117f, 1.0f);
 
             axis = new Axis();
-            highlightBox = new HighlightBox();
+            HighlightBox = new HighlightBox();
             Pcb = new Pcb();
 
             //projection = Matrix4.CreateOrthographic(MathHelper.DegreesToRadians(45f) * 5, (Width / (float)Height) * 5, 0.1f, 100.0f);
@@ -138,7 +132,7 @@ namespace Nexar.Renderer.Visualization
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             axis.Dispose();
-            highlightBox.Dispose();
+            HighlightBox.Dispose();
             Pcb.Dispose();
         }
 
@@ -255,7 +249,7 @@ namespace Nexar.Renderer.Visualization
 
         private void DrawHighlightBox()
         {
-            highlightBox?.Draw(view, projection);
+            HighlightBox?.Draw(view, projection);
         }
 
         public void WindowReshape(int width, int height)

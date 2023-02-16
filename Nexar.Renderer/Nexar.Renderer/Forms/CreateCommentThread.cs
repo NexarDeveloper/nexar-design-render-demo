@@ -1,6 +1,7 @@
 ﻿using Nexar.Client;
 using Nexar.Renderer.Api;
 using Nexar.Renderer.Managers;
+using StrawberryShake;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,20 +27,24 @@ namespace Nexar.Renderer.Forms
         private NexarHelper NexarHelper { get; }
         private NexarClient NexarClient { get; }
         private PcbManager PcbManager { get;}
-        private string Id { get; } = string.Empty;
+        private string? Id { get; }
+        private Tuple<Point, Point> Area { get; }
 
         public CreateCommentThread(
+            NexarHelper nexarHelper,
             E_CommentType commentType,
             PcbManager pcbManager,
+            Tuple<Point, Point> area,
             string? id = null)
         {
             InitializeComponent();
 
             PcbManager = pcbManager;
             CommentType = commentType;
-            Id = id ?? string.Empty;
+            Id = id;
+            Area = area;
 
-            NexarHelper = new NexarHelper();
+            NexarHelper = nexarHelper;
             NexarClient = NexarHelper.GetNexarClient();
 
             KeyDown += CreateCommentThread_KeyDown;
@@ -66,21 +71,32 @@ namespace Nexar.Renderer.Forms
 
         private async Task<bool> ExecuteAsync()
         {
-            bool success = false;
+            bool success;
             var commentThreadInput = new DesCreateCommentThreadInput();
+            var area = new DesRectangleInput();
+            area.Pos1 = new DesPosition2DInput() { X = Area.Item1.X, Y = Area.Item1.Y };
+            area.Pos2 = new DesPosition2DInput() { X = Area.Item2.X, Y = Area.Item2.Y };
 
-            commentThreadInput.EntityId = PcbManager.ActiveProject.ProjectId;
+            commentThreadInput.EntityId = PcbManager.ActiveProject.Id;
             commentThreadInput.DocumentId = PcbManager.DocumentId;
-            commentThreadInput.ObjectId = DecodeNodeId(Id).PcbUniqueId;
+            commentThreadInput.ObjectId = (Id != null ? DecodeNodeId(Id).PcbUniqueId : string.Empty);
             commentThreadInput.Text = commentTextBox.Text.Trim();
+            commentThreadInput.Area = area;
 
             try
             {
-                await NexarClient.CreateCommentThread.ExecuteAsync(commentThreadInput);
+                var result = await NexarClient.CreateCommentThread.ExecuteAsync(commentThreadInput);
+                result.EnsureNoErrors();
                 success = true;
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show(
+                    ex.Message, 
+                    "Error Creating Comment Thread", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
+                
                 success = false;
             }
 

@@ -53,10 +53,15 @@ namespace OpenTk.Tutorial.Tools
             highlightLineShader.Initialise();
         }
 
-        public Tuple<float, float> XYStart
+        public PointF XyStart { get; set; }
+        public PointF XyEnd { get; set; }
+
+        public Tuple<float, float> XyStartVertices
         {
             set
             {
+                XyStart = new PointF(value.Item1, value.Item2);
+
                 highlightBoxVertices[LINE_LEFT_START_X] = value.Item1;
                 highlightBoxVertices[LINE_LEFT_START_Y] = value.Item2;
                 highlightBoxVertices[LINE_LEFT_END_X] = value.Item1;
@@ -79,10 +84,12 @@ namespace OpenTk.Tutorial.Tools
             }
         }
 
-        public Tuple<float, float> XYEnd
+        public Tuple<float, float> XyEndVertices
         {
             set
             {
+                XyEnd = new PointF(value.Item1, value.Item2);
+
                 highlightBoxVertices[LINE_LEFT_END_Y] = value.Item2;
                 highlightBoxVertices[LINE_BOTTOM_END_X] = value.Item1;
 

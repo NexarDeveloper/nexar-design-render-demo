@@ -19,6 +19,9 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using System.Reflection.Emit;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Reflection.Metadata;
+using OpenTk.Tutorial.Tools;
+using Newtonsoft.Json.Linq;
+using System.Runtime.Intrinsics.Arm;
 
 namespace Nexar.Renderer.Managers
 {
@@ -92,6 +95,22 @@ namespace Nexar.Renderer.Managers
         {
             await LoadDesignItemsAsync();
             PcbRenderer.Pcb.FinaliseAdditionalDataSetup();
+        }
+
+        public Tuple<Point, Point> GetHighlightArea()
+        {
+            int scaledStartX = ScaleValueFromMmToNativeUnits(ScaleValueGlToMm((decimal)PcbRenderer.HighlightBox.XyStart.X, xOffset, divisor));
+            int scaledStartY = ScaleValueFromMmToNativeUnits(ScaleValueGlToMm((decimal)PcbRenderer.HighlightBox.XyStart.Y, yOffset, divisor));
+            int scaledEndX = ScaleValueFromMmToNativeUnits(ScaleValueGlToMm((decimal)PcbRenderer.HighlightBox.XyEnd.X, xOffset, divisor));
+            int scaledEndY = ScaleValueFromMmToNativeUnits(ScaleValueGlToMm((decimal)PcbRenderer.HighlightBox.XyEnd.Y, yOffset, divisor));          
+
+            return new Tuple<Point, Point>(
+                new Point(
+                    Math.Min(scaledStartX, scaledEndX),
+                    Math.Max(scaledStartY, scaledEndY)),
+                new Point(
+                    Math.Max(scaledStartX, scaledEndX),
+                    Math.Min(scaledStartY, scaledEndY)));
         }
 
         private void LoadLayerStack()
@@ -226,6 +245,9 @@ namespace Nexar.Renderer.Managers
                                         designItem.Id,
                                         designItem.Designator,
                                         "", //designItem.Comment,
+                                        new Tuple<Point, Point>(
+                                            new Point(designItem.Area.Pos1.X, designItem.Area.Pos1.Y),
+                                            new Point(designItem.Area.Pos2.X, designItem.Area.Pos2.Y)),
                                         (float)designItem.Area.Pos1.XMm,
                                         (float)designItem.Area.Pos1.YMm,
                                         (float)designItem.Area.Pos2.XMm,
@@ -456,6 +478,11 @@ namespace Nexar.Renderer.Managers
         private float ScaleValueGlToMm(decimal value, float offset, float divisor)
         {
             return (((float)value) * divisor) + offset;
+        }
+
+        private int ScaleValueFromMmToNativeUnits(float mmValue)
+        {
+            return (int)Math.Round((mmValue / 0.00000254F), 3, MidpointRounding.AwayFromZero);
         }
     }
 }

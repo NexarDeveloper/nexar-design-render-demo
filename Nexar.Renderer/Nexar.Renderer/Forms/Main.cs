@@ -80,7 +80,7 @@ namespace Nexar.Renderer.Forms
             // Very hacky circular reference
             var glRenderer = new GlRenderer(glWidth, glHeight, "Nexar Renderer");
             pcbManager = new PcbManager(glRenderer);
-            glRenderer.PcbManager = pcbManager;
+            glRenderer.MouseUpCallback = CreateCommentWithArea;
 
             if (renderThreadHelper == null)
             {
@@ -199,14 +199,33 @@ namespace Nexar.Renderer.Forms
             }
         }
 
-        private void CreateCommentThread_Click(object? sender, EventArgs e)
+        private void CreateCommentWithArea(Point location)
         {
+            var highlightArea = pcbManager.GetHighlightArea();
+
             var createCommentThread = new CreateCommentThread(
-                E_CommentType.Component, 
+                NexarHelper,
+                E_CommentType.Area,
                 pcbManager,
-                SelectedComponent.Id);
+                highlightArea);
+
             createCommentThread.Location = Cursor.Position;
             createCommentThread.ShowDialog();
+        }
+
+        private void CreateCommentThread_Click(object? sender, EventArgs e)
+        {
+            if (SelectedComponent != null)
+            {               
+                var createCommentThread = new CreateCommentThread(
+                    NexarHelper,
+                    E_CommentType.Component,
+                    pcbManager,
+                    SelectedComponent.BoundingRectangleCoords,
+                    SelectedComponent.Id);
+                createCommentThread.Location = Cursor.Position;
+                createCommentThread.ShowDialog();
+            }
         }
 
         private void GlControl_MouseWheel(object? sender, MouseEventArgs e)
