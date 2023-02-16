@@ -40,31 +40,7 @@ query GetProjects($workspaceUrl: String!, $cursor: String!) {
   }
 }
 
-query GetDesignItemInfo($id: ID!) {
-  desProjectById (id: $id) {
-    name
-    description
-    design {
-      workInProgress {
-        variants {
-          pcb {
-            designItems {
-              totalCount
-              pageInfo {
-                startCursor
-                hasNextPage
-                hasPreviousPage
-                endCursor
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-query GetDesignItems($id: ID!, $cursor: String!, $count: Int!) {
+query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
   desProjectById (id: $id) {
     name
     description

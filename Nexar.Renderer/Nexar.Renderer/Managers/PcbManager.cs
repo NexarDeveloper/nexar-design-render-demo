@@ -211,96 +211,77 @@ namespace Nexar.Renderer.Managers
 
             Stopwatch componentStopwatch = new Stopwatch();
 
-            var infoResult = await nexarClient.GetDesignItemInfo.ExecuteAsync(ActiveProject.Id);
-            infoResult.EnsureNoErrors();
-
-            var designItemInfo = infoResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DesignItems;
-
-            if (designItemInfo != null)
+            string? cursor = null;
+            bool hasPage = true;
+            while (hasPage)
             {
-                bool hasPage = designItemInfo.TotalCount != 0;
-
-                // Hack for page count
-                int pageFraction = designItemInfo.TotalCount % 10;
-                int pageTotal = ((designItemInfo.TotalCount - pageFraction) / 10);
-
-                if (pageFraction > 0)
-                {
-                    pageTotal++;
-                }
-
-                string? cursor = "LTE="; // Start cursor at -1
-
-                while (hasPage && cursor != null)
-                {
-                    var itemResult = await nexarClient.GetDesignItems.ExecuteAsync(ActiveProject.Id, cursor, 10);
-                    itemResult.EnsureNoErrors();
+                var itemResult = await nexarClient.GetDesignItems.ExecuteAsync(ActiveProject.Id, cursor, 10);
+                itemResult.EnsureNoErrors();
                     
-                    var designItems = itemResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DesignItems;
+                var designItems = itemResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DesignItems;
 
-                    if (designItems?.Nodes != null)
+                if (designItems?.Nodes is null)
+                    break;
+
+                componentStopwatch.Start();
+
+                foreach (var designItem in designItems.Nodes)
+                {
+                    if (designItem.Area != null)
                     {
-                        componentStopwatch.Start();
+                        PcbStats.TotalDesignItems++;
 
-                        foreach (var designItem in designItems.Nodes)
+                        var component = new DesignItem(
+                                designItem.Id,
+                                designItem.Designator,
+                                "", //designItem.Comment,
+                                new Tuple<Point, Point>(
+                                    new Point(designItem.Area.Pos1.X, designItem.Area.Pos1.Y),
+                                    new Point(designItem.Area.Pos2.X, designItem.Area.Pos2.Y)),
+                                (float)designItem.Area.Pos1.XMm,
+                                (float)designItem.Area.Pos1.YMm,
+                                (float)designItem.Area.Pos2.XMm,
+                                (float)designItem.Area.Pos2.YMm);
+
+                        AllComponents.Add(component);
+
+                        PointF? firstVertice = null;
+                        PointF? lastVertice = null;
+
+                        foreach (var vertice in component.PolygonVertices)
                         {
-                            if (designItem.Area != null)
+                            if (firstVertice == null)
                             {
-                                PcbStats.TotalDesignItems++;
-
-                                var component = new DesignItem(
-                                        designItem.Id,
-                                        designItem.Designator,
-                                        "", //designItem.Comment,
-                                        new Tuple<Point, Point>(
-                                            new Point(designItem.Area.Pos1.X, designItem.Area.Pos1.Y),
-                                            new Point(designItem.Area.Pos2.X, designItem.Area.Pos2.Y)),
-                                        (float)designItem.Area.Pos1.XMm,
-                                        (float)designItem.Area.Pos1.YMm,
-                                        (float)designItem.Area.Pos2.XMm,
-                                        (float)designItem.Area.Pos2.YMm);
-
-                                AllComponents.Add(component);
-
-                                PointF? firstVertice = null;
-                                PointF? lastVertice = null;
-
-                                foreach (var vertice in component.PolygonVertices)
-                                {
-                                    if (firstVertice == null)
-                                    {
-                                        firstVertice = vertice;
-                                    }
-
-                                    if (lastVertice != null)
-                                    {
-                                        PcbRenderer.Pcb.AddComponentOutline(
-                                            ScaleValueMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
-                                            ScaleValueMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
-                                            ScaleValueMmToGl((decimal)vertice.X, xOffset, divisor),
-                                            ScaleValueMmToGl((decimal)vertice.Y, yOffset, divisor));
-                                    }
-
-                                    lastVertice = vertice;
-                                }
-
-                                if (lastVertice != null && firstVertice != null)
-                                {
-                                    PcbRenderer.Pcb.AddComponentOutline(
-                                        ScaleValueMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
-                                        ScaleValueMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
-                                        ScaleValueMmToGl((decimal)firstVertice.Value.X, xOffset, divisor),
-                                        ScaleValueMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor));
-                                }
+                                firstVertice = vertice;
                             }
+
+                            if (lastVertice != null)
+                            {
+                                PcbRenderer.Pcb.AddComponentOutline(
+                                    ScaleValueMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
+                                    ScaleValueMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
+                                    ScaleValueMmToGl((decimal)vertice.X, xOffset, divisor),
+                                    ScaleValueMmToGl((decimal)vertice.Y, yOffset, divisor));
+                            }
+
+                            lastVertice = vertice;
                         }
 
-                        componentStopwatch.Stop();
+                        if (lastVertice != null && firstVertice != null)
+                        {
+                            PcbRenderer.Pcb.AddComponentOutline(
+                                ScaleValueMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
+                                ScaleValueMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
+                                ScaleValueMmToGl((decimal)firstVertice.Value.X, xOffset, divisor),
+                                ScaleValueMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor));
+                        }
                     }
-
-                    cursor = designItems?.PageInfo.EndCursor;
-                    hasPage = designItems?.PageInfo.HasNextPage ?? false;
                 }
+
+                componentStopwatch.Stop();
+
+                cursor = designItems.PageInfo.EndCursor;
+                hasPage = designItems.PageInfo.HasNextPage;
             }
             
             GeneralStopwatch.Stop();
