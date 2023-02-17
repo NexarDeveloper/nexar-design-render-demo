@@ -204,13 +204,18 @@ namespace Nexar.Renderer.Forms
             var highlightArea = pcbManager.GetHighlightArea();
 
             var createCommentThread = new CreateCommentThread(
-                NexarHelper,
+                NexarHelper.GetNexarClient(ActiveWorkspace?.Location.ApiServiceUrl),
                 E_CommentType.Area,
                 pcbManager,
                 highlightArea);
 
             createCommentThread.Location = Cursor.Position;
             createCommentThread.ShowDialog();
+
+            if (createCommentThread.DialogResult == DialogResult.OK)
+            {
+                commentThreads.UpdateCommentThreadsThreadSafe();
+            }
         }
 
         private void CreateCommentThread_Click(object? sender, EventArgs e)
@@ -218,13 +223,18 @@ namespace Nexar.Renderer.Forms
             if (SelectedComponent != null)
             {               
                 var createCommentThread = new CreateCommentThread(
-                    NexarHelper,
+                    NexarHelper.GetNexarClient(ActiveWorkspace?.Location.ApiServiceUrl),
                     E_CommentType.Component,
                     pcbManager,
                     SelectedComponent.BoundingRectangleCoords,
                     SelectedComponent.Id);
                 createCommentThread.Location = Cursor.Position;
                 createCommentThread.ShowDialog();
+
+                if (createCommentThread.DialogResult == DialogResult.OK)
+                {
+                    commentThreads.UpdateCommentThreadsThreadSafe();
+                }
             }
         }
 
@@ -433,7 +443,8 @@ namespace Nexar.Renderer.Forms
                 {
                     var workspace = new Workspace()
                     {
-                        Url = ActiveWorkspace.Url
+                        Url = ActiveWorkspace.Url,
+                        ApiUrl = ActiveWorkspace.Location.ApiServiceUrl
                     };
 
                     StatusBusy(string.Format("Loading projects in workspace '{0}'...", ActiveWorkspace.Name));
@@ -448,7 +459,11 @@ namespace Nexar.Renderer.Forms
                         {
                             Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
                             StatusBusy(string.Format("Opening '{0}'...", projectsForm.SelectedDesignProject.Name));
-                            await pcbManager.OpenPcbDesignAsync(projectsForm.SelectedDesignProject);
+                            
+                            await pcbManager.OpenPcbDesignAsync(
+                                workspace.ApiUrl,
+                                projectsForm.SelectedDesignProject);
+                            
                             StatusReady();
                             LoadLayers();
                             StatusBusy("Loading additional design data...");

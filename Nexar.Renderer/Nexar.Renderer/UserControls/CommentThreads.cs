@@ -1,4 +1,5 @@
 ﻿using Nexar.Client;
+using Nexar.Renderer.Api;
 using Nexar.Renderer.DesignEntities;
 using StrawberryShake;
 using System;
@@ -25,6 +26,8 @@ namespace Nexar.Renderer.UserControls
 
         private readonly TableLayoutPanel allThreadsTableLayoutPanel;
 
+        private NexarHelper NexarHelper { get; }
+
         public IOperationResult<IGetPcbModelResult> PcbModel { get; set; } = default!;
 
         public CommentThreads()
@@ -44,6 +47,8 @@ namespace Nexar.Renderer.UserControls
             Controls.Add(allThreadsTableLayoutPanel);
 
             AutoScroll = true;
+
+            NexarHelper = new NexarHelper();
         }
 
         public void LoadCommentThreadsThreadSafe()
@@ -53,7 +58,7 @@ namespace Nexar.Renderer.UserControls
 
         public void UpdateCommentThreadsThreadSafe()
         {
-            InvokeMethodThreadSafe(UpdateCommentThreads);
+            InvokeMethodThreadSafeAsync(UpdateCommentThreadsAsync);
         }
 
         private void InvokeMethodThreadSafe(Action method)
@@ -63,6 +68,21 @@ namespace Nexar.Renderer.UserControls
                 Invoke(new MethodInvoker(delegate
                 {
                     method();
+                }));
+            }
+            else
+            {
+                method();
+            }
+        }
+
+        private void InvokeMethodThreadSafeAsync(Func<Task> method)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new MethodInvoker(async delegate
+                {
+                    await method();
                 }));
             }
             else
@@ -83,12 +103,16 @@ namespace Nexar.Renderer.UserControls
 
                 if (modelCommentThreads != null)
                 {
-                    foreach (var modelCommentThread in modelCommentThreads)
+                    var commentThreads = new List<CommentThread>();
+
+                    foreach (var modelCommentThread in modelCommentThreads.OrderBy(x => x.CreatedAt))
                     {
                         var thread = new CommentThread()
                         {
                             CommentThreadId = modelCommentThread.CommentThreadId
                         };
+
+                        commentThreads.Add(thread);
 
                         AddCommentThreadLayoutPanel(thread);
 
@@ -113,7 +137,7 @@ namespace Nexar.Renderer.UserControls
                         AddCreateCommentUCToLayoutPanel(thread);
                     }
 
-                    UpdateLocalModel();
+                    UpdateLocalModel(commentThreads);
                     ResumeLayout();
                 }
             }
@@ -123,21 +147,85 @@ namespace Nexar.Renderer.UserControls
             }
         }
 
-        private void UpdateCommentThreads()
+        private async Task UpdateCommentThreadsAsync()
         {
             try
             {
-                /*foreach (var thread in Landscape?.Model?.VPCB?.CommentThreads)
-                {
-                    if (threadToPanelMapping.ContainsKey(thread.CommentThreadId))
-                    {
-                        ProcessCommentModelChangesForThread(
-                            thread,
-                            commentModel[thread.CommentThreadId]);
-                    }
-                }*/
+                string? projectId = PcbModel?.Data?.DesProjectById?.Id;
 
-                UpdateLocalModel();
+                if (projectId != null)
+                {
+                    await NexarHelper.LoginAsync();
+                    var nexarClient = NexarHelper.GetNexarClient();
+
+                    var pcbComments = await nexarClient.GetPcbComments.ExecuteAsync(projectId);
+                    var modelCommentThreads = pcbComments?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.CommentThreads;
+
+                    if (modelCommentThreads != null)
+                    {
+                        var commentThreads = new List<CommentThread>();
+
+                        foreach (var modelCommentThread in modelCommentThreads.OrderBy(x => x.CreatedAt))
+                        {
+                            var thread = new CommentThread()
+                            {
+                                CommentThreadId = modelCommentThread.CommentThreadId
+                            };
+
+                            commentThreads.Add(thread);
+
+                            if (threadToPanelMapping.ContainsKey(modelCommentThread.CommentThreadId))
+                            {
+                                foreach (var modelComment in modelCommentThread.Comments)
+                                {
+                                    var comment = new Comment()
+                                    {
+                                        CommentId = modelComment.CommentId,
+                                        CreatedAt = modelComment.CreatedAt.DateTime,
+                                        FirstName = modelComment.ModifiedBy?.FirstName ?? string.Empty,
+                                        LastName = modelComment.ModifiedBy?.LastName ?? string.Empty,
+                                        ModifiedAt = modelComment.ModifiedAt.DateTime,
+                                        PictureUrl = modelComment.ModifiedBy?.PictureUrl ?? string.Empty,
+                                        Text = modelComment.Text,
+                                        Username = modelComment.ModifiedBy?.Email ?? string.Empty
+                                    };
+
+                                    thread.Comments.Add(comment);
+                                }
+
+                                ProcessCommentModelChangesForThread(
+                                    thread,
+                                    commentModel[thread.CommentThreadId]);
+                            }
+                            else
+                            {
+                                AddCommentThreadLayoutPanel(thread);
+
+                                foreach (var modelComment in modelCommentThread.Comments)
+                                {
+                                    var comment = new Comment()
+                                    {
+                                        CommentId = modelComment.CommentId,
+                                        CreatedAt = modelComment.CreatedAt.DateTime,
+                                        FirstName = modelComment.ModifiedBy?.FirstName ?? string.Empty,
+                                        LastName = modelComment.ModifiedBy?.LastName ?? string.Empty,
+                                        ModifiedAt = modelComment.ModifiedAt.DateTime,
+                                        PictureUrl = modelComment.ModifiedBy?.PictureUrl ?? string.Empty,
+                                        Text = modelComment.Text,
+                                        Username = modelComment.ModifiedBy?.Email ?? string.Empty
+                                    };
+
+                                    thread.Comments.Add(comment);
+                                    AddCommentElementUCToLayoutPanel(thread, comment);
+                                }
+
+                                AddCreateCommentUCToLayoutPanel(thread);
+                            }
+                        }
+
+                        UpdateLocalModel(commentThreads);
+                    }
+                }
             }
             catch
             {
@@ -150,6 +238,7 @@ namespace Nexar.Renderer.UserControls
             var commentThreadLayoutPanel = CreateCommentThreadLayoutPanel();
             allThreadsTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             allThreadsTableLayoutPanel.Controls.Add(commentThreadLayoutPanel);
+            //allThreadsTableLayoutPanel.SetRow(commentThreadLayoutPanel, 0);
             threadToPanelMapping.Add(commentThread.CommentThreadId, commentThreadLayoutPanel);
         }
 
@@ -226,11 +315,11 @@ namespace Nexar.Renderer.UserControls
             }
         }
 
-        private void UpdateLocalModel()
+        private void UpdateLocalModel(List<CommentThread> commentThreads)
         {
             commentModel.Clear();
 
-            /*foreach (var thread in Landscape?.Model?.VPCB?.CommentThreads)
+            foreach (var thread in commentThreads)
             {
                 foreach (var comment in thread.Comments)
                 {
@@ -241,7 +330,7 @@ namespace Nexar.Renderer.UserControls
 
                     commentModel[thread.CommentThreadId].Add(comment);
                 }
-            }*/
+            }
         }
 
         private TableLayoutPanel CreateCommentThreadLayoutPanel()

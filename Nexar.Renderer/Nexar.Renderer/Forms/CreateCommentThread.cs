@@ -25,14 +25,13 @@ namespace Nexar.Renderer.Forms
     {
         public E_CommentType CommentType { get; }
 
-        private NexarHelper NexarHelper { get; }
         private NexarClient NexarClient { get; }
         private PcbManager PcbManager { get;}
         private string? Id { get; }
         private Tuple<Point, Point> Area { get; }
 
         public CreateCommentThread(
-            NexarHelper nexarHelper,
+            NexarClient nexarClient,
             E_CommentType commentType,
             PcbManager pcbManager,
             Tuple<Point, Point> area,
@@ -45,10 +44,10 @@ namespace Nexar.Renderer.Forms
             Id = id;
             Area = area;
 
-            NexarHelper = nexarHelper;
-            NexarClient = NexarHelper.GetNexarClient();
+            NexarClient = nexarClient;
 
             KeyDown += CreateCommentThread_KeyDown;
+            createCommentThreadButton.Click += CreateCommentThreadButton_Click;
         }
 
         private async void CreateCommentThread_KeyDown(object? sender, KeyEventArgs e)
@@ -72,6 +71,8 @@ namespace Nexar.Renderer.Forms
 
         private async Task<bool> ExecuteAsync()
         {
+            Enabled = false;
+
             bool success;
             var commentThreadInput = new DesCreateCommentThreadInput();
             var area = new DesRectangleInput();
@@ -105,6 +106,14 @@ namespace Nexar.Renderer.Forms
             }
 
             return success;
+        }
+
+        private async void CreateCommentThreadButton_Click(object? sender, EventArgs e)
+        {
+            if (await ExecuteAsync())
+            {
+                DialogResult = DialogResult.OK;
+            }
         }
 
         public record NodeId(

@@ -30,7 +30,7 @@ namespace Nexar.Renderer.Forms
             flowLayoutPanel.Controls.Clear();
 
             await NexarHelper.LoginAsync();
-            var nexarClient = NexarHelper.GetNexarClient();
+            var nexarClient = NexarHelper.GetNexarClient(workspace.ApiUrl);
 
             var projectInfo = await nexarClient.GetProjectInfo.ExecuteAsync(workspace.Url);
 

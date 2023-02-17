@@ -5,6 +5,11 @@
     name
     description
     isDefault
+    location {
+      name   
+      apiServiceUrl
+      filesServiceUrl   
+    }
   }
 }
 
@@ -84,6 +89,7 @@ query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
 
 query GetPcbModel($id: ID!) {
   desProjectById (id: $id) {
+    id
     name
     description
     design {
@@ -246,6 +252,62 @@ query GetPcbModel($id: ID!) {
                 }
               }
             }            
+          }
+        }
+      }
+    }
+  }
+}
+
+query GetPcbComments($id: ID!) {
+  desProjectById (id: $id) {
+    name
+    description
+    design {
+      workInProgress {
+        variants {
+          pcb {
+            documentId
+            documentName
+            commentThreads {
+              commentThreadId
+              createdAt
+              modifiedAt
+              context {
+                area {
+                  pos1 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                  pos2 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                }
+              }
+              comments {
+                commentId
+                text
+                createdAt
+                createdBy {
+                  firstName
+                  lastName
+                  email
+                  pictureUrl
+                }
+                modifiedAt
+                modifiedBy {
+                  firstName
+                  lastName
+                  email
+                  pictureUrl                
+                }
+              }
+            }
           }
         }
       }

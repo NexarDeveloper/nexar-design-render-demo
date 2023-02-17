@@ -18,6 +18,8 @@ namespace Nexar.Renderer.Api
         private string ClientId { get; }
         private string ClientSecret { get; }
 
+        private Dictionary<string, NexarClient> nexarClient = new Dictionary<string, NexarClient>();
+
         public NexarHelper()
         {
             ClientId = Environment.GetEnvironmentVariable("NEXAR_CLIENT_ID") ?? throw new InvalidOperationException("Please set environment 'NEXAR_CLIENT_ID'");
@@ -68,22 +70,25 @@ namespace Nexar.Renderer.Api
             return login.AccessToken;
         }
 
-        public NexarClient GetNexarClient()
+        public NexarClient GetNexarClient(string? apiServiceUrl = null)
         {
-            var nexarToken = "Bearer " + accessToken;
+            if (!nexarClient.ContainsKey(apiServiceUrl ?? ApiServiceUrl))
+            {
+                var nexarToken = "Bearer " + accessToken;
 
-            var serviceCollection = new ServiceCollection();
-            serviceCollection
-                .AddNexarClient()
-                .ConfigureHttpClient(httpClient =>
-                {
-                    httpClient.BaseAddress = new Uri(ApiServiceUrl);
-                    httpClient.DefaultRequestHeaders.Add("Authorization", nexarToken);
-                });
-            var services = serviceCollection.BuildServiceProvider();
-            var nexarClient = services.GetRequiredService<NexarClient>();
+                var serviceCollection = new ServiceCollection();
+                serviceCollection
+                    .AddNexarClient()
+                    .ConfigureHttpClient(httpClient =>
+                    {
+                        httpClient.BaseAddress = new Uri(ApiServiceUrl);
+                        httpClient.DefaultRequestHeaders.Add("Authorization", nexarToken);
+                    });
+                var services = serviceCollection.BuildServiceProvider();
+                nexarClient.Add(apiServiceUrl ?? ApiServiceUrl, services.GetRequiredService<NexarClient>());
+            }
 
-            return nexarClient;
+            return nexarClient[apiServiceUrl ?? ApiServiceUrl];
         }
     }
 }

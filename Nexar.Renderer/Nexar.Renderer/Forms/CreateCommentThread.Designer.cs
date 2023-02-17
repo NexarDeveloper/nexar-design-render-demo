@@ -60,7 +60,7 @@
             this.commentTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.commentTextBox.ForeColor = System.Drawing.Color.White;
             this.commentTextBox.Location = new System.Drawing.Point(3, 3);
-            this.commentTextBox.MaximumSize = new System.Drawing.Size(0, 10000);
+            this.commentTextBox.MaximumSize = new System.Drawing.Size(10000, 10000);
             this.commentTextBox.MaxLength = 2000;
             this.commentTextBox.MinimumSize = new System.Drawing.Size(0, 10);
             this.commentTextBox.Multiline = true;

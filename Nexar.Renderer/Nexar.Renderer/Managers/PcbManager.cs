@@ -60,7 +60,7 @@ namespace Nexar.Renderer.Managers
             GeneralStopwatch = new Stopwatch();
         }
 
-        public async Task OpenPcbDesignAsync(Project project)
+        public async Task OpenPcbDesignAsync(string apiUrl, Project project)
         {
             ActiveProject = project;
 
@@ -71,7 +71,7 @@ namespace Nexar.Renderer.Managers
             GeneralStopwatch.Restart();
 
             await NexarHelper.LoginAsync();
-            nexarClient = NexarHelper.GetNexarClient();
+            nexarClient = NexarHelper.GetNexarClient(apiUrl);
 
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);
             PcbModel.EnsureNoErrors();
