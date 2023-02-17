@@ -1531,7 +1531,8 @@ input DesCreateCommentThreadInput {
   documentType: DesDocumentType!
   text: String!
   commentContextType: DesCommentContextType!
-  objectId: String
+  itemAsDesignItemId: ID
+  itemAsInternalObjectId: String
   area: DesRectangleInput
   releaseId: String
 }
