@@ -84,7 +84,7 @@ namespace Nexar.Renderer.Forms
             commentThreadInput.EntityId = PcbManager.ActiveProject.Id;
             commentThreadInput.DocumentId = PcbManager.DocumentId;
             commentThreadInput.DocumentName = PcbManager.DocumentName;
-            commentThreadInput.ObjectId = (Id != null ? DecodeNodeId(Id).PcbUniqueId : string.Empty);
+            commentThreadInput.ItemAsDesignItemId = Id;
             commentThreadInput.Text = commentTextBox.Text.Trim();
             commentThreadInput.Area = area;
 
@@ -114,31 +114,6 @@ namespace Nexar.Renderer.Forms
             {
                 DialogResult = DialogResult.OK;
             }
-        }
-
-        public record NodeId(
-            string WorkspaceUrl,
-            string ProjectId,
-            string ReleaseGuid,
-            string SchUniqueId,
-            string PcbUniqueId);
-
-        public static NodeId DecodeNodeId(string nodeId)
-        {
-            byte[] data = Convert.FromBase64String(nodeId);
-            string decodedString = Encoding.UTF8.GetString(data);
-
-            var decodedId = decodedString.Split('|');
-
-            if (decodedId.Length != 5)
-                throw new InvalidDataException("Invalid design item node ID.");
-
-            return new NodeId(
-                decodedId[0],
-                decodedId[1],
-                decodedId[2],
-                decodedId[3],
-                decodedId[4]);
         }
     }
 }
