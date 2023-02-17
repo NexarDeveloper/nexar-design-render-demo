@@ -120,6 +120,19 @@ namespace Nexar.Renderer.Managers
                     Math.Min(scaledStartY, scaledEndY)));
         }
 
+        public float GetHighlightedAreaMm()
+        {
+            if (PcbRenderer.HighlightBox.BoxComplete)
+            {
+                float xSizeMm = ScaleValueGlToMm((decimal)(Math.Abs(PcbRenderer.HighlightBox.XyStart.X - PcbRenderer.HighlightBox.XyEnd.X)), xOffset, divisor);
+                float ySizeMm = ScaleValueGlToMm((decimal)(Math.Abs(PcbRenderer.HighlightBox.XyStart.Y - PcbRenderer.HighlightBox.XyEnd.Y)), xOffset, divisor);
+
+                return (xSizeMm * ySizeMm);
+            }
+
+            return 0.0f;
+        }
+
         private void LoadLayerStack()
         {
             var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.LayerStack?.Stacks.FirstOrDefault()?.Layers;

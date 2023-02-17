@@ -201,20 +201,23 @@ namespace Nexar.Renderer.Forms
 
         private void CreateCommentWithArea(Point location)
         {
-            var highlightArea = pcbManager.GetHighlightArea();
-
-            var createCommentThread = new CreateCommentThread(
-                NexarHelper.GetNexarClient(ActiveWorkspace?.Location.ApiServiceUrl),
-                E_CommentType.Area,
-                pcbManager,
-                highlightArea);
-
-            createCommentThread.Location = Cursor.Position;
-            createCommentThread.ShowDialog();
-
-            if (createCommentThread.DialogResult == DialogResult.OK)
+            if (pcbManager.GetHighlightedAreaMm() > 0.3f)
             {
-                commentThreads.UpdateCommentThreadsThreadSafe();
+                var highlightArea = pcbManager.GetHighlightArea();
+
+                var createCommentThread = new CreateCommentThread(
+                    NexarHelper.GetNexarClient(ActiveWorkspace?.Location.ApiServiceUrl),
+                    E_CommentType.Area,
+                    pcbManager,
+                    highlightArea);
+
+                createCommentThread.Location = Cursor.Position;
+                createCommentThread.ShowDialog();
+
+                if (createCommentThread.DialogResult == DialogResult.OK)
+                {
+                    commentThreads.UpdateCommentThreadsThreadSafe();
+                }
             }
         }
 
