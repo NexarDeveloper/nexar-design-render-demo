@@ -9,6 +9,15 @@
   }
 }
 
+mutation DeleteCommentThread($input: DesDeleteCommentThreadInput!) {
+  desDeleteCommentThread(input: $input)
+  {
+    errors {
+      message
+    }
+  }
+}
+
 mutation CreateComment($input: DesCreateCommentInput!) {
   desCreateComment(input: $input)
   {

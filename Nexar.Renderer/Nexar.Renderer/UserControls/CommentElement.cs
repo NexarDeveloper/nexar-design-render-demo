@@ -1,4 +1,7 @@
-﻿using Nexar.Renderer.DesignEntities;
+﻿using Nexar.Client;
+using Nexar.Renderer.DesignEntities;
+using Nexar.Renderer.Managers;
+using StrawberryShake;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +18,10 @@ namespace Nexar.Renderer.UserControls
 {
     public partial class CommentElement : UserControl
     {
+        private NexarClient NexarClient { get; }
+        private PcbManager PcbManager { get; }
+        private CommentThreads Owner { get; }
+
         private ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
         private ToolStripItem itemEdit;
         private ToolStripItem itemSave;
@@ -24,9 +31,16 @@ namespace Nexar.Renderer.UserControls
         public CommentThread? Thread { get; private set; }
         public Comment? Comment { get; private set; }
 
-        public CommentElement()
+        public CommentElement(
+            CommentThreads owner,
+            NexarClient nexarClient,
+            PcbManager pcbManager)
         {
             InitializeComponent();
+
+            Owner = owner;
+            NexarClient = nexarClient;
+            PcbManager = pcbManager;
 
             itemEdit = new ToolStripMenuItem("Edit");
             itemSave = new ToolStripMenuItem("Save");
@@ -65,33 +79,53 @@ namespace Nexar.Renderer.UserControls
             ConfigureCommentEditMode(true);
         }
 
-        private void ItemDelete_Click(object? sender, EventArgs e)
+        private async void ItemDelete_Click(object? sender, EventArgs e)
         {
-            var result = MessageBox.Show(
-                "Are you sure you want to delete this comment?",
-                "Confirm Deletion",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
+            if (Comment != null && Thread != null)
             {
-                /*
-                var designManager = DIBindings.Resolve<IDesignManager>();
+                var confirm = MessageBox.Show(
+                    "Are you sure you want to delete this comment?",
+                    "Confirm Deletion",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
 
-                var nexarClient = designManager.GetNexarClient();
-
-                var commentInput = new DesDeleteCommentInput()
+                if (confirm == DialogResult.Yes)
                 {
-                    CommentThreadId = Thread.CommentThreadId,
-                    CommentId = Comment.CommentId,
-                    EntityId = designManager.ActiveProjectId
-                };
+                    try
+                    {
+                        if (Owner.CommentModel.ContainsKey(Thread.CommentThreadId))
+                        {
+                            var deleteCommentInput = new DesDeleteCommentInput();
+                            deleteCommentInput.EntityId = PcbManager.ActiveProject.Id;
+                            deleteCommentInput.CommentThreadId = Thread.CommentThreadId;
+                            deleteCommentInput.CommentId = Comment.CommentId;
 
-                await nexarClient.DeleteComment.ExecuteAsync(commentInput);
+                            var deleteCommentResult = await NexarClient.DeleteComment.ExecuteAsync(deleteCommentInput);
+                            deleteCommentResult.EnsureNoErrors();
 
-                // HACK while no subscriptions
-                await designManager.RefreshCommentsAsync(Landscape?.Model?.VPCB);
-                */
+                            // Check if this was the last comment, and if so, delete the entire thread
+                            if (Owner.CommentModel[Thread.CommentThreadId].Count == 1)
+                            {
+                                var deleteCommentThreadInput = new DesDeleteCommentThreadInput();
+                                deleteCommentThreadInput.EntityId = PcbManager.ActiveProject.Id;
+                                deleteCommentThreadInput.CommentThreadId = Thread.CommentThreadId;
+
+                                var deleteCommenThreadResult = await NexarClient.DeleteCommentThread.ExecuteAsync(deleteCommentThreadInput);
+                                deleteCommenThreadResult.EnsureNoErrors();
+                            }
+
+                            await Owner.UpdateCommentThreadsAsync();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            ex.Message,
+                            "Error Deleting Comment",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }
+                }
             }
         }
 

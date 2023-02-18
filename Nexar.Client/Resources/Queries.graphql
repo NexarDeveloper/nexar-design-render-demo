@@ -127,45 +127,6 @@ query GetPcbModel($id: ID!) {
                 yMm
               }
             }
-            commentThreads {
-              commentThreadId
-              createdAt
-              modifiedAt
-              context {
-                area {
-                  pos1 {
-                    x
-                    y
-                    xMm
-                    yMm
-                  }
-                  pos2 {
-                    x
-                    y
-                    xMm
-                    yMm
-                  }
-                }
-              }
-              comments {
-                commentId
-                text
-                createdAt
-                createdBy {
-                  firstName
-                  lastName
-                  email
-                  pictureUrl
-                }
-                modifiedAt
-                modifiedBy {
-                  firstName
-                  lastName
-                  email
-                  pictureUrl                
-                }
-              }
-            }
             pads {
               designator
               globalDesignator

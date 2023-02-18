@@ -18,7 +18,7 @@ namespace Nexar.Renderer.Api
         private string ClientId { get; }
         private string ClientSecret { get; }
 
-        private Dictionary<string, NexarClient> nexarClient = new Dictionary<string, NexarClient>();
+        private Dictionary<string, NexarClient> nexarClientCache = new Dictionary<string, NexarClient>();
 
         public NexarHelper()
         {
@@ -43,8 +43,10 @@ namespace Nexar.Renderer.Api
             }
             catch (GraphQLClientException ex)
             {
-                if (ex.Errors.Any(x => x.Code == "AuthExpiredToken"))
+                if ((ex.Errors.Any(x => x.Code == "AuthExpiredToken")) ||
+                    (ex.Errors.Any(x => x.Code == "AuthInvalidToken")))
                 {
+                    nexarClientCache.Clear();
                     accessToken = await AttemptLoginAsync();
                 }
                 else
@@ -72,7 +74,7 @@ namespace Nexar.Renderer.Api
 
         public NexarClient GetNexarClient(string? apiServiceUrl = null)
         {
-            if (!nexarClient.ContainsKey(apiServiceUrl ?? ApiServiceUrl))
+            if (!nexarClientCache.ContainsKey(apiServiceUrl ?? ApiServiceUrl))
             {
                 var nexarToken = "Bearer " + accessToken;
 
@@ -85,10 +87,10 @@ namespace Nexar.Renderer.Api
                         httpClient.DefaultRequestHeaders.Add("Authorization", nexarToken);
                     });
                 var services = serviceCollection.BuildServiceProvider();
-                nexarClient.Add(apiServiceUrl ?? ApiServiceUrl, services.GetRequiredService<NexarClient>());
+                nexarClientCache.Add(apiServiceUrl ?? ApiServiceUrl, services.GetRequiredService<NexarClient>());
             }
 
-            return nexarClient[apiServiceUrl ?? ApiServiceUrl];
+            return nexarClientCache[apiServiceUrl ?? ApiServiceUrl];
         }
     }
 }

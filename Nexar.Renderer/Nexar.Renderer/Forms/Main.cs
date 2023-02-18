@@ -95,14 +95,6 @@ namespace Nexar.Renderer.Forms
                 renderThreadHelper.StartThreads();
             }
 
-            commentThreads = new CommentThreads()
-            {
-                Dock = DockStyle.Fill
-                //Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right
-            };
-
-            splitContainer.Panel2.Controls.Add(commentThreads);
-
             /*splitContainer.Panel2.Controls.Add(new CommentElement()
             {
                 Dock = DockStyle.Top
@@ -201,7 +193,7 @@ namespace Nexar.Renderer.Forms
 
         private void CreateCommentWithArea(Point location)
         {
-            if (pcbManager.GetHighlightedAreaMm() > 0.3f)
+            if (pcbManager.GetHighlightedAreaMm() > 4.0f)
             {
                 var highlightArea = pcbManager.GetHighlightArea();
 
@@ -474,11 +466,19 @@ namespace Nexar.Renderer.Forms
                             StatusReady();
 
                             // TODO: Fix this
-                            commentThreads.PcbModel = pcbManager.PcbModel;
-                            commentThreads.LoadCommentThreadsThreadSafe();
+                            splitContainer.Panel2.Controls.Clear();
 
-                            splitContainer.Panel2Collapsed =
-                                (pcbManager.PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.CommentThreads?.Count == 0);
+                            commentThreads = new CommentThreads(NexarHelper.GetNexarClient(), pcbManager)
+                            {
+                                Dock = DockStyle.Fill
+                            };
+
+                            splitContainer.Panel2.Controls.Add(commentThreads);
+
+                            commentThreads.PcbModel = pcbManager.PcbModel;
+                            await commentThreads.LoadCommentThreadsAsync();
+
+                            splitContainer.Panel2Collapsed = (commentThreads.GetCommentThreadCount() == 0);
                         }
                     }
                 }
