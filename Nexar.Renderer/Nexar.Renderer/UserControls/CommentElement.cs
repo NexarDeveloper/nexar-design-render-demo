@@ -18,9 +18,9 @@ namespace Nexar.Renderer.UserControls
 {
     public partial class CommentElement : UserControl
     {
+        private CommentThreads Owner { get; }
         private NexarClient NexarClient { get; }
         private PcbManager PcbManager { get; }
-        private CommentThreads Owner { get; }
 
         private ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
         private ToolStripItem itemEdit;
@@ -30,6 +30,8 @@ namespace Nexar.Renderer.UserControls
 
         public CommentThread? Thread { get; private set; }
         public Comment? Comment { get; private set; }
+
+        private string OnEditSnapshot { get; set; } = string.Empty;
 
         public CommentElement(
             CommentThreads owner,
@@ -76,6 +78,7 @@ namespace Nexar.Renderer.UserControls
 
         private void ItemCancel_Click(object? sender, EventArgs e)
         {
+            commentTextBox.Text = OnEditSnapshot;
             ConfigureCommentEditMode(true);
         }
 
@@ -129,32 +132,30 @@ namespace Nexar.Renderer.UserControls
             }
         }
 
-        private void ItemSave_Click(object? sender, EventArgs e)
+        private async void ItemSave_Click(object? sender, EventArgs e)
         {
-            //if (Comment.Text != commentTextBox.Text)
+            if (Comment != null && Thread != null)
             {
-                commentTextBox.Enabled = false;
-
-                /*
-                var designManager = DIBindings.Resolve<IDesignManager>();
-                var nexarClient = designManager.GetNexarClient();
-
-                var commentInput = new DesUpdateCommentInput()
+                if (Comment?.Text != commentTextBox.Text)
                 {
-                    CommentThreadId = Thread.CommentThreadId,
-                    CommentId = Comment.CommentId,
-                    EntityId = designManager.ActiveProjectId,
-                    Text = commentTextBox.Text
-                };
+                    commentTextBox.Enabled = false;
 
-                await nexarClient.UpdateComment.ExecuteAsync(commentInput);
+                    var updateCommentInput = new DesUpdateCommentInput()
+                    {
+                        CommentThreadId = Thread.CommentThreadId,
+                        CommentId = Comment.CommentId,
+                        EntityId = PcbManager.ActiveProject.Id,
+                        Text = commentTextBox.Text
+                    };
 
-                // HACK while no subscriptions
-                await designManager.RefreshCommentsAsync(Landscape?.Model?.VPCB);
-                */
+                    var updateCommentResult = await NexarClient.UpdateComment.ExecuteAsync(updateCommentInput);
+                    updateCommentResult.EnsureNoErrors();
+
+                    await Owner.UpdateCommentThreadsAsync();
+                }
+
+                ConfigureCommentEditMode(true);
             }
-
-            ConfigureCommentEditMode(true);
         }
 
         private void ConfigureCommentEditMode(bool readOnly)
@@ -171,6 +172,7 @@ namespace Nexar.Renderer.UserControls
             }
             else
             {
+                OnEditSnapshot = commentTextBox.Text.Trim();
                 commentTextBox.BorderStyle = BorderStyle.FixedSingle;
                 contextMenuStrip.Items.Add(itemSave);
                 contextMenuStrip.Items.Add(itemCancel);

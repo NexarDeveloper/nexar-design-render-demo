@@ -36,13 +36,14 @@
             this.tracksMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.padsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viasMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.componentOutlinesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.commentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.currentProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.componentOutlinesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.SuspendLayout();
@@ -122,10 +123,20 @@
             this.viasMenuItem.Size = new System.Drawing.Size(185, 22);
             this.viasMenuItem.Text = "Vias";
             // 
+            // componentOutlinesMenuItem
+            // 
+            this.componentOutlinesMenuItem.Checked = true;
+            this.componentOutlinesMenuItem.CheckOnClick = true;
+            this.componentOutlinesMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.componentOutlinesMenuItem.Name = "componentOutlinesMenuItem";
+            this.componentOutlinesMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.componentOutlinesMenuItem.Text = "Component Outlines";
+            // 
             // commentsMenuItem
             // 
             this.commentsMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showCommentsMenuItem});
+            this.showCommentsMenuItem,
+            this.refreshCommentsMenuItem});
             this.commentsMenuItem.Name = "commentsMenuItem";
             this.commentsMenuItem.Size = new System.Drawing.Size(78, 20);
             this.commentsMenuItem.Text = "Comments";
@@ -134,7 +145,7 @@
             // 
             this.showCommentsMenuItem.CheckOnClick = true;
             this.showCommentsMenuItem.Name = "showCommentsMenuItem";
-            this.showCommentsMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.showCommentsMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showCommentsMenuItem.Text = "Show";
             // 
             // splitContainer
@@ -183,14 +194,11 @@
             this.currentProgressBar.Size = new System.Drawing.Size(100, 16);
             this.currentProgressBar.Visible = false;
             // 
-            // componentOutlinesMenuItem
+            // refreshCommentsMenuItem
             // 
-            this.componentOutlinesMenuItem.Checked = true;
-            this.componentOutlinesMenuItem.CheckOnClick = true;
-            this.componentOutlinesMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.componentOutlinesMenuItem.Name = "componentOutlinesMenuItem";
-            this.componentOutlinesMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.componentOutlinesMenuItem.Text = "Component Outlines";
+            this.refreshCommentsMenuItem.Name = "refreshCommentsMenuItem";
+            this.refreshCommentsMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.refreshCommentsMenuItem.Text = "Refresh";
             // 
             // Main
             // 
@@ -232,5 +240,6 @@
         private ToolStripStatusLabel statusLabel;
         private ToolStripProgressBar currentProgressBar;
         private ToolStripMenuItem componentOutlinesMenuItem;
+        private ToolStripMenuItem refreshCommentsMenuItem;
     }
 }

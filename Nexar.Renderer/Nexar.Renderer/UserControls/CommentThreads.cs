@@ -252,8 +252,15 @@ namespace Nexar.Renderer.UserControls
 
         private void AddCreateCommentUCToLayoutPanel(CommentThread thread)
         {
-            var newCommentElement = new CreateComment(thread) { Dock = DockStyle.Top };
-            //newCommentElement.Height = 300;
+            var newCommentElement = new CreateComment(
+                this,
+                thread,
+                NexarClient,
+                PcbManager) 
+            { 
+                Dock = DockStyle.Top 
+            };
+
             newCommentElement.AutoScroll = true;
 
             createCommentUCs.Add(thread.CommentThreadId, newCommentElement);

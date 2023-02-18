@@ -74,6 +74,7 @@ namespace Nexar.Renderer.Forms
             viasMenuItem.CheckedChanged += ViasMenuItem_CheckedChanged;
             componentOutlinesMenuItem.CheckedChanged += ComponentOutlinesMenuItem_CheckedChanged;
             showCommentsMenuItem.CheckedChanged += CommentsMenuItem_CheckedChanged;
+            refreshCommentsMenuItem.Click += RefreshCommentsMenuItem_Click;
 
             NexarHelper = new NexarHelper();
 
@@ -318,13 +319,20 @@ namespace Nexar.Renderer.Forms
             }
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
+        protected override async void OnKeyDown(KeyEventArgs e)
         {
-            if (!splitContainer.Panel2.ContainsFocus)
+            if (e.KeyCode == Keys.F5)
             {
-                if (!pcbManager.PcbRenderer.ActiveKeys.Contains(e.KeyData))
+                await commentThreads.UpdateCommentThreadsAsync();
+            }
+            else
+            {
+                if (!splitContainer.Panel2.ContainsFocus)
                 {
-                    pcbManager.PcbRenderer.ActiveKeys.Add(e.KeyData);
+                    if (!pcbManager.PcbRenderer.ActiveKeys.Contains(e.KeyData))
+                    {
+                        pcbManager.PcbRenderer.ActiveKeys.Add(e.KeyData);
+                    }
                 }
             }
 
@@ -577,6 +585,11 @@ namespace Nexar.Renderer.Forms
         private void CommentsMenuItem_CheckedChanged(object? sender, EventArgs e)
         {
             splitContainer.Panel2Collapsed = (!showCommentsMenuItem.Checked);
+        }
+
+        private async void RefreshCommentsMenuItem_Click(object? sender, EventArgs e)
+        {
+            await commentThreads.UpdateCommentThreadsAsync();
         }
 
         private void StatusBusy(string comment)

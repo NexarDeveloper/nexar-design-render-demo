@@ -1,4 +1,7 @@
-﻿using Nexar.Renderer.DesignEntities;
+﻿using Nexar.Client;
+using Nexar.Renderer.DesignEntities;
+using Nexar.Renderer.Managers;
+using StrawberryShake;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,13 +16,26 @@ namespace Nexar.Renderer.UserControls
 {
     public partial class CreateComment : UserControl
     {
-        private readonly CommentThread commentThread;
+        private CommentThreads Owner { get; }
+        private CommentThread Thread { get; }
+        private NexarClient NexarClient { get; }
+        private PcbManager PcbManager { get; }
 
-        public CreateComment(CommentThread commentThread)
+
+        public CreateComment(
+            CommentThreads owner,
+            CommentThread thread,
+            NexarClient nexarClient,
+            PcbManager pcbManager)
         {
             InitializeComponent();
 
-            this.commentThread = commentThread;
+            Owner = owner;
+            Thread = thread;
+            NexarClient = nexarClient;
+            PcbManager = pcbManager;
+
+            postCommentButton.Enabled = false;
 
             commentTextBox.TextChanged += CommentTextBox_TextChanged;
             postCommentButton.Click += PostCommentButton_Click;
@@ -32,8 +48,21 @@ namespace Nexar.Renderer.UserControls
             postCommentButton.Enabled = (commentTextBox.Text.Trim() != string.Empty);
         }
 
-        private void PostCommentButton_Click(object? sender, EventArgs e)
+        private async void PostCommentButton_Click(object? sender, EventArgs e)
         {
+            commentTextBox.Enabled = false;
+
+            var createCommentInput = new DesCreateCommentInput()
+            {
+                CommentThreadId = Thread.CommentThreadId,
+                EntityId = PcbManager.ActiveProject.Id,
+                Text = commentTextBox.Text
+            };
+
+            var createCommentResult = await NexarClient.CreateComment.ExecuteAsync(createCommentInput);
+            createCommentResult.EnsureNoErrors();
+
+            await Owner.UpdateCommentThreadsAsync();
         }
 
         public void Reset()
