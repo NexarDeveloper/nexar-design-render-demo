@@ -1,24 +1,15 @@
-﻿query SearchMpn($mpn: String!) {
-  supSearchMpn(q: $mpn) {
-    results {
-      part {
-        mpn
-        shortDescription
-        manufacturer {
-          name
-        }
-      }
-    }
-  }
-}
-
-query GetWorkspaces {
+﻿query GetWorkspaces {
   desWorkspaces {
     id
     url
     name
     description
     isDefault
+    location {
+      name   
+      apiServiceUrl
+      filesServiceUrl   
+    }
   }
 }
 
@@ -54,7 +45,7 @@ query GetProjects($workspaceUrl: String!, $cursor: String!) {
   }
 }
 
-query GetPcbModelInfo($id: ID!) {
+query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
   desProjectById (id: $id) {
     name
     description
@@ -62,15 +53,33 @@ query GetPcbModelInfo($id: ID!) {
       workInProgress {
         variants {
           pcb {
-            designItems {
+            designItems (after: $cursor, first: $count) {
               totalCount
               pageInfo {
-                startCursor
                 hasNextPage
                 hasPreviousPage
+                startCursor
                 endCursor
+              }            
+              nodes {
+                id
+                designator
+                area {
+                  pos1 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                  pos2 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                }
               }
-            }
+            }           
           }
         }
       }
@@ -80,12 +89,15 @@ query GetPcbModelInfo($id: ID!) {
 
 query GetPcbModel($id: ID!) {
   desProjectById (id: $id) {
+    id
     name
     description
     design {
       workInProgress {
         variants {
           pcb {
+            documentId
+            documentName
             layerStack {
               stacks {
                 name
@@ -138,7 +150,7 @@ query GetPcbModel($id: ID!) {
               holeSize {
                 xMm
               }
-            }
+            }              
             nets {
               name
               pads {
@@ -198,6 +210,62 @@ query GetPcbModel($id: ID!) {
                 }
                 holeDiameter {
                   xMm
+                }
+              }
+            }            
+          }
+        }
+      }
+    }
+  }
+}
+
+query GetPcbComments($id: ID!) {
+  desProjectById (id: $id) {
+    name
+    description
+    design {
+      workInProgress {
+        variants {
+          pcb {
+            documentId
+            documentName
+            commentThreads {
+              commentThreadId
+              createdAt
+              modifiedAt
+              context {
+                area {
+                  pos1 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                  pos2 {
+                    x
+                    y
+                    xMm
+                    yMm
+                  }
+                }
+              }
+              comments {
+                commentId
+                text
+                createdAt
+                createdBy {
+                  firstName
+                  lastName
+                  email
+                  pictureUrl
+                }
+                modifiedAt
+                modifiedBy {
+                  firstName
+                  lastName
+                  email
+                  pictureUrl                
                 }
               }
             }

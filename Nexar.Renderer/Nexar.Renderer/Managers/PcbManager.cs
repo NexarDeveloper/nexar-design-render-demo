@@ -17,6 +17,11 @@ using Nexar.Renderer.Geometry;
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using System.Reflection.Emit;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Reflection.Metadata;
+using OpenTk.Tutorial.Tools;
+using Newtonsoft.Json.Linq;
+using System.Runtime.Intrinsics.Arm;
 
 namespace Nexar.Renderer.Managers
 {
@@ -30,7 +35,7 @@ namespace Nexar.Renderer.Managers
 
         private PcbStats PcbStats { get; set; } = default!;
 
-        private IOperationResult<IGetPcbModelResult> PcbModel { get; set; } = default!;
+        public IOperationResult<IGetPcbModelResult> PcbModel { get; private set; } = default!;
 
         static bool DisableDrawTracks = false;
         static bool DisableDrawPads = false;
@@ -40,6 +45,14 @@ namespace Nexar.Renderer.Managers
         private float xOffset = 0.0F;
         private float yOffset = 0.0F;
 
+        private NexarClient nexarClient = default!;
+
+        public Project ActiveProject { get; set; } = default!;
+
+        public string DocumentId { get; set; } = string.Empty;
+
+        public string DocumentName { get; set; } = string.Empty;
+
         public PcbManager(GlRenderer renderer)
         {
             PcbRenderer = renderer;
@@ -47,8 +60,10 @@ namespace Nexar.Renderer.Managers
             GeneralStopwatch = new Stopwatch();
         }
 
-        public async Task OpenPcbDesignAsync(Project project)
-        {            
+        public async Task OpenPcbDesignAsync(string apiUrl, Project project)
+        {
+            ActiveProject = project;
+
             PcbRenderer.Pcb.Reset();
 
             PcbStats = new PcbStats();
@@ -56,10 +71,17 @@ namespace Nexar.Renderer.Managers
             GeneralStopwatch.Restart();
 
             await NexarHelper.LoginAsync();
-            var nexarClient = NexarHelper.GetNexarClient();
+            nexarClient = NexarHelper.GetNexarClient(apiUrl);
 
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);
             PcbModel.EnsureNoErrors();
+
+            var pcb = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb;
+            if (pcb is not null)
+            {
+                DocumentId = pcb.DocumentId ?? string.Empty;
+                DocumentName = pcb.DocumentName ?? string.Empty;
+            }
 
             GeneralStopwatch.Stop();
             PcbStats.TimeToLoadPcbFromNexar = GeneralStopwatch.ElapsedMilliseconds;
@@ -76,9 +98,51 @@ namespace Nexar.Renderer.Managers
             Debug.WriteLine(PcbRenderer.Pcb.GetStats());
         }
 
+        public async Task LoadAdditionalDesignDataAsync()
+        {
+            await LoadDesignItemsAsync();
+            PcbRenderer.Pcb.FinaliseAdditionalDataSetup();
+        }
+
+        public Tuple<Point, Point> GetHighlightArea()
+        {
+            int scaledStartX = ScaleValueFromMmToNativeUnits(ScalePositionGlToMm((decimal)PcbRenderer.HighlightBox.XyStart.X, xOffset, divisor));
+            int scaledStartY = ScaleValueFromMmToNativeUnits(ScalePositionGlToMm((decimal)PcbRenderer.HighlightBox.XyStart.Y, yOffset, divisor));
+            int scaledEndX = ScaleValueFromMmToNativeUnits(ScalePositionGlToMm((decimal)PcbRenderer.HighlightBox.XyEnd.X, xOffset, divisor));
+            int scaledEndY = ScaleValueFromMmToNativeUnits(ScalePositionGlToMm((decimal)PcbRenderer.HighlightBox.XyEnd.Y, yOffset, divisor));          
+
+            return new Tuple<Point, Point>(
+                new Point(
+                    Math.Min(scaledStartX, scaledEndX),
+                    Math.Max(scaledStartY, scaledEndY)),
+                new Point(
+                    Math.Max(scaledStartX, scaledEndX),
+                    Math.Min(scaledStartY, scaledEndY)));
+        }
+
+        public float GetHighlightedAreaMm()
+        {
+            if (PcbRenderer.HighlightBox.BoxComplete)
+            {
+                float xSizeMm = ScaleValueGlToMm((decimal)(
+                    Math.Abs(
+                        Math.Abs(PcbRenderer.HighlightBox.XyStart.X) -
+                        Math.Abs(PcbRenderer.HighlightBox.XyEnd.X))), xOffset, divisor);
+                
+                float ySizeMm = ScaleValueGlToMm((decimal)(
+                    Math.Abs(
+                        Math.Abs(PcbRenderer.HighlightBox.XyStart.Y) -
+                        Math.Abs(PcbRenderer.HighlightBox.XyEnd.Y))), xOffset, divisor);
+
+                return (xSizeMm * ySizeMm);
+            }
+
+            return 0.0f;
+        }
+
         private void LoadLayerStack()
         {
-            var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0]?.Pcb?.LayerStack?.Stacks[0]?.Layers;
+            var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.LayerStack?.Stacks.FirstOrDefault()?.Layers;
 
             if (layers != null)
             {
@@ -99,7 +163,7 @@ namespace Nexar.Renderer.Managers
 
         private void LoadBoardOutline()
         {
-            var vertices = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0].Pcb?.Outline?.Vertices;
+            var vertices = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.Outline?.Vertices;
 
             if ((vertices != null) && (vertices.Count > 0))
             {
@@ -123,11 +187,11 @@ namespace Nexar.Renderer.Managers
 
                     if (lastVertice != null)
                     {
-                        PcbRenderer.Pcb.AddOutline(
-                            ScaleValue(lastVertice.XMm, xOffset, divisor),
-                            ScaleValue(lastVertice.YMm, yOffset, divisor),
-                            ScaleValue(vertice.XMm, xOffset, divisor),
-                            ScaleValue(vertice.YMm, yOffset, divisor));
+                        PcbRenderer.Pcb.AddBoardOutline(
+                            ScalePositionMmToGl(lastVertice.XMm, xOffset, divisor),
+                            ScalePositionMmToGl(lastVertice.YMm, yOffset, divisor),
+                            ScalePositionMmToGl(vertice.XMm, xOffset, divisor),
+                            ScalePositionMmToGl(vertice.YMm, yOffset, divisor));
                     }
 
                     lastVertice = vertice;
@@ -135,13 +199,114 @@ namespace Nexar.Renderer.Managers
 
                 if (lastVertice != null && firstVertice != null)
                 {
-                    PcbRenderer.Pcb.AddOutline(
-                        ScaleValue(lastVertice.XMm, xOffset, divisor),
-                        ScaleValue(lastVertice.YMm, yOffset, divisor),
-                        ScaleValue(firstVertice.XMm, xOffset, divisor),
-                        ScaleValue(firstVertice.YMm, yOffset, divisor));
+                    PcbRenderer.Pcb.AddBoardOutline(
+                        ScalePositionMmToGl(lastVertice.XMm, xOffset, divisor),
+                        ScalePositionMmToGl(lastVertice.YMm, yOffset, divisor),
+                        ScalePositionMmToGl(firstVertice.XMm, xOffset, divisor),
+                        ScalePositionMmToGl(firstVertice.YMm, yOffset, divisor));
                 }
             }
+        }
+
+        private List<DesignItem> AllComponents { get; } = new List<DesignItem>();
+
+        public PointF ConvertGlCoordToMm(PointF glValue)
+        {
+            float scaledX = ScalePositionGlToMm((decimal)glValue.X, xOffset, divisor);
+            float scaledY = ScalePositionGlToMm((decimal)glValue.Y, yOffset, divisor);
+
+            return new PointF(scaledX, scaledY);
+        }
+
+        public DesignItem? GetComponentForLocation(PointF location)
+        {
+            return AllComponents.FirstOrDefault(x => x.HitTest(location));
+        }
+
+        private async Task LoadDesignItemsAsync()
+        {
+            GeneralStopwatch.Restart();
+
+            AllComponents.Clear();
+
+            Stopwatch componentStopwatch = new Stopwatch();
+
+            string? cursor = null;
+            bool hasPage = true;
+            while (hasPage)
+            {
+                var itemResult = await nexarClient.GetDesignItems.ExecuteAsync(ActiveProject.Id, cursor, 100);
+                itemResult.EnsureNoErrors();
+                    
+                var designItems = itemResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DesignItems;
+
+                if (designItems?.Nodes is null)
+                    break;
+
+                componentStopwatch.Start();
+
+                foreach (var designItem in designItems.Nodes)
+                {
+                    if (designItem.Area != null)
+                    {
+                        PcbStats.TotalDesignItems++;
+
+                        var component = new DesignItem(
+                                designItem.Id,
+                                designItem.Designator,
+                                "", //designItem.Comment,
+                                new Tuple<Point, Point>(
+                                    new Point(designItem.Area.Pos1.X, designItem.Area.Pos1.Y),
+                                    new Point(designItem.Area.Pos2.X, designItem.Area.Pos2.Y)),
+                                (float)designItem.Area.Pos1.XMm,
+                                (float)designItem.Area.Pos1.YMm,
+                                (float)designItem.Area.Pos2.XMm,
+                                (float)designItem.Area.Pos2.YMm);
+
+                        AllComponents.Add(component);
+
+                        PointF? firstVertice = null;
+                        PointF? lastVertice = null;
+
+                        foreach (var vertice in component.PolygonVertices)
+                        {
+                            if (firstVertice == null)
+                            {
+                                firstVertice = vertice;
+                            }
+
+                            if (lastVertice != null)
+                            {
+                                PcbRenderer.Pcb.AddComponentOutline(
+                                    ScalePositionMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
+                                    ScalePositionMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
+                                    ScalePositionMmToGl((decimal)vertice.X, xOffset, divisor),
+                                    ScalePositionMmToGl((decimal)vertice.Y, yOffset, divisor));
+                            }
+
+                            lastVertice = vertice;
+                        }
+
+                        if (lastVertice != null && firstVertice != null)
+                        {
+                            PcbRenderer.Pcb.AddComponentOutline(
+                                ScalePositionMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
+                                ScalePositionMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
+                                ScalePositionMmToGl((decimal)firstVertice.Value.X, xOffset, divisor),
+                                ScalePositionMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor));
+                        }
+                    }
+                }
+
+                componentStopwatch.Stop();
+
+                cursor = designItems.PageInfo.EndCursor;
+                hasPage = designItems.PageInfo.HasNextPage;
+            }
+            
+            GeneralStopwatch.Stop();
+
+            PcbStats.TimeToCreateComponents = componentStopwatch.ElapsedMilliseconds;
         }
 
         private void LoadNetsAndAssociatedPrimitives()
@@ -172,11 +337,11 @@ namespace Nexar.Renderer.Managers
 
                                 PcbRenderer.Pcb.AddTrack(
                                     layer,
-                                    ScaleValue(track.Begin.XMm, xOffset, divisor),
-                                    ScaleValue(track.Begin.YMm, yOffset, divisor),
-                                    ScaleValue(track.End.XMm, xOffset, divisor),
-                                    ScaleValue(track.End.YMm, yOffset, divisor),
-                                    ScaleValue(track.Width.XMm, 0.0F, divisor));
+                                    ScalePositionMmToGl(track.Begin.XMm, xOffset, divisor),
+                                    ScalePositionMmToGl(track.Begin.YMm, yOffset, divisor),
+                                    ScalePositionMmToGl(track.End.XMm, xOffset, divisor),
+                                    ScalePositionMmToGl(track.End.YMm, yOffset, divisor),
+                                    ScalePositionMmToGl(track.Width.XMm, 0.0F, divisor));
 
                                 trackStopwatch.Stop();
                                 PcbStats.TotalTracks++;
@@ -227,20 +392,20 @@ namespace Nexar.Renderer.Managers
                                 PcbRenderer.Pcb.AddVia(
                                     beginLayer,
                                     via.Shape ?? DesPrimitiveShape.Round,
-                                    ScaleValue(via.Position.XMm, xOffset, divisor),
-                                    ScaleValue(via.Position.YMm, yOffset, divisor),
-                                    ScaleValue(via.PadDiameter.XMm, 0.0F, divisor),
-                                    ScaleValue(via.HoleDiameter.XMm, 0.0F, divisor));
+                                    ScalePositionMmToGl(via.Position.XMm, xOffset, divisor),
+                                    ScalePositionMmToGl(via.Position.YMm, yOffset, divisor),
+                                    ScalePositionMmToGl(via.PadDiameter.XMm, 0.0F, divisor),
+                                    ScalePositionMmToGl(via.HoleDiameter.XMm, 0.0F, divisor));
 
                                 var endLayer = PcbRenderer.Pcb.PcbLayers.First(x => x.Name == via.EndLayer.Name);
 
                                 PcbRenderer.Pcb.AddVia(
                                     endLayer,
                                     via.Shape ?? DesPrimitiveShape.Round,
-                                    ScaleValue(via.Position.XMm, xOffset, divisor),
-                                    ScaleValue(via.Position.YMm, yOffset, divisor),
-                                    ScaleValue(via.PadDiameter.XMm, 0.0F, divisor),
-                                    ScaleValue(via.HoleDiameter.XMm, 0.0F, divisor));
+                                    ScalePositionMmToGl(via.Position.XMm, xOffset, divisor),
+                                    ScalePositionMmToGl(via.Position.YMm, yOffset, divisor),
+                                    ScalePositionMmToGl(via.PadDiameter.XMm, 0.0F, divisor),
+                                    ScalePositionMmToGl(via.HoleDiameter.XMm, 0.0F, divisor));
 
                                 viaStopwatch.Stop();
                                 PcbStats.TotalVias++;
@@ -260,7 +425,7 @@ namespace Nexar.Renderer.Managers
 
         private void LoadNoNetPads()
         {
-            var noNetPads = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0].Pcb?.Pads.Where(x => x.Net?.Name == null);
+            var noNetPads = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.Pads.Where(x => x.Net?.Name == null);
 
             if (noNetPads != null)
             {
@@ -291,12 +456,12 @@ namespace Nexar.Renderer.Managers
                 layer,
                 pad.Shape ?? DesPrimitiveShape.Rectangle,
                 pad.PadType,
-                ScaleValue(pad.Size.XMm, 0.0F, divisor),
-                ScaleValue(pad.Size.YMm, 0.0F, divisor),
-                ScaleValue(pad.Position.XMm, xOffset, divisor),
-                ScaleValue(pad.Position.YMm, yOffset, divisor),
+                ScalePositionMmToGl(pad.Size.XMm, 0.0F, divisor),
+                ScalePositionMmToGl(pad.Size.YMm, 0.0F, divisor),
+                ScalePositionMmToGl(pad.Position.XMm, xOffset, divisor),
+                ScalePositionMmToGl(pad.Position.YMm, yOffset, divisor),
                 pad.Rotation ?? 0.0M,
-                ScaleValue(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
+                ScalePositionMmToGl(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
         }
 
         private void AddPad(IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_Pads pad, IPcbLayer layer)
@@ -305,17 +470,32 @@ namespace Nexar.Renderer.Managers
                 layer,
                 pad.Shape ?? DesPrimitiveShape.Rectangle,
                 pad.PadType,
-                ScaleValue(pad.Size.XMm, 0.0F, divisor),
-                ScaleValue(pad.Size.YMm, 0.0F, divisor),
-                ScaleValue(pad.Position.XMm, xOffset, divisor),
-                ScaleValue(pad.Position.YMm, yOffset, divisor),
+                ScalePositionMmToGl(pad.Size.XMm, 0.0F, divisor),
+                ScalePositionMmToGl(pad.Size.YMm, 0.0F, divisor),
+                ScalePositionMmToGl(pad.Position.XMm, xOffset, divisor),
+                ScalePositionMmToGl(pad.Position.YMm, yOffset, divisor),
                 pad.Rotation ?? 0.0M,
-                ScaleValue(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
+                ScalePositionMmToGl(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
         }
 
-        private float ScaleValue(decimal value, float offset, float divisor)
+        private float ScalePositionMmToGl(decimal value, float offset, float divisor)
         {
             return (((float)value) - offset) / divisor;
+        }
+
+        private float ScalePositionGlToMm(decimal value, float offset, float divisor)
+        {
+            return (((float)value) * divisor) + offset;
+        }
+
+        private float ScaleValueGlToMm(decimal value, float offset, float divisor)
+        {
+            return (((float)value) * divisor);
+        }
+
+        private int ScaleValueFromMmToNativeUnits(float mmValue)
+        {
+            return (int)Math.Round((mmValue / 0.00000254F), 3, MidpointRounding.AwayFromZero);
         }
     }
 }

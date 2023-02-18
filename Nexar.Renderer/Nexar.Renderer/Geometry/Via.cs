@@ -15,7 +15,6 @@ namespace Nexar.Renderer.Geometry
         public DesPrimitiveShape PrimitiveShape { get; }
         public float PadDiameterMm { get; }
         public float HoleDiameterMm { get; }
-        public List<PointF> PolygonVertices { get; } = new List<PointF>();
         public List<float> rawVertices { get; } = new List<float>();
 
         public Via(

@@ -87,6 +87,7 @@ namespace Nexar.Renderer.DesignEntities
         }
 
         private List<SingleLineShader> boardOutlineShaders = new List<SingleLineShader>();
+        private List<SingleLineShader> componentOutlineShaders = new List<SingleLineShader>();
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
 
         private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
@@ -99,6 +100,7 @@ namespace Nexar.Renderer.DesignEntities
         public bool DisableTracks { get; set; } = false;
         public bool DisablePads { get; set; } = false;
         public bool DisableVias { get; set; } = false;
+        public bool DisableComponentOutlines { get; set; } = false;
 
         public void InitialiseLayerStack(List<IPcbLayer> pcbLayers)
         {
@@ -130,6 +132,27 @@ namespace Nexar.Renderer.DesignEntities
             long triangleCount = 0;
             shader.AssociatedPrimitives.ForEach(x => triangleCount += x.TessellatedTriangles.Count);
             return triangleCount;
+        }
+
+        public void AddTestPrimitive()
+        {
+            var track = new Track(
+                null!,
+                new PointF(-1.0F, -1.0F),
+                new PointF(1.0F, 1.0F),
+                0.1F);
+
+            if (!layerMappedTrackShader.ContainsKey("Test"))
+            {
+                layerMappedTrackShader.Add("Test", new PrimitiveShader(0.0F));
+            }
+
+            layerMappedTrackShader["Test"].AddPrimitive(
+                track,
+                Color.Red,
+                0.0F);
+
+            layerMappedTrackShader.Values.ToList().ForEach(x => x.Initialise());
         }
 
         public void AddTrack(
@@ -209,7 +232,7 @@ namespace Nexar.Renderer.DesignEntities
             viaShader.AddPrimitive(layer, via, layerInfo.ZOffset);
         }
 
-        public void AddOutline(
+        public void AddBoardOutline(
             float startX,
             float startY,
             float endX,
@@ -226,11 +249,32 @@ namespace Nexar.Renderer.DesignEntities
             boardOutlineShaders.Add(verticeShader);
         }
 
+        public void AddComponentOutline(
+            float startX,
+            float startY,
+            float endX,
+            float endY)
+        {
+            var verticeShader = new SingleLineShader(new Color4(1.0f, 0.65f, 0.0f, 1.0f));
+            verticeShader.Initialise();
+            verticeShader.UpdateVertices(
+                startX: startX,
+                startY: startY,
+                endX: endX,
+                endY: endY);
+
+            componentOutlineShaders.Add(verticeShader);
+        }
+
         public void Reset()
         {
             boardOutlineShaders.ForEach(x => x.Reset());
             boardOutlineShaders.ForEach(x => x.Dispose());
             boardOutlineShaders.Clear();
+
+            componentOutlineShaders.ForEach(x => x.Reset());
+            componentOutlineShaders.ForEach(x => x.Dispose());
+            componentOutlineShaders.Clear();
 
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Reset());
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
@@ -251,10 +295,15 @@ namespace Nexar.Renderer.DesignEntities
             viaShader.Initialise();
         }
 
+        public void FinaliseAdditionalDataSetup()
+        {
+            componentOutlineShaders.ForEach(x => x.Initialise());
+        }
+
         public void Draw(Matrix4 view, Matrix4 projection)
         {
             boardOutlineShaders.ForEach(x => x.Draw(view, projection));
-
+            
             if (!DisableTracks)
             {
                 DrawLayerMappedPrimitives(view, projection, layerMappedTrackShader);
@@ -268,6 +317,11 @@ namespace Nexar.Renderer.DesignEntities
             if (!DisableVias)
             {
                 viaShader.Draw(view, projection);
+            }
+
+            if (!DisableComponentOutlines)
+            {
+                componentOutlineShaders.ForEach(x => x.Draw(view, projection));
             }
         }
 

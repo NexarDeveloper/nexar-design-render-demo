@@ -12,6 +12,7 @@ namespace Nexar.Renderer.DesignEntities
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
         public string Url { get; set; } = default!;
+        public string ApiUrl { get; set; } = default!;
         public Location Location { get; set; }
     }
 }

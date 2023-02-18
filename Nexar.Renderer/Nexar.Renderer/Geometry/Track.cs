@@ -15,8 +15,6 @@ namespace Nexar.Renderer.Geometry
     {
         public List<PointF> LineVertices { get; } = new List<PointF>();
 
-        public List<PointF> PolygonVertices { get; } = new List<PointF>();
-
         public List<float> rawVertices { get; } = new List<float>();
 
         public Track(

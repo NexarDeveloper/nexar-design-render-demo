@@ -30,7 +30,7 @@ namespace Nexar.Renderer.Forms
             flowLayoutPanel.Controls.Clear();
 
             await NexarHelper.LoginAsync();
-            var nexarClient = NexarHelper.GetNexarClient();
+            var nexarClient = NexarHelper.GetNexarClient(workspace.ApiUrl);
 
             var projectInfo = await nexarClient.GetProjectInfo.ExecuteAsync(workspace.Url);
 
@@ -56,6 +56,7 @@ namespace Nexar.Renderer.Forms
                             var designProject = new Project()
                             {
                                 Id = project.Id,
+                                ProjectId = project.ProjectId,
                                 Description = project?.Description ?? string.Empty,
                                 Name = project?.Name ?? string.Empty,
                                 PreviewUrl = project?.PreviewUrl ?? string.Empty,

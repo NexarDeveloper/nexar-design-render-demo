@@ -1,0 +1,47 @@
+﻿mutation CreateCommentThread($input: DesCreateCommentThreadInput!) {
+  desCreateCommentThread(input: $input)
+  {
+    commentThreadId
+    commentId
+    errors {
+      message
+    }
+  }
+}
+
+mutation DeleteCommentThread($input: DesDeleteCommentThreadInput!) {
+  desDeleteCommentThread(input: $input)
+  {
+    errors {
+      message
+    }
+  }
+}
+
+mutation CreateComment($input: DesCreateCommentInput!) {
+  desCreateComment(input: $input)
+  {
+    commentId
+    errors {
+      message
+    }
+  }
+}
+
+mutation DeleteComment($input: DesDeleteCommentInput!) {
+  desDeleteComment(input: $input)
+  {
+    errors {
+      message
+    }
+  }
+}
+
+mutation UpdateComment($input: DesUpdateCommentInput!) {
+  desUpdateComment(input: $input)
+  {
+    errors {
+      message
+    }
+  }
+}

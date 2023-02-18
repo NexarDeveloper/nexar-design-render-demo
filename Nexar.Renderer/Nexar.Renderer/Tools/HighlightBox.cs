@@ -46,17 +46,24 @@ namespace OpenTk.Tutorial.Tools
         {
             highlightLineShader = new LineShader(
                 highlightBoxVertices,
-                Color4.Purple,
+                Color4.White,
                 "dottedLineShader.vert",
                 "dottedLineShader.frag");
 
             highlightLineShader.Initialise();
         }
 
-        public Tuple<float, float> XYStart
+        public PointF XyStart { get; set; }
+        public PointF XyEnd { get; set; }
+
+        public bool BoxComplete = false;
+
+        public Tuple<float, float> XyStartVertices
         {
             set
             {
+                XyStart = new PointF(value.Item1, value.Item2);
+
                 highlightBoxVertices[LINE_LEFT_START_X] = value.Item1;
                 highlightBoxVertices[LINE_LEFT_START_Y] = value.Item2;
                 highlightBoxVertices[LINE_LEFT_END_X] = value.Item1;
@@ -79,10 +86,12 @@ namespace OpenTk.Tutorial.Tools
             }
         }
 
-        public Tuple<float, float> XYEnd
+        public Tuple<float, float> XyEndVertices
         {
             set
             {
+                XyEnd = new PointF(value.Item1, value.Item2);
+
                 highlightBoxVertices[LINE_LEFT_END_Y] = value.Item2;
                 highlightBoxVertices[LINE_BOTTOM_END_X] = value.Item1;
 
@@ -93,6 +102,8 @@ namespace OpenTk.Tutorial.Tools
                 highlightBoxVertices[LINE_TOP_START_Y] = value.Item2;
                 highlightBoxVertices[LINE_TOP_END_X] = value.Item1;
                 highlightBoxVertices[LINE_TOP_END_Y] = value.Item2;
+
+                BoxComplete = true;
             }
         }
 
@@ -103,6 +114,8 @@ namespace OpenTk.Tutorial.Tools
                 highlightBoxVertices[index] = 0.0F;
                 highlightBoxVertices[index + 1] = 0.0F;
             }
+
+            BoxComplete = false;
         }
 
         public void Draw(Matrix4 view, Matrix4 projection)

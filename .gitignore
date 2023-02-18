@@ -5,6 +5,7 @@
 
 # Strawberry Shake "Generated"
 Generated/
+.graphqlrc.json
 
 # User-specific files
 *.suo

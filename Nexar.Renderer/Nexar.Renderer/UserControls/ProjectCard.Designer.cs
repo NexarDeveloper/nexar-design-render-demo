@@ -39,6 +39,7 @@
             // 
             this.thumbnail.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.thumbnail.InitialImage = global::Nexar.Renderer.Properties.Resources.loading;
             this.thumbnail.Location = new System.Drawing.Point(3, 3);
             this.thumbnail.Name = "thumbnail";
             this.thumbnail.Size = new System.Drawing.Size(294, 189);
@@ -50,6 +51,7 @@
             // 
             this.projectName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.projectName.ForeColor = System.Drawing.Color.White;
             this.projectName.Location = new System.Drawing.Point(3, 195);
             this.projectName.Name = "projectName";
             this.projectName.Size = new System.Drawing.Size(294, 23);
@@ -61,6 +63,7 @@
             // 
             this.projectDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.projectDescription.ForeColor = System.Drawing.Color.White;
             this.projectDescription.Location = new System.Drawing.Point(3, 223);
             this.projectDescription.Name = "projectDescription";
             this.projectDescription.Size = new System.Drawing.Size(294, 23);
@@ -69,17 +72,21 @@
             // 
             // openProjectButton
             // 
+            this.openProjectButton.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.openProjectButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.openProjectButton.ForeColor = System.Drawing.Color.Black;
             this.openProjectButton.Location = new System.Drawing.Point(3, 249);
             this.openProjectButton.Name = "openProjectButton";
             this.openProjectButton.Size = new System.Drawing.Size(294, 23);
             this.openProjectButton.TabIndex = 3;
             this.openProjectButton.Text = "Open";
-            this.openProjectButton.UseVisualStyleBackColor = true;
+            this.openProjectButton.UseVisualStyleBackColor = false;
             // 
             // ProjectCard
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.Controls.Add(this.openProjectButton);
             this.Controls.Add(this.projectDescription);
             this.Controls.Add(this.projectName);

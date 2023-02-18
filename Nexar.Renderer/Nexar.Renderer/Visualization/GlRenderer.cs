@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using Nexar.Renderer.DesignEntities;
+using Nexar.Renderer.Forms;
+using Nexar.Renderer.Managers;
 using Nexar.Renderer.Tools;
 using OpenTk.Tutorial.Tools;
 using OpenTK;
@@ -26,7 +28,7 @@ namespace Nexar.Renderer.Visualization
         private Stopwatch timer;
 
         private Axis axis = default!;
-        private HighlightBox highlightBox = default!;
+        public HighlightBox HighlightBox = default!;
 
         public Pcb Pcb { get; set; } = default!;
 
@@ -47,6 +49,8 @@ namespace Nexar.Renderer.Visualization
 
         private int Width;
         private int Height;
+
+        public Action<Point>? MouseUpCallback { get; set; }
 
         // TODO: Come back to native input (commented out as reminder)
         //private INativeInput nativeInput;
@@ -82,19 +86,26 @@ namespace Nexar.Renderer.Visualization
             Height = height;
         }
 
+        public PointF GetXYOnZeroZPlane(Point location)
+        {
+            var xy = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
+            return new PointF(xy.Item1, xy.Item2);
+        }
+
         public void Demo_MouseDown(object sender, Point location)
         {
-            highlightBox.XYStart = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
+            HighlightBox.XyStartVertices = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
         }
 
         public void Demo_MouseMove(object sender, Point location)
         {
-            highlightBox.XYEnd = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
+            HighlightBox.XyEndVertices = ObjectPicker.GetXYOnZeroZPlane(location, view, projection);
         }
 
         public void Demo_MouseUp(object sender, Point location)
         {
-            highlightBox.ResetHighlightBox();
+            MouseUpCallback?.Invoke(location);
+            HighlightBox.ResetHighlightBox();
         }
 
         public void MousePan(object sender, Point location)
@@ -107,7 +118,7 @@ namespace Nexar.Renderer.Visualization
             GL.ClearColor(0.117f, 0.117f, 0.117f, 1.0f);
 
             axis = new Axis();
-            highlightBox = new HighlightBox();
+            HighlightBox = new HighlightBox();
             Pcb = new Pcb();
 
             //projection = Matrix4.CreateOrthographic(MathHelper.DegreesToRadians(45f) * 5, (Width / (float)Height) * 5, 0.1f, 100.0f);
@@ -121,11 +132,13 @@ namespace Nexar.Renderer.Visualization
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             axis.Dispose();
-            highlightBox.Dispose();
+            HighlightBox.Dispose();
             Pcb.Dispose();
         }
 
         public List<Keys> ActiveKeys { get; } = new List<Keys>();
+
+        public int ZoomRequest { get; set; } = 0;
 
         public void OnUpdateFrame(FrameEventArgs e)
         {
@@ -143,7 +156,7 @@ namespace Nexar.Renderer.Visualization
 
             //DrawAxisLines();
             DrawPcb();
-            //DrawHighlightBox();
+            DrawHighlightBox();
 
             if (ActiveKeys != null)
             {
@@ -153,8 +166,8 @@ namespace Nexar.Renderer.Visualization
                 }
 
                 // Camera speed
-                speed = 10.0f;
-                speed2 = 100.0f;
+                speed = 15.0f;
+                speed2 = 150.0f;
 
                 if (ActiveKeys.Any(x => x == Keys.LShiftKey))
                 {
@@ -184,6 +197,15 @@ namespace Nexar.Renderer.Visualization
                 {
                     cameraDistance += speed * (float)e.Time;
                     cameraPosition -= front * speed * (float)e.Time;
+                }
+
+                // Forward or backward
+                if (ZoomRequest != 0)
+                {
+                    float scaledRequest = ZoomRequest * 0.01f;
+                    cameraDistance += scaledRequest;
+                    cameraPosition -= front * scaledRequest;
+                    ZoomRequest = 0;
                 }
 
                 // Up
@@ -227,7 +249,7 @@ namespace Nexar.Renderer.Visualization
 
         private void DrawHighlightBox()
         {
-            highlightBox?.Draw(view, projection);
+            HighlightBox?.Draw(view, projection);
         }
 
         public void WindowReshape(int width, int height)

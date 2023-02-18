@@ -12,6 +12,7 @@ out vec3 fColor;
 
 void main()
 {
+    fColor = vec3(1.0f, 0.0f, 0.0f)
 	fColor = vec3(gs_in[0].color);
     int i;
     for(i = 0; i < gl_in.length(); i++)
