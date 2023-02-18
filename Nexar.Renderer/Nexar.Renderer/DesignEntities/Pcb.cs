@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
 using System.Windows.Forms;
+using System.Reflection.Emit;
 
 namespace Nexar.Renderer.DesignEntities
 {
@@ -86,8 +87,8 @@ namespace Nexar.Renderer.DesignEntities
             return layerInfo;
         }
 
-        private List<SingleLineShader> boardOutlineShaders = new List<SingleLineShader>();
-        private List<SingleLineShader> componentOutlineShaders = new List<SingleLineShader>();
+        private PrimitiveShader boardOutlineShader = new PrimitiveShader(0.0f);
+        private PrimitiveShader componentOutlineShader = new PrimitiveShader(0.0f);
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
 
         private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
@@ -157,16 +158,16 @@ namespace Nexar.Renderer.DesignEntities
 
         public void AddTrack(
             IPcbLayer layer,
-            float beginXMm,
-            float beginYMm,
-            float endXMm,
-            float endYMm,
+            float beginX,
+            float beginY,
+            float endX,
+            float endY,
             float width)
         {
             var track = new Track(
                 layer,
-                new PointF(beginXMm, beginYMm),
-                new PointF(endXMm, endYMm),
+                new PointF(beginX, beginY),
+                new PointF(endX, endY),
                 width);
 
             if (!layerMappedTrackShader.ContainsKey(layer.Name))
@@ -185,21 +186,21 @@ namespace Nexar.Renderer.DesignEntities
             IPcbLayer layer,
             DesPrimitiveShape primitiveShape,
             DesPadType padType,
-            float sizeXMm,
-            float sizeYMm,
-            float positionXMm,
-            float positionYMm,
+            float sizeX,
+            float sizeY,
+            float positionX,
+            float positionY,
             decimal rotation,
-            float holeSizeMm)
+            float holeSize)
         {
             var pad = new Pad(
                 layer,
                 primitiveShape,
                 padType,
-                new PointF(sizeXMm, sizeYMm),
-                new PointF(positionXMm, positionYMm),
+                new PointF(sizeX, sizeY),
+                new PointF(positionX, positionY),
                 rotation,
-                holeSizeMm);
+                holeSize);
 
             if (!layerMappedPadShader.ContainsKey(layer.Name))
             {
@@ -216,65 +217,57 @@ namespace Nexar.Renderer.DesignEntities
         public void AddVia(
             IPcbLayer layer,
             DesPrimitiveShape primitiveShape,
-            float positionXMm,
-            float positionYMm,
-            float padDiameterMm,
-            float holeDiameterMm)
+            float positionX,
+            float positionY,
+            float padDiameter,
+            float holeDiameter)
         {
             var via = new Via(
                 layer,
                 primitiveShape,
-                new PointF(positionXMm, positionYMm),
-                padDiameterMm,
-                holeDiameterMm);
+                new PointF(positionX, positionY),
+                padDiameter,
+                holeDiameter);
 
             var layerInfo = GetLayerInfo(layer);
             viaShader.AddPrimitive(layer, via, layerInfo.ZOffset);
         }
 
         public void AddBoardOutline(
-            float startX,
-            float startY,
+            float beginX,
+            float beginY,
             float endX,
             float endY)
         {
-            var verticeShader = new SingleLineShader(new Color4(1.0f, 0.0f, 1.0f, 1.0f));
-            verticeShader.Initialise();
-            verticeShader.UpdateVertices(
-                startX: startX,
-                startY: startY,
-                endX: endX,
-                endY: endY);
+            var line = new ThickLine(
+                null,
+                new PointF(beginX, beginY),
+                new PointF(endX, endY));
 
-            boardOutlineShaders.Add(verticeShader);
+            boardOutlineShader.AddPrimitive(line, Color4.Purple, 0.0f);
         }
 
         public void AddComponentOutline(
-            float startX,
-            float startY,
+            float beginX,
+            float beginY,
             float endX,
             float endY)
         {
-            var verticeShader = new SingleLineShader(new Color4(1.0f, 0.65f, 0.0f, 1.0f));
-            verticeShader.Initialise();
-            verticeShader.UpdateVertices(
-                startX: startX,
-                startY: startY,
-                endX: endX,
-                endY: endY);
+            var line = new ThickLine(
+                null,
+                new PointF(beginX, beginY),
+                new PointF(endX, endY));
 
-            componentOutlineShaders.Add(verticeShader);
+            componentOutlineShader.AddPrimitive(line, new Color4(1.0f, 0.65f, 0.0f, 1.0f), 0.0f);
         }
 
         public void Reset()
         {
-            boardOutlineShaders.ForEach(x => x.Reset());
-            boardOutlineShaders.ForEach(x => x.Dispose());
-            boardOutlineShaders.Clear();
+            boardOutlineShader.Reset();
+            boardOutlineShader.Dispose();
 
-            componentOutlineShaders.ForEach(x => x.Reset());
-            componentOutlineShaders.ForEach(x => x.Dispose());
-            componentOutlineShaders.Clear();
+            componentOutlineShader.Reset();
+            componentOutlineShader.Dispose();
 
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Reset());
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
@@ -289,7 +282,7 @@ namespace Nexar.Renderer.DesignEntities
 
         public void FinaliseSetup()
         {
-            boardOutlineShaders.ForEach(x => x.Initialise());
+            boardOutlineShader.Initialise();
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Initialise());
             layerMappedPadShader.Values.ToList().ForEach(x => x.Initialise());
             viaShader.Initialise();
@@ -297,12 +290,12 @@ namespace Nexar.Renderer.DesignEntities
 
         public void FinaliseAdditionalDataSetup()
         {
-            componentOutlineShaders.ForEach(x => x.Initialise());
+            componentOutlineShader.Initialise();
         }
 
         public void Draw(Matrix4 view, Matrix4 projection)
         {
-            boardOutlineShaders.ForEach(x => x.Draw(view, projection));
+            boardOutlineShader.Draw(view, projection);
             
             if (!DisableTracks)
             {
@@ -321,7 +314,7 @@ namespace Nexar.Renderer.DesignEntities
 
             if (!DisableComponentOutlines)
             {
-                componentOutlineShaders.ForEach(x => x.Draw(view, projection));
+                componentOutlineShader.Draw(view, projection);
             }
         }
 
@@ -340,10 +333,11 @@ namespace Nexar.Renderer.DesignEntities
 
         public void Dispose()
         {
-            boardOutlineShaders.ForEach(x => x.Dispose());
+            boardOutlineShader.Dispose();
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
             layerMappedPadShader.Values.ToList().ForEach(x => x.Dispose());
             viaShader.Dispose();
+            componentOutlineShader.Dispose();
         }
     }
 }

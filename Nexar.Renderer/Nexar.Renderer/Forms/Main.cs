@@ -38,7 +38,7 @@ namespace Nexar.Renderer.Forms
 
         private ThreadHelper? renderThreadHelper;
 
-        private CommentThreads commentThreads;
+        private CommentThreads commentThreads = default!;
 
         private const int THREAD_PERIOD_MS = 10;
 
@@ -194,7 +194,8 @@ namespace Nexar.Renderer.Forms
 
         private void CreateCommentWithArea(Point location)
         {
-            if (pcbManager.GetHighlightedAreaMm() > 4.0f)
+            if (pcbManager.ActiveProject!= null &&
+                pcbManager.GetHighlightedAreaMm() > 4.0f)
             {
                 var highlightArea = pcbManager.GetHighlightArea();
 
@@ -460,6 +461,9 @@ namespace Nexar.Renderer.Forms
                     {
                         if (projectsForm.SelectedDesignProject != null)
                         {
+                            splitContainer.Panel2.Controls.Clear();
+                            splitContainer.Panel2Collapsed = true;
+
                             Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
                             StatusBusy(string.Format("Opening '{0}'...", projectsForm.SelectedDesignProject.Name));
                             
@@ -473,9 +477,6 @@ namespace Nexar.Renderer.Forms
                             await pcbManager.LoadAdditionalDesignDataAsync();
                             StatusReady();
 
-                            // TODO: Fix this
-                            splitContainer.Panel2.Controls.Clear();
-
                             commentThreads = new CommentThreads(NexarHelper.GetNexarClient(), pcbManager)
                             {
                                 Dock = DockStyle.Fill
@@ -487,6 +488,7 @@ namespace Nexar.Renderer.Forms
                             await commentThreads.LoadCommentThreadsAsync();
 
                             splitContainer.Panel2Collapsed = (commentThreads.GetCommentThreadCount() == 0);
+                            showCommentsMenuItem.Checked = (!splitContainer.Panel2Collapsed);
                         }
                     }
                 }

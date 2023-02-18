@@ -14,7 +14,7 @@ namespace Nexar.Renderer.Geometry
     public abstract class Primitive
     {
         public const int SCALING_FACTOR = 10000;
-        public IPcbLayer Layer { get; protected set; } = default!;
+        public IPcbLayer? Layer { get; protected set; } = null;
 
         public List<PointF> PolygonVertices { get; } = new List<PointF>();
 

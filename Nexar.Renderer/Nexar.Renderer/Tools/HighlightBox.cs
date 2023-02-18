@@ -56,6 +56,7 @@ namespace OpenTk.Tutorial.Tools
         public PointF XyStart { get; set; }
         public PointF XyEnd { get; set; }
 
+        public bool StartComplete = false;
         public bool BoxComplete = false;
 
         public Tuple<float, float> XyStartVertices
@@ -83,6 +84,8 @@ namespace OpenTk.Tutorial.Tools
                 highlightBoxVertices[LINE_TOP_START_Y] = value.Item2;
                 highlightBoxVertices[LINE_TOP_END_X] = value.Item1;
                 highlightBoxVertices[LINE_TOP_END_Y] = value.Item2;
+
+                StartComplete = true;
             }
         }
 
@@ -103,7 +106,10 @@ namespace OpenTk.Tutorial.Tools
                 highlightBoxVertices[LINE_TOP_END_X] = value.Item1;
                 highlightBoxVertices[LINE_TOP_END_Y] = value.Item2;
 
-                BoxComplete = true;
+                if (StartComplete)
+                {
+                    BoxComplete = true;
+                }
             }
         }
 
@@ -115,6 +121,7 @@ namespace OpenTk.Tutorial.Tools
                 highlightBoxVertices[index + 1] = 0.0F;
             }
 
+            StartComplete = false;
             BoxComplete = false;
         }
 

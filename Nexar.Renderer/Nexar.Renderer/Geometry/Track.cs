@@ -18,7 +18,7 @@ namespace Nexar.Renderer.Geometry
         public List<float> rawVertices { get; } = new List<float>();
 
         public Track(
-            IPcbLayer layer,
+            IPcbLayer? layer,
             PointF beginMm,
             PointF endMm,
             double width)
