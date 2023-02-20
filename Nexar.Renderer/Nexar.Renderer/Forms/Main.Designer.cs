@@ -71,7 +71,7 @@
             this.workspaceToolStripMenuItem.Name = "workspaceToolStripMenuItem";
             this.workspaceToolStripMenuItem.Size = new System.Drawing.Size(154, 20);
             this.workspaceToolStripMenuItem.Text = "Click to Load Workspaces";
-            this.workspaceToolStripMenuItem.Click += new System.EventHandler(this.workspaceToolStripMenuItem_Click);
+            this.workspaceToolStripMenuItem.Click += new System.EventHandler(this.WorkspaceToolStripMenuItem_Click);
             // 
             // openProjectMenuItem
             // 

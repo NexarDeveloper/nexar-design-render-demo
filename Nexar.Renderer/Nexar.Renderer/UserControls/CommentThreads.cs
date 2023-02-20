@@ -41,7 +41,7 @@ namespace Nexar.Renderer.UserControls
 
         public IOperationResult<IGetPcbModelResult> PcbModel { get; set; } = default!;
 
-        public Action<CommentThread?>? CommentThreadSelectionChanged { get; set; }
+        public Action<CommentThread?>? CommentThreadsChanged { get; set; }
 
         public CommentThreads(
             NexarClient nexarClient,
@@ -70,31 +70,6 @@ namespace Nexar.Renderer.UserControls
         public int GetCommentThreadCount()
         {
             return CommentModel.Count;
-        }
-
-        public void LoadCommentThreadsThreadSafe()
-        {
-            InvokeMethodThreadSafeAsync(LoadCommentThreadsAsync);
-        }
-
-        public void UpdateCommentThreadsThreadSafe()
-        {
-            InvokeMethodThreadSafeAsync(UpdateCommentThreadsAsync);
-        }
-
-        private void InvokeMethodThreadSafeAsync(Func<Task> method)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new MethodInvoker(async delegate
-                {
-                    await method();
-                }));
-            }
-            else
-            {
-                method();
-            }
         }
 
         public async Task LoadCommentThreadsAsync()
@@ -174,12 +149,17 @@ namespace Nexar.Renderer.UserControls
                         }
 
                         UpdateLocalModel(commentThreads);
+                        CommentThreadsChanged?.Invoke(ActiveCommentThread);
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                //AppLogger.Error(string.Format("Exception updating comment threads: {0}", ex.Message));
+                MessageBox.Show(
+                    string.Format("Exception updating comment threads: {0}", ex.Message), 
+                    "Error", 
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
@@ -227,12 +207,8 @@ namespace Nexar.Renderer.UserControls
         {
             var commentThreadTableLayoutPanel = new TableLayoutPanel()
             {
-                //BackColor = Color.LimeGreen,
-                //CellBorderStyle = TableLayoutPanelCellBorderStyle.None,
-                //Dock = DockStyle.Top,
                 AutoSize = true,
                 Margin = new Padding(5),
-                //Height = 500,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Padding = new System.Windows.Forms.Padding(0, 0, 0, 0)
             };
@@ -263,7 +239,7 @@ namespace Nexar.Renderer.UserControls
                     active.BackColor = Color.LimeGreen;
                 }
 
-                CommentThreadSelectionChanged?.Invoke(ActiveCommentThread);
+                CommentThreadsChanged?.Invoke(ActiveCommentThread);
             }
         }
 

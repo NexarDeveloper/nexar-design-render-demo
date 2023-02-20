@@ -79,7 +79,6 @@ namespace Nexar.Renderer.Forms
 
             NexarHelper = new NexarHelper();
 
-            // Very hacky circular reference
             var glRenderer = new GlRenderer(glWidth, glHeight, "Nexar Renderer");
             pcbManager = new PcbManager(glRenderer);
             glRenderer.MouseUpCallback = CreateCommentWithArea;
@@ -96,12 +95,6 @@ namespace Nexar.Renderer.Forms
 
                 renderThreadHelper.StartThreads();
             }
-
-            /*splitContainer.Panel2.Controls.Add(new CommentElement()
-            {
-                Dock = DockStyle.Top
-                //Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right
-            });*/
         }
 
         private void GlControl_Click(object? sender, EventArgs e)
@@ -111,8 +104,6 @@ namespace Nexar.Renderer.Forms
 
         private void GlControl_Load(object? sender, EventArgs e)
         {
-            // Make sure that when the GLControl is resized or needs to be painted,
-            // we update our projection matrix or re-render its contents, respectively.
             glControl.Resize += GlControl_Resize;
 
             pcbManager.PcbRenderer.OnLoad();
@@ -123,7 +114,6 @@ namespace Nexar.Renderer.Forms
                 pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
             }
 
-            // Ensure that the viewport and projection matrix are set correctly initially.
             GlControl_Resize(glControl, EventArgs.Empty);
         }
 
@@ -193,7 +183,7 @@ namespace Nexar.Renderer.Forms
             }
         }
 
-        private void CreateCommentWithArea(Point location)
+        private async void CreateCommentWithArea(Point location)
         {
             if (pcbManager.ActiveProject!= null &&
                 pcbManager.GetHighlightedAreaMm() > 4.0f)
@@ -211,12 +201,12 @@ namespace Nexar.Renderer.Forms
 
                 if (createCommentThread.DialogResult == DialogResult.OK)
                 {
-                    commentThreads.UpdateCommentThreadsThreadSafe();
+                    await commentThreads.UpdateCommentThreadsAsync();
                 }
             }
         }
 
-        private void CreateCommentThread_Click(object? sender, EventArgs e)
+        private async void CreateCommentThread_Click(object? sender, EventArgs e)
         {
             if (SelectedComponent != null)
             {               
@@ -231,7 +221,7 @@ namespace Nexar.Renderer.Forms
 
                 if (createCommentThread.DialogResult == DialogResult.OK)
                 {
-                    commentThreads.UpdateCommentThreadsThreadSafe();
+                    await commentThreads.UpdateCommentThreadsAsync();
                 }
             }
         }
@@ -364,7 +354,7 @@ namespace Nexar.Renderer.Forms
             }
         }
 
-        private async void workspaceToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void WorkspaceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             await LoadWorkspacesAsync();
         }
@@ -422,6 +412,14 @@ namespace Nexar.Renderer.Forms
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    string.Format("Exception loading workspaces: {0}", ex.Message),
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
             finally
             {
@@ -487,7 +485,7 @@ namespace Nexar.Renderer.Forms
 
                             commentThreads.PcbModel = pcbManager.PcbModel;
                             await commentThreads.LoadCommentThreadsAsync();
-                            commentThreads.CommentThreadSelectionChanged = CommentThreadSelectionChanged;
+                            commentThreads.CommentThreadsChanged = UpdateCommentThreadsOnPcb;
 
                             pcbManager.LoadCommentAreas(commentThreads.CommentModel.Select(x => x.Value.Item1).ToList());
 
@@ -497,13 +495,21 @@ namespace Nexar.Renderer.Forms
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    string.Format("Exception loading projects: {0}", ex.Message),
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
             finally
             {
                 mainMenu.Enabled = true;
             }
         }
 
-        private void CommentThreadSelectionChanged(CommentThread? commentThread)
+        private void UpdateCommentThreadsOnPcb(CommentThread? commentThread)
         {
             pcbManager.LoadCommentAreas(commentThreads.CommentModel.Select(x => x.Value.Item1).ToList(), commentThread);
         }
