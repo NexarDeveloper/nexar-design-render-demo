@@ -487,6 +487,7 @@ namespace Nexar.Renderer.Forms
 
                             commentThreads.PcbModel = pcbManager.PcbModel;
                             await commentThreads.LoadCommentThreadsAsync();
+                            commentThreads.CommentThreadSelectionChanged = CommentThreadSelectionChanged;
 
                             pcbManager.LoadCommentAreas(commentThreads.CommentModel.Select(x => x.Value.Item1).ToList());
 
@@ -500,6 +501,11 @@ namespace Nexar.Renderer.Forms
             {
                 mainMenu.Enabled = true;
             }
+        }
+
+        private void CommentThreadSelectionChanged(CommentThread? commentThread)
+        {
+            pcbManager.LoadCommentAreas(commentThreads.CommentModel.Select(x => x.Value.Item1).ToList(), commentThread);
         }
 
         private void LoadLayers()
@@ -565,7 +571,6 @@ namespace Nexar.Renderer.Forms
                 }
             }
         }
-
 
         private void TracksMenuItem_CheckedChanged(object? sender, EventArgs e)
         {

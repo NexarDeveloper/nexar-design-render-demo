@@ -37,6 +37,7 @@
             this.padsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viasMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.componentOutlinesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.commentAreaMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.commentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.refreshCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,7 +45,6 @@
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.currentProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.commentAreaMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.SuspendLayout();
@@ -134,6 +134,15 @@
             this.componentOutlinesMenuItem.Size = new System.Drawing.Size(185, 22);
             this.componentOutlinesMenuItem.Text = "Component Outlines";
             // 
+            // commentAreaMenuItem
+            // 
+            this.commentAreaMenuItem.Checked = true;
+            this.commentAreaMenuItem.CheckOnClick = true;
+            this.commentAreaMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.commentAreaMenuItem.Name = "commentAreaMenuItem";
+            this.commentAreaMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.commentAreaMenuItem.Text = "Comment Areas";
+            // 
             // commentsMenuItem
             // 
             this.commentsMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -201,14 +210,6 @@
             this.currentProgressBar.Name = "currentProgressBar";
             this.currentProgressBar.Size = new System.Drawing.Size(100, 16);
             this.currentProgressBar.Visible = false;
-            // 
-            // commentAreaMenuItem
-            // 
-            this.commentAreaMenuItem.Checked = true;
-            this.commentAreaMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.commentAreaMenuItem.Name = "commentAreaMenuItem";
-            this.commentAreaMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.commentAreaMenuItem.Text = "Comment Areas";
             // 
             // Main
             // 

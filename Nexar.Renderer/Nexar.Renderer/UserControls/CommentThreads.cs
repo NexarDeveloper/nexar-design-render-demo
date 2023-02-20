@@ -34,10 +34,14 @@ namespace Nexar.Renderer.UserControls
 
         private readonly TableLayoutPanel allThreadsTableLayoutPanel;
 
+        private CommentThread? ActiveCommentThread { get; set; }
+
         private NexarClient NexarClient { get; }
         private PcbManager PcbManager { get; }
 
         public IOperationResult<IGetPcbModelResult> PcbModel { get; set; } = default!;
+
+        public Action<CommentThread?>? CommentThreadSelectionChanged { get; set; }
 
         public CommentThreads(
             NexarClient nexarClient,
@@ -215,7 +219,7 @@ namespace Nexar.Renderer.UserControls
             var commentThreadLayoutPanel = CreateCommentThreadLayoutPanel();
             allThreadsTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             allThreadsTableLayoutPanel.Controls.Add(commentThreadLayoutPanel);
-            //allThreadsTableLayoutPanel.SetRow(commentThreadLayoutPanel, 0);
+            commentThreadLayoutPanel.Tag = commentThread.CommentThreadId;
             threadToPanelMapping.Add(commentThread.CommentThreadId, commentThreadLayoutPanel);
         }
 
@@ -246,7 +250,20 @@ namespace Nexar.Renderer.UserControls
 
             if (active != null) 
             {
-                active.BackColor = Color.LimeGreen;
+                var commentThread = CommentModel[(string)active.Tag].Item1;
+
+                if (ActiveCommentThread == commentThread)
+                {
+                    ActiveCommentThread = null;
+                    active.BackColor = Color.Transparent;
+                }
+                else
+                {
+                    ActiveCommentThread = commentThread;
+                    active.BackColor = Color.LimeGreen;
+                }
+
+                CommentThreadSelectionChanged?.Invoke(ActiveCommentThread);
             }
         }
 

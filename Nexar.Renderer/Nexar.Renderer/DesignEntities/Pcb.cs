@@ -270,50 +270,65 @@ namespace Nexar.Renderer.DesignEntities
             float beginX,
             float beginY,
             float endX,
-            float endY)
+            float endY,
+            bool highlight)
         {
             Color4 boxColor = new Color4(53, 113, 209, 255);
 
-            float argA, argB, argC, argD;
-
-            // We will assume a bounding rectangle with side on the X and Y axis
-            if (beginX != endX)
+            if (highlight)
             {
-                float start = beginX;
-                float stop = endX;
+                var line = new ThickLine(
+                    null,
+                    new PointF(beginX, beginY),
+                    new PointF(endX, endY));
 
-                if (beginX > endX)
-                {
-                    start = endX;
-                    stop = beginX;
-                }
-
-                // Size is in X direction
-                for (float segmentPoint = start; segmentPoint < stop; segmentPoint += segmentSize)
-                {
-                    CreateLine(segmentPoint, beginY, Math.Min(segmentPoint + segmentSolid, stop), endY, boxColor);
-                }
+                commentAreaShader.AddPrimitive(line, Color4.LimeGreen, 0.01f);
             }
             else
             {
-                float start = beginY;
-                float stop = endY;
-
-                if (beginY > endY)
+                // We will assume a bounding rectangle with side on the X and Y axis
+                if (beginX != endX)
                 {
-                    start = endY;
-                    stop = beginY;
+                    float start = beginX;
+                    float stop = endX;
+
+                    if (beginX > endX)
+                    {
+                        start = endX;
+                        stop = beginX;
+                    }
+
+                    // Size is in X direction
+                    for (float segmentPoint = start; segmentPoint < stop; segmentPoint += segmentSize)
+                    {
+                        CreateLine(segmentPoint, beginY, Math.Min(segmentPoint + segmentSolid, stop), endY, boxColor);
+                    }
                 }
-
-                // Side is in Y direction
-                for (float segmentPoint = start; segmentPoint < stop; segmentPoint += segmentSize)
+                else
                 {
-                    CreateLine(beginX, segmentPoint, endX, Math.Min(segmentPoint + segmentSolid, stop), boxColor);
+                    float start = beginY;
+                    float stop = endY;
+
+                    if (beginY > endY)
+                    {
+                        start = endY;
+                        stop = beginY;
+                    }
+
+                    // Side is in Y direction
+                    for (float segmentPoint = start; segmentPoint < stop; segmentPoint += segmentSize)
+                    {
+                        CreateLine(beginX, segmentPoint, endX, Math.Min(segmentPoint + segmentSolid, stop), boxColor);
+                    }
                 }
             }
         }
-
-        private void CreateLine(float posX1, float posY1, float posX2, float posY2, Color4 lineColor)
+        private void CreateLine(
+            float posX1, 
+            float posY1, 
+            float posX2, 
+            float posY2, 
+            Color4 lineColor)
         {
             var line = new ThickLine(
                 null,
@@ -331,8 +346,7 @@ namespace Nexar.Renderer.DesignEntities
             componentOutlineShader.Reset();
             componentOutlineShader.Dispose();
 
-            commentAreaShader.Reset();
-            commentAreaShader.Dispose();
+            ResetComments();
 
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Reset());
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
@@ -343,6 +357,12 @@ namespace Nexar.Renderer.DesignEntities
             layerMappedPadShader.Clear();
 
             viaShader.Reset();
+        }
+
+        public void ResetComments()
+        {
+            commentAreaShader.Reset();
+            commentAreaShader.Dispose();
         }
 
         public void FinaliseSetup()

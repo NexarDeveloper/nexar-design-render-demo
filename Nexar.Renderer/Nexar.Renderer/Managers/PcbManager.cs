@@ -309,8 +309,10 @@ namespace Nexar.Renderer.Managers
             PcbStats.TimeToCreateComponents = componentStopwatch.ElapsedMilliseconds;
         }
 
-        public void LoadCommentAreas(List<CommentThread> commentThreads)
+        public void LoadCommentAreas(List<CommentThread> commentThreads, CommentThread? activeThread = null)
         {
+            PcbRenderer.Pcb.ResetComments();
+
             foreach (var commentThread in commentThreads)
             {
                 PointF? firstVertice = null;
@@ -329,7 +331,8 @@ namespace Nexar.Renderer.Managers
                             ScalePositionMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
                             ScalePositionMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
                             ScalePositionMmToGl((decimal)vertice.X, xOffset, divisor),
-                            ScalePositionMmToGl((decimal)vertice.Y, yOffset, divisor));
+                            ScalePositionMmToGl((decimal)vertice.Y, yOffset, divisor),
+                            commentThread.CommentThreadId == activeThread?.CommentThreadId);
                     }
 
                     lastVertice = vertice;
@@ -341,7 +344,8 @@ namespace Nexar.Renderer.Managers
                         ScalePositionMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
                         ScalePositionMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
                         ScalePositionMmToGl((decimal)firstVertice.Value.X, xOffset, divisor),
-                        ScalePositionMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor));
+                        ScalePositionMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor),
+                        commentThread.CommentThreadId == activeThread?.CommentThreadId);
                 }
             }
 
