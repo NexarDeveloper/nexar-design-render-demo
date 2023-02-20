@@ -21,6 +21,7 @@ namespace Nexar.Renderer.UserControls
         private NexarClient NexarClient { get; }
         private PcbManager PcbManager { get; }
 
+        public event EventHandler<EventArgs>? ElementClick;
 
         public CreateComment(
             CommentThreads owner,
@@ -40,6 +41,28 @@ namespace Nexar.Renderer.UserControls
             commentTextBox.TextChanged += CommentTextBox_TextChanged;
             postCommentButton.Click += PostCommentButton_Click;
 
+            commentTextBox.Click += UserControlElement_Click;
+            createCommentLayoutPanel.Click += CreateCommentLayoutPanel_Click;
+        }
+
+        private void CreateCommentLayoutPanel_Click(object? sender, EventArgs e)
+        {
+            var control = sender as TableLayoutPanel;
+
+            if (control != null)
+            {
+                ElementClick?.Invoke(control.Parent, new EventArgs());
+            }
+        }
+
+        private void UserControlElement_Click(object? sender, EventArgs e)
+        {
+            var control = sender as Control;
+
+            if (control != null)
+            {
+                ElementClick?.Invoke(control.Parent.Parent, new EventArgs());
+            }
         }
 
         private void CommentTextBox_TextChanged(object? sender, EventArgs e)

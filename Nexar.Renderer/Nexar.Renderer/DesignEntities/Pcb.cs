@@ -89,6 +89,7 @@ namespace Nexar.Renderer.DesignEntities
 
         private PrimitiveShader boardOutlineShader = new PrimitiveShader(0.0f);
         private PrimitiveShader componentOutlineShader = new PrimitiveShader(0.0f);
+        private PrimitiveShader commentAreaShader = new PrimitiveShader(0.0f);
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
 
         private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
@@ -102,6 +103,7 @@ namespace Nexar.Renderer.DesignEntities
         public bool DisablePads { get; set; } = false;
         public bool DisableVias { get; set; } = false;
         public bool DisableComponentOutlines { get; set; } = false;
+        public bool DisableCommentAreas { get; set; } = false;
 
         public void InitialiseLayerStack(List<IPcbLayer> pcbLayers)
         {
@@ -261,6 +263,66 @@ namespace Nexar.Renderer.DesignEntities
             componentOutlineShader.AddPrimitive(line, new Color4(1.0f, 0.65f, 0.0f, 1.0f), 0.0f);
         }
 
+        float segmentSize = 0.1f;
+        float segmentSolid = 0.035f;
+
+        public void AddCommentArea(
+            float beginX,
+            float beginY,
+            float endX,
+            float endY)
+        {
+            Color4 boxColor = new Color4(53, 113, 209, 255);
+
+            float argA, argB, argC, argD;
+
+            // We will assume a bounding rectangle with side on the X and Y axis
+            if (beginX != endX)
+            {
+                float start = beginX;
+                float stop = endX;
+
+                if (beginX > endX)
+                {
+                    start = endX;
+                    stop = beginX;
+                }
+
+                // Size is in X direction
+                for (float segmentPoint = start; segmentPoint < stop; segmentPoint += segmentSize)
+                {
+                    CreateLine(segmentPoint, beginY, Math.Min(segmentPoint + segmentSolid, stop), endY, boxColor);
+                }
+            }
+            else
+            {
+                float start = beginY;
+                float stop = endY;
+
+                if (beginY > endY)
+                {
+                    start = endY;
+                    stop = beginY;
+                }
+
+                // Side is in Y direction
+                for (float segmentPoint = start; segmentPoint < stop; segmentPoint += segmentSize)
+                {
+                    CreateLine(beginX, segmentPoint, endX, Math.Min(segmentPoint + segmentSolid, stop), boxColor);
+                }
+            }
+        }
+
+        private void CreateLine(float posX1, float posY1, float posX2, float posY2, Color4 lineColor)
+        {
+            var line = new ThickLine(
+                null,
+                new PointF(posX1, posY1),
+                new PointF(posX2, posY2));
+
+            commentAreaShader.AddPrimitive(line, lineColor, 0.01f);
+        }
+
         public void Reset()
         {
             boardOutlineShader.Reset();
@@ -268,6 +330,9 @@ namespace Nexar.Renderer.DesignEntities
 
             componentOutlineShader.Reset();
             componentOutlineShader.Dispose();
+
+            commentAreaShader.Reset();
+            commentAreaShader.Dispose();
 
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Reset());
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Dispose());
@@ -293,6 +358,11 @@ namespace Nexar.Renderer.DesignEntities
             componentOutlineShader.Initialise();
         }
 
+        public void FinaliseCommentAreaSetup()
+        {
+            commentAreaShader.Initialise();
+        }
+
         public void Draw(Matrix4 view, Matrix4 projection)
         {
             boardOutlineShader.Draw(view, projection);
@@ -316,6 +386,11 @@ namespace Nexar.Renderer.DesignEntities
             {
                 componentOutlineShader.Draw(view, projection);
             }
+
+            if (!DisableCommentAreas)
+            {
+                commentAreaShader.Draw(view, projection);
+            }           
         }
 
         private void DrawLayerMappedPrimitives(
@@ -338,6 +413,7 @@ namespace Nexar.Renderer.DesignEntities
             layerMappedPadShader.Values.ToList().ForEach(x => x.Dispose());
             viaShader.Dispose();
             componentOutlineShader.Dispose();
+            commentAreaShader.Dispose();
         }
     }
 }

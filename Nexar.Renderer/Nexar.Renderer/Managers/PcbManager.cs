@@ -309,6 +309,45 @@ namespace Nexar.Renderer.Managers
             PcbStats.TimeToCreateComponents = componentStopwatch.ElapsedMilliseconds;
         }
 
+        public void LoadCommentAreas(List<CommentThread> commentThreads)
+        {
+            foreach (var commentThread in commentThreads)
+            {
+                PointF? firstVertice = null;
+                PointF? lastVertice = null;
+
+                foreach (var vertice in commentThread.PolygonVertices)
+                {
+                    if (firstVertice == null)
+                    {
+                        firstVertice = vertice;
+                    }
+
+                    if (lastVertice != null)
+                    {
+                        PcbRenderer.Pcb.AddCommentArea(
+                            ScalePositionMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
+                            ScalePositionMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
+                            ScalePositionMmToGl((decimal)vertice.X, xOffset, divisor),
+                            ScalePositionMmToGl((decimal)vertice.Y, yOffset, divisor));
+                    }
+
+                    lastVertice = vertice;
+                }
+
+                if (lastVertice != null && firstVertice != null)
+                {
+                    PcbRenderer.Pcb.AddCommentArea(
+                        ScalePositionMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
+                        ScalePositionMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
+                        ScalePositionMmToGl((decimal)firstVertice.Value.X, xOffset, divisor),
+                        ScalePositionMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor));
+                }
+            }
+
+            PcbRenderer.Pcb.FinaliseCommentAreaSetup();
+        }
+
         private void LoadNetsAndAssociatedPrimitives()
         {
             GeneralStopwatch.Restart();

@@ -73,6 +73,7 @@ namespace Nexar.Renderer.Forms
             padsMenuItem.CheckedChanged += PadsMenuItem_CheckedChanged;
             viasMenuItem.CheckedChanged += ViasMenuItem_CheckedChanged;
             componentOutlinesMenuItem.CheckedChanged += ComponentOutlinesMenuItem_CheckedChanged;
+            commentAreaMenuItem.CheckedChanged += CommentAreaMenuItem_CheckedChanged;
             showCommentsMenuItem.CheckedChanged += CommentsMenuItem_CheckedChanged;
             refreshCommentsMenuItem.Click += RefreshCommentsMenuItem_Click;
 
@@ -487,6 +488,8 @@ namespace Nexar.Renderer.Forms
                             commentThreads.PcbModel = pcbManager.PcbModel;
                             await commentThreads.LoadCommentThreadsAsync();
 
+                            pcbManager.LoadCommentAreas(commentThreads.CommentModel.Select(x => x.Value.Item1).ToList());
+
                             splitContainer.Panel2Collapsed = (commentThreads.GetCommentThreadCount() == 0);
                             showCommentsMenuItem.Checked = (!splitContainer.Panel2Collapsed);
                         }
@@ -583,6 +586,12 @@ namespace Nexar.Renderer.Forms
         {
             pcbManager.PcbRenderer.Pcb.DisableComponentOutlines = (!componentOutlinesMenuItem.Checked);
         }
+
+        private void CommentAreaMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbManager.PcbRenderer.Pcb.DisableCommentAreas = (!commentAreaMenuItem.Checked);
+        }
+
 
         private void CommentsMenuItem_CheckedChanged(object? sender, EventArgs e)
         {

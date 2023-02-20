@@ -30,38 +30,38 @@ namespace Nexar.Renderer.UserControls
         /// </summary>
         private void InitializeComponent()
         {
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.commentElementLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.commentUpdatedLabel = new System.Windows.Forms.Label();
             this.commentUserLabel = new System.Windows.Forms.Label();
             this.menuButton = new System.Windows.Forms.Button();
             this.avatarPictureBox = new Terpsichore.AddIn.PnP.App.AvatarPictureBox();
             this.commentTextBox = new System.Windows.Forms.TextBox();
-            this.tableLayoutPanel1.SuspendLayout();
+            this.commentElementLayoutPanel.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.avatarPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // commentElementLayoutPanel
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.commentElementLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.menuButton, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.avatarPictureBox, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.commentTextBox, 1, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(414, 94);
-            this.tableLayoutPanel1.TabIndex = 0;
+            this.commentElementLayoutPanel.ColumnCount = 3;
+            this.commentElementLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.commentElementLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.commentElementLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+            this.commentElementLayoutPanel.Controls.Add(this.tableLayoutPanel2, 1, 0);
+            this.commentElementLayoutPanel.Controls.Add(this.menuButton, 2, 0);
+            this.commentElementLayoutPanel.Controls.Add(this.avatarPictureBox, 0, 0);
+            this.commentElementLayoutPanel.Controls.Add(this.commentTextBox, 1, 1);
+            this.commentElementLayoutPanel.Location = new System.Drawing.Point(3, 3);
+            this.commentElementLayoutPanel.Name = "commentElementLayoutPanel";
+            this.commentElementLayoutPanel.RowCount = 2;
+            this.commentElementLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.commentElementLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.commentElementLayoutPanel.Size = new System.Drawing.Size(414, 94);
+            this.commentElementLayoutPanel.TabIndex = 0;
             // 
             // tableLayoutPanel2
             // 
@@ -151,11 +151,12 @@ namespace Nexar.Renderer.UserControls
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.commentElementLayoutPanel);
+            this.Margin = new System.Windows.Forms.Padding(5, 0, 0, 0);
             this.Name = "CommentElement";
             this.Size = new System.Drawing.Size(420, 100);
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
+            this.commentElementLayoutPanel.ResumeLayout(false);
+            this.commentElementLayoutPanel.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.avatarPictureBox)).EndInit();
             this.ResumeLayout(false);
@@ -164,7 +165,7 @@ namespace Nexar.Renderer.UserControls
 
         #endregion
 
-        private TableLayoutPanel tableLayoutPanel1;
+        private TableLayoutPanel commentElementLayoutPanel;
         private TableLayoutPanel tableLayoutPanel2;
         private Button menuButton;
         private Label commentUserLabel;

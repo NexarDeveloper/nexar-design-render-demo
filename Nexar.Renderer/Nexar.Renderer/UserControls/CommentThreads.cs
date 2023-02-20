@@ -29,7 +29,8 @@ namespace Nexar.Renderer.UserControls
         private readonly Dictionary<string, CreateComment> createCommentUCs = new Dictionary<string, CreateComment>();
         private readonly Dictionary<string, TableLayoutPanel> threadToPanelMapping = new Dictionary<string, TableLayoutPanel>();
 
-        public Dictionary<string, List<Comment>> CommentModel { get; } = new Dictionary<string, List<Comment>>();
+        public Dictionary<string, Tuple<CommentThread, List<Comment>>> CommentModel { get; } = 
+            new Dictionary<string, Tuple<CommentThread, List<Comment>>>();
 
         private readonly TableLayoutPanel allThreadsTableLayoutPanel;
 
@@ -128,10 +129,12 @@ namespace Nexar.Renderer.UserControls
                         {
                             existingThreadIds.Add(modelCommentThread.CommentThreadId);
 
-                            var thread = new CommentThread()
-                            {
-                                CommentThreadId = modelCommentThread.CommentThreadId
-                            };
+                            var thread = new CommentThread(
+                                modelCommentThread.CommentThreadId,
+                                (float)modelCommentThread.Context.Area.Pos1.XMm,
+                                (float)modelCommentThread.Context.Area.Pos1.YMm,
+                                (float)modelCommentThread.Context.Area.Pos2.XMm,
+                                (float)modelCommentThread.Context.Area.Pos2.YMm);
 
                             commentThreads.Add(thread);
 
@@ -146,7 +149,7 @@ namespace Nexar.Renderer.UserControls
 
                                 ProcessCommentModelChangesForThread(
                                     thread,
-                                    CommentModel[thread.CommentThreadId]);
+                                    CommentModel[thread.CommentThreadId].Item2);
                             }
                             else
                             {
@@ -220,16 +223,31 @@ namespace Nexar.Renderer.UserControls
         {
             var commentThreadTableLayoutPanel = new TableLayoutPanel()
             {
-                Dock = DockStyle.Top,
+                //BackColor = Color.LimeGreen,
+                //CellBorderStyle = TableLayoutPanelCellBorderStyle.None,
+                //Dock = DockStyle.Top,
                 AutoSize = true,
+                Margin = new Padding(5),
                 //Height = 500,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Padding = new System.Windows.Forms.Padding(0, 0, 0, 0)
             };
 
             commentThreadTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            commentThreadTableLayoutPanel.Click += CommentThreadTableLayoutPanel_Click;
 
             return commentThreadTableLayoutPanel;
+        }
+
+        private void CommentThreadTableLayoutPanel_Click(object? sender, EventArgs e)
+        {
+            threadToPanelMapping.Values.ToList().ForEach(x => x.BackColor = Color.Transparent);
+            var active = sender as TableLayoutPanel;
+
+            if (active != null) 
+            {
+                active.BackColor = Color.LimeGreen;
+            }
         }
 
         private void AddCommentElementUCToLayoutPanel(CommentThread thread, Comment comment)
@@ -244,10 +262,27 @@ namespace Nexar.Renderer.UserControls
             
             commentElement.AutoScroll = true;
             commentElement.LoadComment(thread, comment);
+            commentElement.Click += CommentElement_Click;
+            commentElement.ElementClick += CommentElement_Click;
             commentElementUCs.Add(commentElement);
 
             threadToPanelMapping[thread.CommentThreadId].RowStyles.Add(new RowStyle(SizeType.AutoSize));
             threadToPanelMapping[thread.CommentThreadId].Controls.Add(commentElement);
+        }
+
+        private void CommentElement_Click(object? sender, EventArgs e)
+        {
+            var parentLayoutPanel = (sender as CommentElement)?.Parent as TableLayoutPanel;
+            
+            if (parentLayoutPanel == null)
+            {
+                parentLayoutPanel = (sender as CreateComment)?.Parent as TableLayoutPanel;
+            }
+
+            if (parentLayoutPanel != null)
+            {
+                CommentThreadTableLayoutPanel_Click(parentLayoutPanel, e);
+            }
         }
 
         private void AddCreateCommentUCToLayoutPanel(CommentThread thread)
@@ -262,6 +297,7 @@ namespace Nexar.Renderer.UserControls
             };
 
             newCommentElement.AutoScroll = true;
+            newCommentElement.ElementClick += CommentElement_Click;
 
             createCommentUCs.Add(thread.CommentThreadId, newCommentElement);
 
@@ -328,10 +364,14 @@ namespace Nexar.Renderer.UserControls
                 {
                     if (!CommentModel.ContainsKey(thread.CommentThreadId))
                     {
-                        CommentModel.Add(thread.CommentThreadId, new List<Comment>());
+                        CommentModel.Add(
+                            thread.CommentThreadId, 
+                            new Tuple<CommentThread, List<Comment>>(
+                                thread,
+                                new List<Comment>()));
                     }
 
-                    CommentModel[thread.CommentThreadId].Add(comment);
+                    CommentModel[thread.CommentThreadId].Item2.Add(comment);
                 }
             }
         }

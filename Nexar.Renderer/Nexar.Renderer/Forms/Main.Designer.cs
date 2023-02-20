@@ -39,11 +39,12 @@
             this.componentOutlinesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.commentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.currentProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.refreshCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.commentAreaMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.SuspendLayout();
@@ -91,7 +92,8 @@
             this.tracksMenuItem,
             this.padsMenuItem,
             this.viasMenuItem,
-            this.componentOutlinesMenuItem});
+            this.componentOutlinesMenuItem,
+            this.commentAreaMenuItem});
             this.primitivesToolStripMenuItem.Name = "primitivesToolStripMenuItem";
             this.primitivesToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
             this.primitivesToolStripMenuItem.Text = "Primitives";
@@ -145,8 +147,14 @@
             // 
             this.showCommentsMenuItem.CheckOnClick = true;
             this.showCommentsMenuItem.Name = "showCommentsMenuItem";
-            this.showCommentsMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showCommentsMenuItem.Size = new System.Drawing.Size(113, 22);
             this.showCommentsMenuItem.Text = "Show";
+            // 
+            // refreshCommentsMenuItem
+            // 
+            this.refreshCommentsMenuItem.Name = "refreshCommentsMenuItem";
+            this.refreshCommentsMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.refreshCommentsMenuItem.Text = "Refresh";
             // 
             // splitContainer
             // 
@@ -194,11 +202,13 @@
             this.currentProgressBar.Size = new System.Drawing.Size(100, 16);
             this.currentProgressBar.Visible = false;
             // 
-            // refreshCommentsMenuItem
+            // commentAreaMenuItem
             // 
-            this.refreshCommentsMenuItem.Name = "refreshCommentsMenuItem";
-            this.refreshCommentsMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.refreshCommentsMenuItem.Text = "Refresh";
+            this.commentAreaMenuItem.Checked = true;
+            this.commentAreaMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.commentAreaMenuItem.Name = "commentAreaMenuItem";
+            this.commentAreaMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.commentAreaMenuItem.Text = "Comment Areas";
             // 
             // Main
             // 
@@ -241,5 +251,6 @@
         private ToolStripProgressBar currentProgressBar;
         private ToolStripMenuItem componentOutlinesMenuItem;
         private ToolStripMenuItem refreshCommentsMenuItem;
+        private ToolStripMenuItem commentAreaMenuItem;
     }
 }

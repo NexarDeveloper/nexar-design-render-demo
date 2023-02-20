@@ -33,6 +33,8 @@ namespace Nexar.Renderer.UserControls
 
         private string OnEditSnapshot { get; set; } = string.Empty;
 
+        public event EventHandler<EventArgs>? ElementClick;
+
         public CommentElement(
             CommentThreads owner,
             NexarClient nexarClient,
@@ -56,9 +58,43 @@ namespace Nexar.Renderer.UserControls
             itemCancel.Click += ItemCancel_Click;
             itemDelete.Click += ItemDelete_Click;
 
+            commentUserLabel.Click += UserControlElement_Click;
+            commentUpdatedLabel.Click += UserControlElement_Click;
+            commentTextBox.Click += UserControlElement_Click;
+            avatarPictureBox.Click += UserControlElement_Click;
+
+            commentElementLayoutPanel.Click += CommentElementLayoutPanel_Click;
+
             commentTextBox.TextChanged += CommentTextBox_TextChanged;
 
             ConfigureCommentEditMode(true);
+        }
+
+        private void CommentElementLayoutPanel_Click(object? sender, EventArgs e)
+        {
+            var control = sender as TableLayoutPanel;
+
+            if (control != null)
+            {
+                ElementClick?.Invoke(control.Parent, new EventArgs());
+            }
+        }
+
+        private void UserControlElement_Click(object? sender, EventArgs e)
+        {
+            var control = sender as Control;
+
+            if (control != null)
+            {
+                Control validParent = control.Parent;
+
+                while (validParent.GetType() == typeof(TableLayoutPanel) && validParent != null)
+                {
+                    validParent = validParent.Parent;
+                }
+
+                ElementClick?.Invoke(validParent, new EventArgs());
+            }
         }
 
         private void CommentTextBox_TextChanged(object? sender, EventArgs e)
@@ -107,7 +143,7 @@ namespace Nexar.Renderer.UserControls
                             deleteCommentResult.EnsureNoErrors();
 
                             // Check if this was the last comment, and if so, delete the entire thread
-                            if (Owner.CommentModel[Thread.CommentThreadId].Count == 1)
+                            if (Owner.CommentModel[Thread.CommentThreadId].Item2.Count == 1)
                             {
                                 var deleteCommentThreadInput = new DesDeleteCommentThreadInput();
                                 deleteCommentThreadInput.EntityId = PcbManager.ActiveProject.Id;

@@ -39,9 +39,9 @@ namespace Nexar.Renderer.DesignEntities
             float maxY = Math.Max(pos1Y, pos2Y);
 
             PolygonVertices.Add(new PointF(minX, maxY));
-            PolygonVertices.Add(new PointF(pos2X, pos2Y));
+            PolygonVertices.Add(new PointF(maxX, maxY));
             PolygonVertices.Add(new PointF(maxX, minY));
-            PolygonVertices.Add(new PointF(pos1X, pos1Y));
+            PolygonVertices.Add(new PointF(minX, minY));
         }
 
         public bool HitTest(PointF location)

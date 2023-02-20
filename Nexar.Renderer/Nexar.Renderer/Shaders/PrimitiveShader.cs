@@ -30,7 +30,7 @@ namespace Nexar.Renderer.Shaders
 
             AddVertices(
                 primitive.TessellatedTriangles,
-                zOffset,
+                BaseZOffset + zOffset,
                 color);
         }
 
