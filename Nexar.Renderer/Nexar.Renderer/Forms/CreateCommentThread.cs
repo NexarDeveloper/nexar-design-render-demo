@@ -48,6 +48,8 @@ namespace Nexar.Renderer.Forms
 
             KeyDown += CreateCommentThread_KeyDown;
             createCommentThreadButton.Click += CreateCommentThreadButton_Click;
+            commentTextBox.PreviewKeyDown += CommentTextBox_PreviewKeyDown;
+
         }
 
         private async void CreateCommentThread_KeyDown(object? sender, KeyEventArgs e)
@@ -61,7 +63,7 @@ namespace Nexar.Renderer.Forms
             }
         }
 
-        private void commentTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        private void CommentTextBox_PreviewKeyDown(object? sender, PreviewKeyDownEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
             {

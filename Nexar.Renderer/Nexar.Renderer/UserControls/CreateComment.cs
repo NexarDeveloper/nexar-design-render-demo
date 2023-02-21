@@ -1,4 +1,5 @@
-﻿using Nexar.Client;
+﻿using Microsoft.VisualBasic.Devices;
+using Nexar.Client;
 using Nexar.Renderer.DesignEntities;
 using Nexar.Renderer.Managers;
 using StrawberryShake;
@@ -42,7 +43,16 @@ namespace Nexar.Renderer.UserControls
             postCommentButton.Click += PostCommentButton_Click;
 
             commentTextBox.Click += UserControlElement_Click;
+            commentTextBox.PreviewKeyDown += CommentTextBox_PreviewKeyDown;
             createCommentLayoutPanel.Click += CreateCommentLayoutPanel_Click;
+        }
+
+        private async void CommentTextBox_PreviewKeyDown(object? sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && e.Modifiers == Keys.Control)
+            {
+                await PostCommentAsync();
+            }
         }
 
         private void CreateCommentLayoutPanel_Click(object? sender, EventArgs e)
@@ -72,6 +82,11 @@ namespace Nexar.Renderer.UserControls
         }
 
         private async void PostCommentButton_Click(object? sender, EventArgs e)
+        {
+            await PostCommentAsync();
+        }
+        
+        private async Task PostCommentAsync()
         {
             commentTextBox.Enabled = false;
 

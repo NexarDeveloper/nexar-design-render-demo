@@ -67,7 +67,6 @@
             this.commentTextBox.Name = "commentTextBox";
             this.commentTextBox.Size = new System.Drawing.Size(292, 136);
             this.commentTextBox.TabIndex = 4;
-            this.commentTextBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.commentTextBox_PreviewKeyDown);
             // 
             // tableLayoutPanel2
             // 
