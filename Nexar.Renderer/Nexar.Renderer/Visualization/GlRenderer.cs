@@ -37,6 +37,7 @@ namespace Nexar.Renderer.Visualization
         private Matrix4 view;
         private Matrix4 projection;
 
+        private float panStepMultiplier = 0.055f;
         private float keyPanStep = 0.2f;
         private float mousePanStep = 0.01f;
 
@@ -96,8 +97,8 @@ namespace Nexar.Renderer.Visualization
         {
             if (lastPanLocation != null)
             {
-                float xDelta = (location.X - lastPanLocation.Value.X) * mousePanStep;
-                float yDelta = (location.Y - lastPanLocation.Value.Y) * mousePanStep;
+                float xDelta = (location.X - lastPanLocation.Value.X) * CalcPanStep(mousePanStep);
+                float yDelta = (location.Y - lastPanLocation.Value.Y) * CalcPanStep(mousePanStep);
 
                 cameraTarget.X -= xDelta;
                 cameraXOffset -= xDelta;
@@ -115,6 +116,11 @@ namespace Nexar.Renderer.Visualization
         public void ResetPan()
         {
             lastPanLocation = null;
+        }
+
+        private float CalcPanStep(float panStep)
+        {
+            return panStep * panStepMultiplier * cameraPosition.Z;
         }
 
         public void OnLoad()
@@ -190,29 +196,29 @@ namespace Nexar.Renderer.Visualization
                 // Left 
                 if (ActiveKeys.Any(x => x == Keys.N))
                 {
-                    cameraTarget.X -= keyPanStep;
-                    cameraXOffset -= keyPanStep;
+                    cameraTarget.X -= CalcPanStep(keyPanStep);
+                    cameraXOffset -= CalcPanStep(keyPanStep);
                 }
 
                 // Right 
                 if (ActiveKeys.Any(x => x == Keys.M))
                 {
-                    cameraTarget.X += keyPanStep;
-                    cameraXOffset += keyPanStep;
+                    cameraTarget.X += CalcPanStep(keyPanStep);
+                    cameraXOffset += CalcPanStep(keyPanStep);
                 }
 
                 // Up 
                 if (ActiveKeys.Any(x => x == Keys.I))
                 {
-                    cameraTarget.Y += keyPanStep;
-                    cameraYOffset += keyPanStep;
+                    cameraTarget.Y += CalcPanStep(keyPanStep);
+                    cameraYOffset += CalcPanStep(keyPanStep);
                 }
 
                 // Down
                 if (ActiveKeys.Any(x => x == Keys.J))
                 {
-                    cameraTarget.Y -= keyPanStep;
-                    cameraYOffset -= keyPanStep;
+                    cameraTarget.Y -= CalcPanStep(keyPanStep);
+                    cameraYOffset -= CalcPanStep(keyPanStep);
                 }
 
                 // Forward 
