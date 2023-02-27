@@ -43,16 +43,14 @@ These will be fixed in future but in alignment with priorities based on use case
 Open the solution in Visual Studio.
 Ensure `Nexar.Renderer` is the startup project, build, and run.
 
-The browser is started with the identity server sign in page.
-Enter your credentials and click `Sign In`.
-
 ### Load a PCB project
 
 Click on the `Click to Load Workspaces` menu option in the main window:
 
 ![clickToLoadWorkspaces](https://user-images.githubusercontent.com/623551/221542274-85c66cbc-960c-4624-b8f0-82c6c288108c.png)
 
-The workspace menu is populated with available workspaces, with the default workspace selected. 
+The browser is started with the identity server sign in page the first time you start the application. Enter your credentials and click `Sign In`. After successful sign in, the workspace menu populated with available workspaces, with the default workspace selected. 
+
 Select your workspace then click on the `Open Project` menu option:
 
 ![clickToOpenProject](https://user-images.githubusercontent.com/623551/221542178-dcd5628a-d484-433a-bf1c-4f51a10b083c.png)
