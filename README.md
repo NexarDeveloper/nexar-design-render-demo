@@ -46,14 +46,13 @@ Ensure `Nexar.Renderer` is the startup project, build, and run.
 The browser is started with the identity server sign in page.
 Enter your credentials and click `Sign In`.
 
-The application window is activated and the workspace context automatically configured based on the aforementioned environment variable.
-
 ### Load a PCB project
 
-Click on the "Click to Load Workspaces" menu option in the main window:
+Click on the `Click to Load Workspaces` menu option in the main window:
 
 ![clickToLoadWorkspaces](https://user-images.githubusercontent.com/623551/221542274-85c66cbc-960c-4624-b8f0-82c6c288108c.png)
 
+The workspace menu is populated with available workspaces, with the default workspace selected. 
 Select your workspace then click on the `Open Project` menu option:
 
 ![clickToOpenProject](https://user-images.githubusercontent.com/623551/221542178-dcd5628a-d484-433a-bf1c-4f51a10b083c.png)
@@ -62,7 +61,7 @@ A dialog will open listing projects in the workspace along with thumbnails, name
 
 ![image](https://user-images.githubusercontent.com/623551/221542339-357e4d99-ec16-43d1-8378-764540d711a4.png)
 
-After a few seconds (for larger designs this might take several seconds) you will see the PCB rendered. Any example of a large 16 layer design is shown below.
+After a few seconds (for larger designs this might take several seconds) you will see the PCB rendered. An example of a large 16 layer design is shown below:
 
 ![image](https://user-images.githubusercontent.com/623551/221542462-661148b9-6042-41a4-bdd5-36ad2db3700a.png)
 
@@ -72,7 +71,7 @@ You can control the layer visibility in the `Layers` menu option:
 
 ![image](https://user-images.githubusercontent.com/623551/221542591-9055f3bd-3189-4b7c-adad-964cf664ed4b.png)
 
-The below example shows only two of the inner layers enabled.
+The below example shows only two of the inner layers enabled:
 
 ![image](https://user-images.githubusercontent.com/623551/221544097-982a1c70-40c4-4e3e-97fa-0da7a8a1295b.png)
 
@@ -80,7 +79,7 @@ You can control the primitives that are visible from the `Primitives` menu optio
 
 ![image](https://user-images.githubusercontent.com/623551/221543217-5aabab55-4ecf-4151-ae2a-51a8bf9af5f5.png)
 
-The below example shows only Pads and Component Outlines enabled.
+The below example shows only Pads and Component Outlines enabled:
 
 ![image](https://user-images.githubusercontent.com/623551/221543968-d4d8ed68-e1d7-44ac-b90d-4b565b57ed5c.png)
 
@@ -101,7 +100,7 @@ There are a few keys supported for different actions:
 
 Use the mouse wheel to zoom in / out. Right click and drag with the mouse to pan around the scene (moving the camera and camera target).
 
-The below example shows the camera moved in the bottom left direction and the camra target moved to the bottom left quadrant of the PCB.
+The below example shows the camera moved in the bottom left direction and the camra target moved to the bottom left quadrant of the PCB:
 
 ![image](https://user-images.githubusercontent.com/623551/221544367-91cf5daf-08c6-4a31-b841-28972d36d3fa.png)
 
@@ -109,7 +108,7 @@ The below example shows the camera moved in the bottom left direction and the ca
 
 Comments are now supported. If comments exist in the design when it is opened, the comments panel will be shown auomatically on the right hand side. To enable / disable the panel and to refresh the comments (automatic refresh through GraphQL subscriptions is a work in progress) use the `Comments` menu option.
 
-The below example shows the comments panel visible.
+The below example shows the comments panel visible:
 
 ![image](https://user-images.githubusercontent.com/623551/221545138-93b27ff8-2977-47af-9222-ada436d35240.png)
 
@@ -117,14 +116,14 @@ Click on the comments in the comments panel to highlight them with a green box (
 
 Comments on area or on components are currently supported.
 
-To create a comment on an area, left click and drag, release to finalize the area and a popup window will appear to enter the comment. Hit `Ctrl + Enter` or click `Create` to create the comment.
+To create a comment on an area, left click and drag, release to finalize the area and a popup window will appear to enter the comment. Hit `Ctrl + Enter` or click `Create` to create the comment:
 
 ![image](https://user-images.githubusercontent.com/623551/221545768-3bfb04ae-e536-48d4-8a7d-5dcfdd9ef282.png)
 
-To attach a comment to a component, right-click in the component outline and select the `Add Comment` option.
+To attach a comment to a component, right-click in the component outline and select the `Add Comment` option:
 
 ![image](https://user-images.githubusercontent.com/623551/221545999-b1870716-a78d-4151-8047-1f5ce9ad27b8.png)
 
-Use the controls in each comment and comment thread in the comments panel to reply to a comment or delete or update existing commments.
+Use the controls in each comment and comment thread in the comments panel to reply to a comment or delete or update existing commments:
 
 ![image](https://user-images.githubusercontent.com/623551/221546339-d9b121c7-2db3-49d9-83a5-fe43ed91fb07.png)
