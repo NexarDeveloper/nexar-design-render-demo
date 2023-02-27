@@ -53,7 +53,7 @@ The browser is started with the identity server sign in page the first time you 
 
 Select your workspace then click on the `Open Project` menu option:
 
-![clickToOpenProject](https://user-images.githubusercontent.com/623551/221542178-dcd5628a-d484-433a-bf1c-4f51a10b083c.png)
+![clickToOpenProject](https://user-images.githubusercontent.com/623551/221698192-0aef80db-dc66-46f4-a183-2a11b995c53b.png)
 
 A dialog will open listing projects in the workspace along with thumbnails, names and descriptions. Click on the `Open` button on the project you want to open:
 
