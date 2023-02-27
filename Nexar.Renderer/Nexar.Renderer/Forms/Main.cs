@@ -46,6 +46,7 @@ namespace Nexar.Renderer.Forms
         private int glHeight = 800;
 
         private bool testPrimitiveEnabled = false;
+        private bool mousePanDetected = false;
 
         private DesignItem? SelectedComponent { get; set; }
 
@@ -128,10 +129,11 @@ namespace Nexar.Renderer.Forms
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbManager.PcbRenderer.Demo_MouseMove(control, pt);
+                    pcbManager.PcbRenderer.MouseMove(control, pt);
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
+                    mousePanDetected = true;
                     pcbManager.PcbRenderer.MousePan(control, pt);
                 }
             }
@@ -143,11 +145,13 @@ namespace Nexar.Renderer.Forms
 
             if (control != null)
             {
+                pcbManager.PcbRenderer.ResetPan();
+
                 Point pt = control.PointToClient(Control.MousePosition);
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbManager.PcbRenderer.Demo_MouseDown(control, pt);
+                    pcbManager.PcbRenderer.MouseDown(control, pt);
                 }
             }
         }
@@ -158,27 +162,35 @@ namespace Nexar.Renderer.Forms
 
             if (control != null)
             {
+                pcbManager.PcbRenderer.ResetPan();
+
                 Point pt = control.PointToClient(Control.MousePosition);
 
                 if (e.Button == MouseButtons.Left)
                 {
-                    pcbManager.PcbRenderer.Demo_MouseUp(control, pt);
+                    pcbManager.PcbRenderer.MouseUp(control, pt);
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
-                    var glCoord = pcbManager.PcbRenderer.GetXYOnZeroZPlane(pt);
-                    var mmCoord = pcbManager.ConvertGlCoordToMm(glCoord);
-
-                    SelectedComponent = pcbManager.GetComponentForLocation(mmCoord);
-
-                    if (SelectedComponent != null)
+                    if (!mousePanDetected)
                     {
-                        ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
-                        ToolStripItem createCommentThread = new ToolStripMenuItem(string.Format("Add Comment to '{0}'", SelectedComponent.Designator));
-                        createCommentThread.Click += CreateCommentThread_Click;
-                        contextMenuStrip.Items.Add(createCommentThread);
-                        contextMenuStrip.Show(MousePosition);
+                        var glCoord = pcbManager.PcbRenderer.GetXYOnZeroZPlane(pt);
+                        var mmCoord = pcbManager.ConvertGlCoordToMm(glCoord);
+
+                        SelectedComponent = pcbManager.GetComponentForLocation(mmCoord);
+
+                        if (SelectedComponent != null)
+                        {
+                            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+                            ToolStripItem createCommentThread = new ToolStripMenuItem(string.Format("Add Comment to '{0}'", SelectedComponent.Designator));
+                            createCommentThread.Click += CreateCommentThread_Click;
+                            contextMenuStrip.Items.Add(createCommentThread);
+                            contextMenuStrip.Show(MousePosition);
+                        }
                     }
+
+                    // Reset pan detection on mouse up
+                    mousePanDetected = false;
                 }
             }
         }

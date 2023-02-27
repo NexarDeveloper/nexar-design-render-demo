@@ -47,6 +47,86 @@ namespace Nexar.Renderer.DesignEntities
             new LayerInfo() { ZOffset = -0.005F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
         };
 
+        private readonly List<LayerInfo> EightLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.005F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.005F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly List<LayerInfo> TenLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.005F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.6F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.6F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.005F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly List<LayerInfo> TwelveLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.005F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.6F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.6F, 0.5F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.6F, 0.5F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.6F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.005F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly List<LayerInfo> ForteenLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.005F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.6F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.6F, 0.5F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.0F, 0.7F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.0F, 0.7F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.6F, 0.5F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.6F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.005F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
+        private readonly List<LayerInfo> SixteenLayerInfo = new()
+        {
+            new LayerInfo() { ZOffset = 0.005F, Color = new Color4(1.0F, 0.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.003F, Color = new Color4(0.0F, 1.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.0F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(1.0F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.6F, 0.5F, 1.0F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.6F, 0.5F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.0F, 0.7F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = 0.001F, Color = new Color4(0.3F, 0.7F, 0.9F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.3F, 0.7F, 0.9F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.0F, 0.7F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.6F, 0.5F, 0.6F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(0.6F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.5F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.001F, Color = new Color4(1.0F, 0.6F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.003F, Color = new Color4(0.0F, 1.0F, 0.0F, 1.0F) },
+            new LayerInfo() { ZOffset = -0.005F, Color = new Color4(0.0F, 0.0F, 1.0F, 1.0F) }
+        };
+
         private readonly LayerInfo unknownLayerInfo = new LayerInfo() { ZOffset = 0.0F, Color = new Color4(0.75F, 0.75F, 0.75F, 1.0F) };
 
         private LayerInfo GetLayerInfo(IPcbLayer pcbLayer)
@@ -70,6 +150,31 @@ namespace Nexar.Renderer.DesignEntities
                     case 6:
                     {
                         layerInfo = SixLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 8:
+                    {
+                        layerInfo = EightLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 10:
+                    {
+                        layerInfo = TenLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 12:
+                    {
+                        layerInfo = TwelveLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 14:
+                    {
+                        layerInfo = ForteenLayerInfo[PcbLayers.IndexOf(pcbLayer)];
+                        break;
+                    }
+                    case 16:
+                    {
+                        layerInfo = SixteenLayerInfo[PcbLayers.IndexOf(pcbLayer)];
                         break;
                     }
                     default:
