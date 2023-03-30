@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Nexar.Client\Nexar.Client.csproj" />
     <ProjectReference Include="..\..\OpenTK.WinForms\OpenTK.WinForms.csproj" />
+    <ProjectReference Include="..\SharpGLTF.Toolkit\SharpGLTF.Toolkit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="DemoFiles\IC.gltf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="DemoFiles\IC.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Properties\Settings.settings">

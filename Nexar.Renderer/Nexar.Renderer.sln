@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTK.WinForms", "..\OpenT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nexar.Client", "..\Nexar.Client\Nexar.Client.csproj", "{D09E3FEB-DBBD-413A-A4C8-E0E7456C9010}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpGLTF.Toolkit", "SharpGLTF.Toolkit\SharpGLTF.Toolkit.csproj", "{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpGLTF.Core", "SharpGLTF.Core\SharpGLTF.Core.csproj", "{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +45,22 @@ Global
 		{D09E3FEB-DBBD-413A-A4C8-E0E7456C9010}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D09E3FEB-DBBD-413A-A4C8-E0E7456C9010}.Release|x86.ActiveCfg = Release|Any CPU
 		{D09E3FEB-DBBD-413A-A4C8-E0E7456C9010}.Release|x86.Build.0 = Release|Any CPU
+		{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}.Debug|x86.Build.0 = Debug|Any CPU
+		{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}.Release|x86.ActiveCfg = Release|Any CPU
+		{01C4E5E0-4FF3-4328-88D7-16D11E4E3DC9}.Release|x86.Build.0 = Release|Any CPU
+		{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}.Debug|x86.Build.0 = Debug|Any CPU
+		{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}.Release|x86.ActiveCfg = Release|Any CPU
+		{BB5CE8BA-D567-4A46-8FD2-A99D8A435C32}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

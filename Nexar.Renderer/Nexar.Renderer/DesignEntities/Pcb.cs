@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using System.Reflection.Emit;
 using Assimp;
 using Nexar.Renderer.Shapes;
+using System.Diagnostics;
 
 namespace Nexar.Renderer.DesignEntities
 {
@@ -284,6 +285,74 @@ namespace Nexar.Renderer.DesignEntities
 
                         var colour = new Color4(vertexColor.R, vertexColor.G, vertexColor.B, vertexColor.A);
                         threeDModelShader.AddVertices(triangles, 0.0f, colour);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        public void AddTestComponent2()
+        {
+            try
+            {
+                using (var gltf = new SharpGLTF.IO.ZipReader("./DemoFiles/IC.zip"))
+                {
+                    foreach (var modelFile in gltf.ModelFiles)
+                    {
+                        var model = gltf.LoadModel(modelFile);
+
+                        // Get the default scene
+                        var scene = model.DefaultScene;
+
+                        List<Triangle> triangles = new List<Triangle>();
+
+                        // Iterate over all the meshes in the scene
+                        foreach (var node in scene.VisualChildren)
+                        {
+                            triangles.Clear();
+
+                            var mesh = node.Mesh;
+
+                            // Extract vertices and indices from the mesh
+                            var vertices = new List<System.Numerics.Vector3>();
+                            var colors = new List<System.Numerics.Vector4>();
+                            var indices = new List<int>();
+                            var triangleIndices = mesh.Primitives[0].GetTriangleIndices();
+
+                            var positionArray = mesh.Primitives[0].GetVertices("POSITION").AsVector3Array();
+
+                            foreach (var vertex in mesh.Primitives[0].GetVertices("POSITION").AsVector3Array())
+                            {
+                                //var position = vertex.GetGeometry<Vector3>("POSITION");
+                                //vertices.Add(vertex);
+                                //var color = vertex.TryGetColor("COLOR_0", out Vector4 c) ? c : Vector4.One;
+                                //colors.Add(color);
+                            }
+
+                            Debug.Print($"Triangle count: {triangleIndices.Count()}");
+
+                            foreach (var triangleIndice in triangleIndices)
+                            {
+                                Triangle triangle = new Triangle(
+                                    positionArray[triangleIndice.A].X,
+                                    positionArray[triangleIndice.A].Y,
+                                    positionArray[triangleIndice.A].Z,
+                                    positionArray[triangleIndice.B].X,
+                                    positionArray[triangleIndice.B].Y,
+                                    positionArray[triangleIndice.B].Z,
+                                    positionArray[triangleIndice.C].X,
+                                    positionArray[triangleIndice.C].Y,
+                                    positionArray[triangleIndice.C].Z);
+                                triangles.Add(triangle);
+
+                                //var colour = new Color4(vertexColor.R, vertexColor.G, vertexColor.B, vertexColor.A);
+                            }
+
+                            var colour = new Color4(0.8f, 0.0f, 0.8f, 1.0f);
+                            threeDModelShader.AddVertices(triangles, 0.0f, colour);
+                        }
                     }
                 }
             }
