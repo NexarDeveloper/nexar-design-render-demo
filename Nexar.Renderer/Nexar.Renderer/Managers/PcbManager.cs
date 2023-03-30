@@ -66,8 +66,8 @@ namespace Nexar.Renderer.Managers
 
             //PcbRenderer.Pcb.Reset();
 
-            PcbRenderer.Pcb.AddTestPrimitive();
-            PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
+            //PcbRenderer.Pcb.AddTestPrimitive();
+            //PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
             PcbRenderer.Pcb.AddTestComponent2();
             PcbRenderer.Pcb.FinaliseSetup();
 
@@ -310,6 +310,14 @@ namespace Nexar.Renderer.Managers
                                 ScalePositionMmToGl((decimal)firstVertice.Value.X, xOffset, divisor),
                                 ScalePositionMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor));
                         }
+                    }
+
+                    if (!string.IsNullOrEmpty(designItem.Mesh3D?.GlbFile?.DownloadUrl))
+                    {
+                        await PcbRenderer.Pcb.Add3DComponentBodyAsync(
+                            xOffset, 
+                            yOffset, 
+                            designItem.Mesh3D.GlbFile.DownloadUrl);
                     }
                 }
 
