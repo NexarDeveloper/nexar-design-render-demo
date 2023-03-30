@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AssimpNet" Version="4.1.0" />
     <PackageReference Include="Clipper2" Version="1.0.5" />
     <PackageReference Include="LibTessDotNet" Version="1.1.15" />
     <PackageReference Include="Nexar.Client.Login" Version="0.2.2" />
@@ -23,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="DemoFiles\IC.glb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="DemoFiles\IC.gltf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -80,6 +87,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DemoFiles\" />
   </ItemGroup>
 
 </Project>

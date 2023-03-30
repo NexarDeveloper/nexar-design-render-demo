@@ -23,6 +23,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
 using Microsoft.VisualBasic.Devices;
 using Nexar.Renderer.UserControls;
+using Nexar.Renderer.GltfRendering;
 
 namespace Nexar.Renderer.Forms
 {
@@ -53,6 +54,9 @@ namespace Nexar.Renderer.Forms
         public Main()
         {
             InitializeComponent();
+
+            //var gltfDemo = new GltfDemo();
+            //gltfDemo.Demo();
 
             glControl = new GLControl();
 
@@ -639,6 +643,11 @@ namespace Nexar.Renderer.Forms
             statusLabel.Text = "Ready";
             currentProgressBar.Visible = false;
             statusStrip.Refresh();
+        }
+
+        private void load3DTestComponentsMenuItem_Click(object sender, EventArgs e)
+        {
+            pcbManager.Open3DComponentDemo();
         }
     }
 }

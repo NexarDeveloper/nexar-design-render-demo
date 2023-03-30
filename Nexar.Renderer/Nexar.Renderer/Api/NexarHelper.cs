@@ -44,7 +44,8 @@ namespace Nexar.Renderer.Api
             catch (GraphQLClientException ex)
             {
                 if ((ex.Errors.Any(x => x.Code == "AuthExpiredToken")) ||
-                    (ex.Errors.Any(x => x.Code == "AuthInvalidToken")))
+                    (ex.Errors.Any(x => x.Code == "AuthInvalidToken")) ||
+                    (ex.Errors.Any(x => x.Code == "AUTH_NOT_AUTHORIZED")))
                 {
                     nexarClientCache.Clear();
                     accessToken = await AttemptLoginAsync();
