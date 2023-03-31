@@ -400,7 +400,7 @@ namespace Nexar.Renderer.DesignEntities
                                 positionArray[triangleIndice.C].X,
                                 positionArray[triangleIndice.C].Y,
                                 positionArray[triangleIndice.C].Z,
-                                3.5f,
+                                3.8f,
                                 posX,
                                 posY);
                             triangles.Add(triangle);
