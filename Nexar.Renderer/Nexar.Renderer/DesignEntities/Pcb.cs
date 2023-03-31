@@ -374,6 +374,10 @@ namespace Nexar.Renderer.DesignEntities
                 {
                     triangles.Clear();
 
+                    System.Numerics.Quaternion rotation = node.LocalTransform.GetDecomposed().Rotation;
+                    System.Numerics.Vector3 translation = node.LocalTransform.GetDecomposed().Translation;
+                    System.Numerics.Vector3 scale = node.LocalTransform.GetDecomposed().Scale;
+
                     var mesh = node.Mesh;
 
                     if (!meshes.Contains(mesh))
@@ -390,16 +394,28 @@ namespace Nexar.Renderer.DesignEntities
 
                         foreach (var triangleIndice in triangleIndices)
                         {
+                            var triangleIndiceA = System.Numerics.Vector3.Transform(positionArray[triangleIndice.A], rotation);
+                            var triangleIndiceB = System.Numerics.Vector3.Transform(positionArray[triangleIndice.B], rotation);
+                            var triangleIndiceC = System.Numerics.Vector3.Transform(positionArray[triangleIndice.C], rotation);
+
+                            //triangleIndiceA = System.Numerics.Vector3.Multiply(triangleIndiceA, translation);
+                            //triangleIndiceB = System.Numerics.Vector3.Multiply(triangleIndiceB, translation);
+                            //triangleIndiceC = System.Numerics.Vector3.Multiply(triangleIndiceC, translation);
+
+                            triangleIndiceA = System.Numerics.Vector3.Multiply(triangleIndiceA, scale);
+                            triangleIndiceB = System.Numerics.Vector3.Multiply(triangleIndiceB, scale);
+                            triangleIndiceC = System.Numerics.Vector3.Multiply(triangleIndiceC, scale);
+
                             Triangle triangle = new Triangle(
-                                positionArray[triangleIndice.A].X,
-                                positionArray[triangleIndice.A].Y,
-                                positionArray[triangleIndice.A].Z,
-                                positionArray[triangleIndice.B].X,
-                                positionArray[triangleIndice.B].Y,
-                                positionArray[triangleIndice.B].Z,
-                                positionArray[triangleIndice.C].X,
-                                positionArray[triangleIndice.C].Y,
-                                positionArray[triangleIndice.C].Z,
+                                triangleIndiceA.X,
+                                triangleIndiceA.Y,
+                                triangleIndiceA.Z,
+                                triangleIndiceB.X,
+                                triangleIndiceB.Y,
+                                triangleIndiceB.Z,
+                                triangleIndiceC.X,
+                                triangleIndiceC.Y,
+                                triangleIndiceC.Z,
                                 3.937f,
                                 posX,
                                 posY);
