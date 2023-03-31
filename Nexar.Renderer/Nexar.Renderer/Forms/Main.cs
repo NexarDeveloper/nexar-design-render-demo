@@ -23,7 +23,6 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
 using Microsoft.VisualBasic.Devices;
 using Nexar.Renderer.UserControls;
-using Nexar.Renderer.GltfRendering;
 
 namespace Nexar.Renderer.Forms
 {
@@ -55,9 +54,6 @@ namespace Nexar.Renderer.Forms
         {
             InitializeComponent();
 
-            //var gltfDemo = new GltfDemo();
-            //gltfDemo.Demo();
-
             glControl = new GLControl();
 
             glControl.Size = new Size(glWidth, glHeight);
@@ -78,6 +74,7 @@ namespace Nexar.Renderer.Forms
             padsMenuItem.CheckedChanged += PadsMenuItem_CheckedChanged;
             viasMenuItem.CheckedChanged += ViasMenuItem_CheckedChanged;
             componentOutlinesMenuItem.CheckedChanged += ComponentOutlinesMenuItem_CheckedChanged;
+            componentBodyMenuItem.CheckedChanged += ComponentBodyMenuItem_CheckedChanged;
             commentAreaMenuItem.CheckedChanged += CommentAreaMenuItem_CheckedChanged;
             showCommentsMenuItem.CheckedChanged += CommentsMenuItem_CheckedChanged;
             refreshCommentsMenuItem.Click += RefreshCommentsMenuItem_Click;
@@ -612,6 +609,11 @@ namespace Nexar.Renderer.Forms
         private void ComponentOutlinesMenuItem_CheckedChanged(object? sender, EventArgs e)
         {
             pcbManager.PcbRenderer.Pcb.DisableComponentOutlines = (!componentOutlinesMenuItem.Checked);
+        }
+
+        private void ComponentBodyMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbManager.PcbRenderer.Pcb.DisableComponentBodies = (!componentBodyMenuItem.Checked);
         }
 
         private void CommentAreaMenuItem_CheckedChanged(object? sender, EventArgs e)
