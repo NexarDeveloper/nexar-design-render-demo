@@ -298,7 +298,7 @@ namespace Nexar.Renderer.DesignEntities
             }
         }*/
 
-        public void AddTestComponent2()
+        public void Add3DTestComponent()
         {
             try
             {
