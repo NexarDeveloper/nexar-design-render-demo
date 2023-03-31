@@ -66,10 +66,11 @@ namespace Nexar.Renderer.Managers
 
             //PcbRenderer.Pcb.Reset();
 
-            PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
-            PcbRenderer.Pcb.Add3DTestComponent();
-            //PcbRenderer.Pcb.FinaliseSetup();
-            PcbRenderer.Pcb.FinaliseAdditionalDataSetup();
+            //PcbRenderer.Pcb.AddTestPrimitive();
+            //PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
+            PcbRenderer.Pcb.AddTestComponent2();
+            PcbRenderer.Pcb.FinaliseSetup();
+
         }
 
         public async Task OpenPcbDesignAsync(string apiUrl, Project project)
@@ -103,7 +104,7 @@ namespace Nexar.Renderer.Managers
             LoadNetsAndAssociatedPrimitives();
             LoadNoNetPads();
 
-            PcbRenderer.Pcb.Add3DTestComponent();
+            //PcbRenderer.Pcb.AddTestComponent();
 
             PcbRenderer.Pcb.FinaliseSetup();
 
