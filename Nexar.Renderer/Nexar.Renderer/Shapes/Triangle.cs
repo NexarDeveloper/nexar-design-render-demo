@@ -44,27 +44,22 @@ namespace Nexar.Renderer.Shapes
             float v2X,
             float v2Y,
             float v2Z,
-            int? scaleFactor = null,
-            float? offsetX = null,
-            float? offsetY = null)
+            int? scaleFactor = null)
         {
-            V0X = ScaleDown(v0X, scaleFactor, offsetX);
-            V0Y = ScaleDown(v0Y, scaleFactor, offsetY);
+            V0X = ScaleDown(v0X, scaleFactor);
+            V0Y = ScaleDown(v0Y, scaleFactor);
             V0Z = ScaleDown(v0Z, scaleFactor);
-            V1X = ScaleDown(v1X, scaleFactor, offsetX);
-            V1Y = ScaleDown(v1Y, scaleFactor, offsetY);
+            V1X = ScaleDown(v1X, scaleFactor);
+            V1Y = ScaleDown(v1Y, scaleFactor);
             V1Z = ScaleDown(v1Z, scaleFactor);
-            V2X = ScaleDown(v2X, scaleFactor, offsetX);
-            V2Y = ScaleDown(v2Y, scaleFactor, offsetY);
+            V2X = ScaleDown(v2X, scaleFactor);
+            V2Y = ScaleDown(v2Y, scaleFactor);
             V2Z = ScaleDown(v2Z, scaleFactor);
         }
 
-        protected float ScaleDown(
-            float input, 
-            int? scaleFactor = null,
-            float? offset = null)
+        protected float ScaleDown(float input, int? scaleFactor = null)
         {
-            return (float)(((float)input / (scaleFactor ?? 1)) + offset ?? 0.0f);
+            return (float)((float)input / (scaleFactor ?? 1));
         }
     }
 }

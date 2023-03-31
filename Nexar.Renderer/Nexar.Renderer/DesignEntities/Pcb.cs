@@ -12,13 +12,9 @@ using System.Threading.Tasks;
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
 using System.Windows.Forms;
 using System.Reflection.Emit;
-//using Assimp;
+using Assimp;
 using Nexar.Renderer.Shapes;
 using System.Diagnostics;
-using SharpGLTF.Schema2;
-using System.IO;
-using System.Net;
-using System.Security.Policy;
 
 namespace Nexar.Renderer.DesignEntities
 {
@@ -204,8 +200,7 @@ namespace Nexar.Renderer.DesignEntities
         private PrimitiveShader commentAreaShader = new PrimitiveShader(0.0f);
         private ViaShaderWrapper viaShader = new ViaShaderWrapper();
 
-        private List<TriangleShader> threeDModelShaders = new List<TriangleShader>();
-        //private TriangleShader threeDModelShader = new TriangleShader();
+        private TriangleShader threeDModelShader = new TriangleShader();
 
         private Dictionary<string, PrimitiveShader> layerMappedTrackShader = new Dictionary<string, PrimitiveShader>();
         private Dictionary<string, PrimitiveShader> layerMappedPadShader = new Dictionary<string, PrimitiveShader>();
@@ -252,7 +247,7 @@ namespace Nexar.Renderer.DesignEntities
             return triangleCount;
         }
 
-        /*public void AddTestComponent()
+        public void AddTestComponent()
         {
             try
             {
@@ -296,7 +291,7 @@ namespace Nexar.Renderer.DesignEntities
             catch (Exception ex)
             {
             }
-        }*/
+        }
 
         public void AddTestComponent2()
         {
@@ -304,8 +299,6 @@ namespace Nexar.Renderer.DesignEntities
             {
                 using (var gltf = new SharpGLTF.IO.ZipReader("./DemoFiles/IC.zip"))
                 {
-                    var threeDModelShader = new TriangleShader();
-
                     foreach (var modelFile in gltf.ModelFiles)
                     {
                         var model = gltf.LoadModel(modelFile);
@@ -315,10 +308,6 @@ namespace Nexar.Renderer.DesignEntities
 
                         List<Triangle> triangles = new List<Triangle>();
 
-                        Debug.Print($"Visual children: {scene.VisualChildren.Count()}");
-
-                        var meshes = new List<Mesh>();
-
                         // Iterate over all the meshes in the scene
                         foreach (var node in scene.VisualChildren)
                         {
@@ -326,48 +315,45 @@ namespace Nexar.Renderer.DesignEntities
 
                             var mesh = node.Mesh;
 
-                            if (!meshes.Contains(mesh))
+                            // Extract vertices and indices from the mesh
+                            var vertices = new List<System.Numerics.Vector3>();
+                            var colors = new List<System.Numerics.Vector4>();
+                            var indices = new List<int>();
+                            var triangleIndices = mesh.Primitives[0].GetTriangleIndices();
+
+                            var positionArray = mesh.Primitives[0].GetVertices("POSITION").AsVector3Array();
+
+                            foreach (var vertex in mesh.Primitives[0].GetVertices("POSITION").AsVector3Array())
                             {
-                                meshes.Add(mesh);
-
-                                // Extract vertices and indices from the mesh
-                                var triangleIndices = mesh.Primitives[0].GetTriangleIndices();
-                                var positionArray = mesh.Primitives[0].GetVertices("POSITION").AsVector3Array();
-                                var colorArray = mesh.Primitives[0].GetVertices("COLOR_0").AsColorArray();
-
-                                Debug.Print($"Triangle count: {triangleIndices.Count()}");
-                                Debug.Print($"Position array count: {positionArray.Count()}");
-                                Debug.Print($"Color array count: {colorArray.Count()}");
-
-                                foreach (var triangleIndice in triangleIndices)
-                                {
-                                    Triangle triangle = new Triangle(
-                                        positionArray[triangleIndice.A].X,
-                                        positionArray[triangleIndice.A].Y,
-                                        positionArray[triangleIndice.A].Z,
-                                        positionArray[triangleIndice.B].X,
-                                        positionArray[triangleIndice.B].Y,
-                                        positionArray[triangleIndice.B].Z,
-                                        positionArray[triangleIndice.C].X,
-                                        positionArray[triangleIndice.C].Y,
-                                        positionArray[triangleIndice.C].Z,
-                                        10);
-                                    triangles.Add(triangle);
-
-                                    // Take the first vertice colour (fix this later)
-                                    var colour = new Color4(
-                                        colorArray[triangleIndice.A].X,
-                                        colorArray[triangleIndice.A].Y,
-                                        colorArray[triangleIndice.A].Z,
-                                        colorArray[triangleIndice.A].W);
-
-                                    threeDModelShader.AddVertices(new List<Triangle>() { triangle }, 0.0f, colour);
-                                }
+                                //var position = vertex.GetGeometry<Vector3>("POSITION");
+                                //vertices.Add(vertex);
+                                //var color = vertex.TryGetColor("COLOR_0", out Vector4 c) ? c : Vector4.One;
+                                //colors.Add(color);
                             }
+
+                            Debug.Print($"Triangle count: {triangleIndices.Count()}");
+
+                            foreach (var triangleIndice in triangleIndices)
+                            {
+                                Triangle triangle = new Triangle(
+                                    positionArray[triangleIndice.A].X,
+                                    positionArray[triangleIndice.A].Y,
+                                    positionArray[triangleIndice.A].Z,
+                                    positionArray[triangleIndice.B].X,
+                                    positionArray[triangleIndice.B].Y,
+                                    positionArray[triangleIndice.B].Z,
+                                    positionArray[triangleIndice.C].X,
+                                    positionArray[triangleIndice.C].Y,
+                                    positionArray[triangleIndice.C].Z);
+                                triangles.Add(triangle);
+
+                                //var colour = new Color4(vertexColor.R, vertexColor.G, vertexColor.B, vertexColor.A);
+                            }
+
+                            var colour = new Color4(0.8f, 0.0f, 0.8f, 1.0f);
+                            threeDModelShader.AddVertices(triangles, 0.0f, colour);
                         }
                     }
-
-                    threeDModelShaders.Add(threeDModelShader);
                 }
             }
             catch (Exception ex)
@@ -561,96 +547,6 @@ namespace Nexar.Renderer.DesignEntities
                 }
             }
         }
-
-
-        public async Task Add3DComponentBodyAsync(
-            float posX,
-            float posY,
-            string downloadFileUrl)
-        {
-            string path = Path.GetTempFileName();
-
-            try
-            {
-                var client = new HttpClient();
-                using var response = await client.GetAsync(downloadFileUrl);
-                using var content = response.Content;
-                using var stream = await content.ReadAsStreamAsync();
-                using var fileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
-                await stream.CopyToAsync(fileStream);
-                fileStream.Seek(0, SeekOrigin.Begin);
-
-                var model = ModelRoot.ReadGLB(fileStream);
-                var scene = model.DefaultScene;
-
-                List<Triangle> triangles = new List<Triangle>();
-
-                var meshes = new List<Mesh>();
-
-                var threeDModelShader = new TriangleShader();
-
-                foreach (var node in scene.VisualChildren)
-                {
-                    triangles.Clear();
-
-                    var mesh = node.Mesh;
-
-                    if (!meshes.Contains(mesh))
-                    {
-                        meshes.Add(mesh);
-
-                        var triangleIndices = mesh.Primitives[0].GetTriangleIndices();
-                        var positionArray = mesh.Primitives[0].GetVertices("POSITION").AsVector3Array();
-                        var colorArray = mesh.Primitives[0].GetVertices("COLOR_0").AsColorArray();
-
-                        Debug.Print($"Triangle count: {triangleIndices.Count()}");
-                        Debug.Print($"Position array count: {positionArray.Count()}");
-                        Debug.Print($"Color array count: {colorArray.Count()}");
-
-                        foreach (var triangleIndice in triangleIndices)
-                        {
-                            Triangle triangle = new Triangle(
-                                positionArray[triangleIndice.A].X,
-                                positionArray[triangleIndice.A].Y,
-                                positionArray[triangleIndice.A].Z,
-                                positionArray[triangleIndice.B].X,
-                                positionArray[triangleIndice.B].Y,
-                                positionArray[triangleIndice.B].Z,
-                                positionArray[triangleIndice.C].X,
-                                positionArray[triangleIndice.C].Y,
-                                positionArray[triangleIndice.C].Z,
-                                10/*,
-                                posX,
-                                posY*/);
-                            triangles.Add(triangle);
-
-                            // Take the first vertice colour (fix this later)
-                            var colour = new Color4(
-                                colorArray[triangleIndice.A].X,
-                                colorArray[triangleIndice.A].Y,
-                                colorArray[triangleIndice.A].Z,
-                                colorArray[triangleIndice.A].W);
-
-                            threeDModelShader.AddVertices(new List<Triangle>() { triangle }, 0.0f, colour);
-                        }
-                    }
-                }
-
-                threeDModelShaders.Add(threeDModelShader);
-            }
-            catch (Exception ex)
-            {
-
-            }
-            finally
-            {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-            }
-        }
-
         private void CreateLine(
             float posX1, 
             float posY1, 
@@ -686,8 +582,8 @@ namespace Nexar.Renderer.DesignEntities
 
             viaShader.Reset();
 
-            //threeDModelShaders.ForEach(x => x.Reset());
-            //threeDModelShaders.ForEach(x => x.Dispose());
+            threeDModelShader.Reset();
+            threeDModelShader.Dispose();
         }
 
         public void ResetComments()
@@ -702,12 +598,13 @@ namespace Nexar.Renderer.DesignEntities
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Initialise());
             layerMappedPadShader.Values.ToList().ForEach(x => x.Initialise());
             viaShader.Initialise();
+
+            threeDModelShader.Initialise();
         }
 
         public void FinaliseAdditionalDataSetup()
         {
             componentOutlineShader.Initialise();
-            threeDModelShaders.ForEach(x => x.Initialise());
         }
 
         public void FinaliseCommentAreaSetup()
@@ -744,7 +641,7 @@ namespace Nexar.Renderer.DesignEntities
                 commentAreaShader.Draw(view, projection);
             }
 
-            threeDModelShaders.ForEach(x => x.Draw(view, projection));
+            threeDModelShader.Draw(view, projection);
         }
 
         private void DrawLayerMappedPrimitives(
@@ -768,7 +665,7 @@ namespace Nexar.Renderer.DesignEntities
             viaShader.Dispose();
             componentOutlineShader.Dispose();
             commentAreaShader.Dispose();
-            threeDModelShaders.ForEach(x => x.Dispose());
+            threeDModelShader.Dispose();
         }
     }
 }
