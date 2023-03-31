@@ -78,6 +78,12 @@ query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
                     yMm
                   }
                 }
+                mesh3D {
+                  glbFile {
+                    fileName
+                    downloadUrl
+                  }
+                }
               }
             }           
           }
