@@ -66,6 +66,7 @@ namespace Nexar.Renderer.Managers
 
             //PcbRenderer.Pcb.Reset();
 
+            PcbRenderer.Pcb.AddTestPrimitive();
             PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
             PcbRenderer.Pcb.Add3DTestComponent();
             //PcbRenderer.Pcb.FinaliseSetup();
