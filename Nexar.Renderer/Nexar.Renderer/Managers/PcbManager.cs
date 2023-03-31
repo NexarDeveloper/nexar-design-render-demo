@@ -68,7 +68,7 @@ namespace Nexar.Renderer.Managers
 
             PcbRenderer.Pcb.AddTestPrimitive();
             PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
-            PcbRenderer.Pcb.AddTestComponent2();
+            PcbRenderer.Pcb.Add3DTestComponent();
             PcbRenderer.Pcb.FinaliseSetup();
             PcbRenderer.Pcb.FinaliseAdditionalDataSetup();
 
@@ -316,8 +316,8 @@ namespace Nexar.Renderer.Managers
                     if (!string.IsNullOrEmpty(designItem.Mesh3D?.GlbFile?.DownloadUrl))
                     {
                         await PcbRenderer.Pcb.Add3DComponentBodyAsync(
-                            xOffset,
-                            yOffset,
+                            ScalePositionMmToGl(designItem.Position.XMm, xOffset, divisor),
+                            ScalePositionMmToGl(designItem.Position.YMm, yOffset, divisor),
                             designItem.Mesh3D.GlbFile.DownloadUrl);
                     }
                 }

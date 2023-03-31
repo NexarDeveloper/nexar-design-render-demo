@@ -250,7 +250,7 @@ namespace Nexar.Renderer.DesignEntities
         }
 
 
-        public void AddTestComponent2()
+        public void Add3DTestComponent()
         {
             try
             {
@@ -299,7 +299,7 @@ namespace Nexar.Renderer.DesignEntities
                                         positionArray[triangleIndice.C].X,
                                         positionArray[triangleIndice.C].Y,
                                         positionArray[triangleIndice.C].Z,
-                                        10);
+                                        3.5f);
                                     triangles.Add(triangle);
 
                                     // Take the first vertice colour (fix this later)
@@ -400,9 +400,9 @@ namespace Nexar.Renderer.DesignEntities
                                 positionArray[triangleIndice.C].X,
                                 positionArray[triangleIndice.C].Y,
                                 positionArray[triangleIndice.C].Z,
-                                10/*,
+                                3.5f,
                                 posX,
-                                posY*/);
+                                posY);
                             triangles.Add(triangle);
 
                             // Take the first vertice colour (fix this later)

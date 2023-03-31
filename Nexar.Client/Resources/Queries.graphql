@@ -64,6 +64,12 @@ query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
               nodes {
                 id
                 designator
+                position {
+                  x
+                  y
+                  xMm
+                  yMm
+                }
                 area {
                   pos1 {
                     x
