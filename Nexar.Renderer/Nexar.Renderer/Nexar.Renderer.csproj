@@ -21,6 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Nexar.Client\Nexar.Client.csproj" />
     <ProjectReference Include="..\..\OpenTK.WinForms\OpenTK.WinForms.csproj" />
+    <ProjectReference Include="..\..\SharpGLTF\SharpGLTF.Core\SharpGLTF.Core.csproj" />
+    <ProjectReference Include="..\..\SharpGLTF\SharpGLTF.Toolkit\SharpGLTF.Toolkit.csproj" />
     <ProjectReference Include="..\SharpGLTF.Toolkit\SharpGLTF.Toolkit.csproj" />
   </ItemGroup>
 
