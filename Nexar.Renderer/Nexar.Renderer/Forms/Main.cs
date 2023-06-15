@@ -20,7 +20,7 @@ using Nexar.Renderer.Api;
 using StrawberryShake;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
-using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_Variants_Pcb_LayerStack_Stacks_Layers;
 using Microsoft.VisualBasic.Devices;
 using Nexar.Renderer.UserControls;
 

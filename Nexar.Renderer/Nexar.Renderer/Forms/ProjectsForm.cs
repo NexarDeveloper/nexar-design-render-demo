@@ -60,7 +60,7 @@ namespace Nexar.Renderer.Forms
                                 Description = project?.Description ?? string.Empty,
                                 Name = project?.Name ?? string.Empty,
                                 PreviewUrl = project?.PreviewUrl ?? string.Empty,
-                                UpdatedAt = project?.UpdatedAt?.UtcDateTime ?? DateTime.MinValue,
+                                UpdatedAt = project?.UpdatedAt.UtcDateTime ?? DateTime.MinValue,
                                 Workspace = workspace
                             };
 

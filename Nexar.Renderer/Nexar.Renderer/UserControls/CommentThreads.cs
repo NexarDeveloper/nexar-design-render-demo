@@ -20,8 +20,8 @@ using System.Xml.Linq;
 
 namespace Nexar.Renderer.UserControls
 {
-    using QueryCommentThread = IGetPcbComments_DesProjectById_Design_WorkInProgress_Variants_Pcb_CommentThreads;
-    using QueryComment = IGetPcbComments_DesProjectById_Design_WorkInProgress_Variants_Pcb_CommentThreads_Comments;
+    using QueryCommentThread = IGetPcbComments_DesProjectById_Design_Variants_Pcb_CommentThreads;
+    using QueryComment = IGetPcbComments_DesProjectById_Design_Variants_Pcb_CommentThreads_Comments;
 
     public partial class CommentThreads : UserControl
     {
@@ -97,7 +97,7 @@ namespace Nexar.Renderer.UserControls
                 {
                     var pcbComments = await NexarClient.GetPcbComments.ExecuteAsync(projectId);
                     pcbComments.EnsureNoErrors();
-                    var modelCommentThreads = pcbComments?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.CommentThreads;
+                    var modelCommentThreads = pcbComments?.Data?.DesProjectById?.Design?.Variants.FirstOrDefault()?.Pcb?.CommentThreads;
 
                     if (modelCommentThreads != null)
                     {
