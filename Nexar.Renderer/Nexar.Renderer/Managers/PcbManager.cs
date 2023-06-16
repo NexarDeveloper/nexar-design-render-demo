@@ -1,27 +1,10 @@
-﻿using StrawberryShake;
-using Nexar.Client.Login;
-using Nexar.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
-using Nexar.Renderer.DesignEntities;
+﻿using Nexar.Client;
 using Nexar.Renderer.Api;
+using Nexar.Renderer.DesignEntities;
 using Nexar.Renderer.Visualization;
-using Nexar.Renderer.Geometry;
-
+using StrawberryShake;
+using System.Diagnostics;
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_Variants_Pcb_LayerStack_Stacks_Layers;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
-using System.Reflection.Emit;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using System.Reflection.Metadata;
-using OpenTk.Tutorial.Tools;
-using Newtonsoft.Json.Linq;
-using System.Runtime.Intrinsics.Arm;
 
 namespace Nexar.Renderer.Managers
 {
