@@ -14,8 +14,6 @@ namespace Nexar.Renderer.Managers
 
         private Stopwatch GeneralStopwatch { get; }
 
-        private NexarHelper NexarHelper { get; }
-
         private PcbStats PcbStats { get; set; } = default!;
 
         public IOperationResult<IGetPcbModelResult> PcbModel { get; private set; } = default!;
@@ -39,7 +37,6 @@ namespace Nexar.Renderer.Managers
         public PcbManager(GlRenderer renderer)
         {
             PcbRenderer = renderer;
-            NexarHelper = new NexarHelper();
             GeneralStopwatch = new Stopwatch();
         }
 
@@ -53,7 +50,6 @@ namespace Nexar.Renderer.Managers
 
             GeneralStopwatch.Restart();
 
-            await NexarHelper.LoginAsync();
             nexarClient = NexarHelper.GetNexarClient(apiUrl);
 
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);

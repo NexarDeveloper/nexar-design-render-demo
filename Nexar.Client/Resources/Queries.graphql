@@ -1,15 +1,20 @@
 ﻿query GetWorkspaces {
   desWorkspaces {
-    id
-    url
+    ...MyWorkspace
+  }
+}
+
+# IMyWorkspace in C#
+fragment MyWorkspace on DesWorkspace {
+  id
+  url
+  name
+  description
+  isDefault
+  location {
     name
-    description
-    isDefault
-    location {
-      name
-      apiServiceUrl
-      filesServiceUrl
-    }
+    apiServiceUrl
+    filesServiceUrl
   }
 }
 

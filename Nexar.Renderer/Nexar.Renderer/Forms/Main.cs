@@ -1,28 +1,14 @@
-using System;
-using System.ComponentModel;
-using System.Windows.Forms;
+using Nexar.Client;
+using Nexar.Renderer.Api;
 using Nexar.Renderer.DesignEntities;
-using Nexar.Renderer.Geometry;
 using Nexar.Renderer.Managers;
+using Nexar.Renderer.UserControls;
 using Nexar.Renderer.Utilities;
 using Nexar.Renderer.Visualization;
-using Microsoft.Extensions.DependencyInjection;
-using Nexar.Client;
-using Nexar.Client.Login;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.WinForms;
-using System.Security.Policy;
-using System.Runtime.CompilerServices;
-using Nexar.Renderer.Api;
-using StrawberryShake;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-
+using System.ComponentModel;
 using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_Variants_Pcb_LayerStack_Stacks_Layers;
-using Microsoft.VisualBasic.Devices;
-using Nexar.Renderer.UserControls;
 
 namespace Nexar.Renderer.Forms
 {
@@ -30,9 +16,7 @@ namespace Nexar.Renderer.Forms
     {
         private GLControl glControl;
 
-        private NexarHelper NexarHelper { get; }
-
-        private IGetWorkspaces_DesWorkspaces? ActiveWorkspace { get; set; }
+        private IMyWorkspace? ActiveWorkspace { get; set; }
 
         private PcbManager pcbManager;
 
@@ -77,8 +61,6 @@ namespace Nexar.Renderer.Forms
             commentAreaMenuItem.CheckedChanged += CommentAreaMenuItem_CheckedChanged;
             showCommentsMenuItem.CheckedChanged += CommentsMenuItem_CheckedChanged;
             refreshCommentsMenuItem.Click += RefreshCommentsMenuItem_Click;
-
-            NexarHelper = new NexarHelper();
 
             var glRenderer = new GlRenderer(glWidth, glHeight, "Nexar Renderer");
             pcbManager = new PcbManager(glRenderer);
@@ -383,18 +365,12 @@ namespace Nexar.Renderer.Forms
                     workspaceToolStripMenuItem.Text = "Loading...";
                     StatusBusy("Loading workspace list...");
 
-                    await NexarHelper.LoginAsync();
-                    var nexarClient = NexarHelper.GetNexarClient();
-
-                    var workspaces = await nexarClient.GetWorkspaces.ExecuteAsync();
-
-                    workspaces.EnsureNoErrors();
-
-                    if (workspaces?.Data != null)
+                    var workspaces = await NexarHelper.LoginAsync();
+                    if (workspaces != null)
                     {
                         var items = new List<ToolStripMenuItem>();
 
-                        foreach (var workspace in workspaces.Data.DesWorkspaces)
+                        foreach (var workspace in workspaces)
                         {
                             var toolStripMenuItem = new ToolStripMenuItem();
                             toolStripMenuItem.Name = workspace.Id;
@@ -410,8 +386,10 @@ namespace Nexar.Renderer.Forms
                     workspaceToolStripMenuItem.Text = "Workspaces";
                     StatusReady();
 
-                    var defaultWorkspace = workspaces?.Data?.DesWorkspaces.FirstOrDefault(x => x.IsDefault == true);
+                    if (workspaces == null)
+                        return;
 
+                    var defaultWorkspace = workspaces.FirstOrDefault(x => x.IsDefault == true);
                     if (defaultWorkspace != null)
                     {
                         ActiveWorkspace = defaultWorkspace;
