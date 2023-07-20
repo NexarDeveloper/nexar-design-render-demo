@@ -12,9 +12,9 @@
     <PackageReference Include="AssimpNet" Version="4.1.0" />
     <PackageReference Include="Clipper2" Version="1.0.5" />
     <PackageReference Include="LibTessDotNet" Version="1.1.15" />
-    <PackageReference Include="Nexar.Client.Login" Version="0.2.2" />
-    <PackageReference Include="OpenTK" Version="4.6.7" />
-    <PackageReference Include="OpenTK.Input" Version="4.6.7" />
+    <PackageReference Include="Nexar.Client.Login" Version="0.3.1" />
+    <PackageReference Include="OpenTK" Version="4.7.7" />
+    <PackageReference Include="OpenTK.Input" Version="4.7.7" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
   </ItemGroup>
 

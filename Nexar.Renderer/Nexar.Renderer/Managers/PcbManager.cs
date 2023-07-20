@@ -1,27 +1,10 @@
-﻿using StrawberryShake;
-using Nexar.Client.Login;
-using Nexar.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
-using Nexar.Renderer.DesignEntities;
+﻿using Nexar.Client;
 using Nexar.Renderer.Api;
+using Nexar.Renderer.DesignEntities;
 using Nexar.Renderer.Visualization;
-using Nexar.Renderer.Geometry;
-
-using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_LayerStack_Stacks_Layers;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
-using System.Reflection.Emit;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using System.Reflection.Metadata;
-using OpenTk.Tutorial.Tools;
-using Newtonsoft.Json.Linq;
-using System.Runtime.Intrinsics.Arm;
+using StrawberryShake;
+using System.Diagnostics;
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_Variants_Pcb_LayerStack_Stacks_Layers;
 
 namespace Nexar.Renderer.Managers
 {
@@ -30,8 +13,6 @@ namespace Nexar.Renderer.Managers
         public GlRenderer PcbRenderer { get; }
 
         private Stopwatch GeneralStopwatch { get; }
-
-        private NexarHelper NexarHelper { get; }
 
         private PcbStats PcbStats { get; set; } = default!;
 
@@ -56,7 +37,6 @@ namespace Nexar.Renderer.Managers
         public PcbManager(GlRenderer renderer)
         {
             PcbRenderer = renderer;
-            NexarHelper = new NexarHelper();
             GeneralStopwatch = new Stopwatch();
         }
 
@@ -84,13 +64,12 @@ namespace Nexar.Renderer.Managers
 
             GeneralStopwatch.Restart();
 
-            await NexarHelper.LoginAsync();
             nexarClient = NexarHelper.GetNexarClient(apiUrl);
 
             PcbModel = await nexarClient.GetPcbModel.ExecuteAsync(project.Id);
             PcbModel.EnsureNoErrors();
 
-            var pcb = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb;
+            var pcb = PcbModel?.Data?.DesProjectById?.Design?.Variants.FirstOrDefault()?.Pcb;
             if (pcb is not null)
             {
                 DocumentId = pcb.DocumentId ?? string.Empty;
@@ -158,7 +137,7 @@ namespace Nexar.Renderer.Managers
 
         private void LoadLayerStack()
         {
-            var layers = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.LayerStack?.Stacks.FirstOrDefault()?.Layers;
+            var layers = PcbModel?.Data?.DesProjectById?.Design?.Variants.FirstOrDefault()?.Pcb?.LayerStack?.Stacks.FirstOrDefault()?.Layers;
 
             if (layers != null)
             {
@@ -179,7 +158,7 @@ namespace Nexar.Renderer.Managers
 
         private void LoadBoardOutline()
         {
-            var vertices = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.Outline?.Vertices;
+            var vertices = PcbModel?.Data?.DesProjectById?.Design?.Variants.FirstOrDefault()?.Pcb?.Outline?.Vertices;
 
             if ((vertices != null) && (vertices.Count > 0))
             {
@@ -191,8 +170,8 @@ namespace Nexar.Renderer.Managers
                 xOffset = ((maxX - minX) / 2) + minX;
                 yOffset = ((maxY - minY) / 2) + minY;
 
-                IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_Outline_Vertices? firstVertice = null;
-                IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_Outline_Vertices? lastVertice = null;
+                IGetPcbModel_DesProjectById_Design_Variants_Pcb_Outline_Vertices? firstVertice = null;
+                IGetPcbModel_DesProjectById_Design_Variants_Pcb_Outline_Vertices? lastVertice = null;
 
                 foreach (var vertice in vertices)
                 {
@@ -254,7 +233,7 @@ namespace Nexar.Renderer.Managers
                 var itemResult = await nexarClient.GetDesignItems.ExecuteAsync(ActiveProject.Id, cursor, 100);
                 itemResult.EnsureNoErrors();
                     
-                var designItems = itemResult.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.DesignItems;
+                var designItems = itemResult.Data?.DesProjectById?.Design?.Variants.FirstOrDefault()?.Pcb?.DesignItems;
 
                 if (designItems?.Nodes is null)
                     break;
@@ -384,7 +363,7 @@ namespace Nexar.Renderer.Managers
             Stopwatch padStopwatch = new Stopwatch();
             Stopwatch viaStopwatch = new Stopwatch();
 
-            var nets = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants[0].Pcb?.Nets;
+            var nets = PcbModel?.Data?.DesProjectById?.Design?.Variants[0].Pcb?.Nets;
 
             if (nets != null)
             {
@@ -492,7 +471,7 @@ namespace Nexar.Renderer.Managers
 
         private void LoadNoNetPads()
         {
-            var noNetPads = PcbModel?.Data?.DesProjectById?.Design?.WorkInProgress?.Variants.FirstOrDefault()?.Pcb?.Pads.Where(x => x.Net?.Name == null);
+            var noNetPads = PcbModel?.Data?.DesProjectById?.Design?.Variants.FirstOrDefault()?.Pcb?.Pads.Where(x => x.Net?.Name == null);
 
             if (noNetPads != null)
             {
@@ -517,7 +496,7 @@ namespace Nexar.Renderer.Managers
             }
         }
 
-        private void AddPad(IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_Nets_Pads pad, IPcbLayer layer)
+        private void AddPad(IGetPcbModel_DesProjectById_Design_Variants_Pcb_Nets_Pads pad, IPcbLayer layer)
         {
             PcbRenderer.Pcb.AddPad(
                 layer,
@@ -531,7 +510,7 @@ namespace Nexar.Renderer.Managers
                 ScalePositionMmToGl(pad.HoleSize?.XMm ?? 0.0M, 0.0F, divisor));
         }
 
-        private void AddPad(IGetPcbModel_DesProjectById_Design_WorkInProgress_Variants_Pcb_Pads pad, IPcbLayer layer)
+        private void AddPad(IGetPcbModel_DesProjectById_Design_Variants_Pcb_Pads pad, IPcbLayer layer)
         {
             PcbRenderer.Pcb.AddPad(
                 layer,

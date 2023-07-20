@@ -1,28 +1,16 @@
 ﻿using Nexar.Renderer.Api;
 using Nexar.Renderer.DesignEntities;
 using StrawberryShake;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Nexar.Renderer.Forms
 {
     public partial class ProjectsForm : Form
     {
-        private NexarHelper NexarHelper { get; }
-
         public Project? SelectedDesignProject { get; set; }
 
         public ProjectsForm()
         {
             InitializeComponent();
-            NexarHelper = new NexarHelper();
         }
 
         public async Task LoadProjectsAsync(Workspace workspace)
@@ -60,7 +48,7 @@ namespace Nexar.Renderer.Forms
                                 Description = project?.Description ?? string.Empty,
                                 Name = project?.Name ?? string.Empty,
                                 PreviewUrl = project?.PreviewUrl ?? string.Empty,
-                                UpdatedAt = project?.UpdatedAt?.UtcDateTime ?? DateTime.MinValue,
+                                UpdatedAt = project?.UpdatedAt.UtcDateTime ?? DateTime.MinValue,
                                 Workspace = workspace
                             };
 

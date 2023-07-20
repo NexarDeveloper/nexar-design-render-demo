@@ -1,15 +1,20 @@
 ﻿query GetWorkspaces {
   desWorkspaces {
-    id
-    url
+    ...MyWorkspace
+  }
+}
+
+# IMyWorkspace in C#
+fragment MyWorkspace on DesWorkspace {
+  id
+  url
+  name
+  description
+  isDefault
+  location {
     name
-    description
-    isDefault
-    location {
-      name   
-      apiServiceUrl
-      filesServiceUrl   
-    }
+    apiServiceUrl
+    filesServiceUrl
   }
 }
 
@@ -50,39 +55,31 @@ query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
     name
     description
     design {
-      workInProgress {
-        variants {
-          pcb {
-            designItems (after: $cursor, first: $count) {
-              totalCount
-              pageInfo {
-                hasNextPage
-                hasPreviousPage
-                startCursor
-                endCursor
-              }            
-              nodes {
-                id
-                designator
-                position {
+      variants {
+        pcb {
+          designItems (after: $cursor, first: $count) {
+            totalCount
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+            }
+            nodes {
+              id
+              designator
+              area {
+                pos1 {
                   x
                   y
                   xMm
                   yMm
                 }
-                area {
-                  pos1 {
-                    x
-                    y
-                    xMm
-                    yMm
-                  }
-                  pos2 {
-                    x
-                    y
-                    xMm
-                    yMm
-                  }
+                pos2 {
+                  x
+                  y
+                  xMm
+                  yMm
                 }
                 mesh3D {
                   glbFile {
@@ -91,7 +88,7 @@ query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
                   }
                 }
               }
-            }           
+            }
           }
         }
       }
@@ -105,48 +102,70 @@ query GetPcbModel($id: ID!) {
     name
     description
     design {
-      workInProgress {
-        variants {
-          pcb {
-            documentId
-            documentName
-            layerStack {
-              stacks {
+      variants {
+        pcb {
+          documentId
+          documentName
+          layerStack {
+            stacks {
+              name
+              layers {
                 name
-                layers {
+                thickness {
+                  xMm
+                }
+                dielectricConstant
+                copperWeight {
+                  gram
+                }
+                layerType
+                layerProperties {
                   name
-                  thickness {
+                  text
+                  size {
                     xMm
-                  }
-                  dielectricConstant
-                  copperWeight {
-                    gram
-                  }
-                  layerType
-                  layerProperties {
-                    name
-                    text
-                    size {
-                      xMm
-                    }
                   }
                 }
               }
             }
-            outline {
-              vertices {
-                xMm
-                yMm
-              }
+          }
+          outline {
+            vertices {
+              xMm
+              yMm
             }
+          }
+          pads {
+            designator
+            globalDesignator
+            padType
+            shape
+            net {
+              name
+            }
+            layer {
+              name
+            }
+            position {
+              xMm
+              yMm
+            }
+            rotation
+            size {
+              xMm
+              yMm
+            }
+            holeSize {
+              xMm
+            }
+          }
+          nets {
+            name
             pads {
               designator
               globalDesignator
               padType
               shape
-              net {
-                name
-              }
               layer {
                 name
               }
@@ -162,69 +181,45 @@ query GetPcbModel($id: ID!) {
               holeSize {
                 xMm
               }
-            }              
-            nets {
-              name
-              pads {
-                designator
-                globalDesignator
-                padType
-                shape
-                layer {
-                  name
-                }
-                position {
-                  xMm
-                  yMm
-                }
-                rotation
-                size {
-                  xMm
-                  yMm
-                }
-                holeSize {
-                  xMm
-                }
+            }
+            tracks {
+              layer {
+                name
               }
-              tracks {
-                layer {
-                  name
-                }
-                width {
-                  xMm
-                }
-                width {
-                  xMm
-                }
-                begin {
-                  xMm
-                  yMm
-                }
-                end {
-                  xMm
-                  yMm
-                }
+              width {
+                xMm
               }
-              vias {
-                shape
-                beginLayer {
-                  name
-                }
-                endLayer {
-                  name
-                }
-                position {
-                  xMm
-                  yMm
-                }
-                padDiameter {
-                  xMm
-                }
-                holeDiameter {
-                  xMm
-                }
+              width {
+                xMm
               }
-            }            
+              begin {
+                xMm
+                yMm
+              }
+              end {
+                xMm
+                yMm
+              }
+            }
+            vias {
+              shape
+              beginLayer {
+                name
+              }
+              endLayer {
+                name
+              }
+              position {
+                xMm
+                yMm
+              }
+              padDiameter {
+                xMm
+              }
+              holeDiameter {
+                xMm
+              }
+            }
           }
         }
       }
@@ -237,48 +232,46 @@ query GetPcbComments($id: ID!) {
     name
     description
     design {
-      workInProgress {
-        variants {
-          pcb {
-            documentId
-            documentName
-            commentThreads {
-              commentThreadId
-              createdAt
-              modifiedAt
-              context {
-                area {
-                  pos1 {
-                    x
-                    y
-                    xMm
-                    yMm
-                  }
-                  pos2 {
-                    x
-                    y
-                    xMm
-                    yMm
-                  }
+      variants {
+        pcb {
+          documentId
+          documentName
+          commentThreads {
+            commentThreadId
+            createdAt
+            modifiedAt
+            context {
+              area {
+                pos1 {
+                  x
+                  y
+                  xMm
+                  yMm
+                }
+                pos2 {
+                  x
+                  y
+                  xMm
+                  yMm
                 }
               }
-              comments {
-                commentId
-                text
-                createdAt
-                createdBy {
-                  firstName
-                  lastName
-                  email
-                  pictureUrl
-                }
-                modifiedAt
-                modifiedBy {
-                  firstName
-                  lastName
-                  email
-                  pictureUrl                
-                }
+            }
+            comments {
+              commentId
+              text
+              createdAt
+              createdBy {
+                firstName
+                lastName
+                email
+                pictureUrl
+              }
+              modifiedAt
+              modifiedBy {
+                firstName
+                lastName
+                email
+                pictureUrl
               }
             }
           }
