@@ -1,21 +1,13 @@
-﻿using Clipper2Lib;
+﻿using Nexar.Client;
+using Nexar.Renderer.Forms;
 using Nexar.Renderer.Geometry;
 using Nexar.Renderer.Shaders;
-using Nexar.Client;
-using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_Variants_Pcb_LayerStack_Stacks_Layers;
-using System.Windows.Forms;
-using System.Reflection.Emit;
-using Assimp;
 using Nexar.Renderer.Shapes;
-using System.Diagnostics;
+using OpenTK.Mathematics;
 using SharpGLTF.Schema2;
+using System.Diagnostics;
+using System.Text;
+using IPcbLayer = Nexar.Client.IGetPcbModel_DesProjectById_Design_Variants_Pcb_LayerStack_Stacks_Layers;
 
 namespace Nexar.Renderer.DesignEntities
 {
@@ -340,11 +332,15 @@ namespace Nexar.Renderer.DesignEntities
         }
 
         public async Task Add3DComponentBodyAsync(
+            string designator,
             float posX,
             float posY,
+            bool bboxPositioned,
             string downloadFileUrl)
         {
             string path = Path.GetTempFileName();
+
+            Debug.Print($"Designator: {designator} 3D model load");
 
             try
             {
@@ -365,6 +361,8 @@ namespace Nexar.Renderer.DesignEntities
 
                 var threeDModelShader = new TriangleShader();
 
+                const float scaleFactor = 3.937f;
+                
                 foreach (var node in scene.VisualChildren)
                 {
                     triangles.Clear();
@@ -382,16 +380,30 @@ namespace Nexar.Renderer.DesignEntities
                         var positionArray = mesh.Primitives[0].GetVertices("POSITION").AsVector3Array();
                         var colorArray = mesh.Primitives[0].GetVertices("COLOR_0").AsColorArray();
 
-                        Debug.Print($"Triangle count: {triangleIndices.Count()}");
-                        Debug.Print($"Position array count: {positionArray.Count()}");
-                        Debug.Print($"Color array count: {colorArray.Count()}");
+                        var centre = new System.Numerics.Vector3();
+
+                        if (bboxPositioned)
+                        {
+                            var maxX = positionArray.MaxBy(p => p.X).X;
+                            var maxY = positionArray.MaxBy(p => p.Y).Y;
+                            var maxZ = positionArray.MaxBy(p => p.Z).Z;
+                            var minX = positionArray.MinBy(p => p.X).X;
+                            var minY = positionArray.MinBy(p => p.Y).Y;
+                            var minZ = positionArray.MinBy(p => p.Z).Z;
+
+                            centre.X = (minX + maxX) / 2f;
+                            centre.Y = (minY + maxY) / 2f;
+                            centre.Z = (minZ + maxZ) / 2f;
+                            centre = System.Numerics.Vector3.Transform(centre, rotation);
+                            centre = System.Numerics.Vector3.Multiply(centre, scale);
+                            centre = System.Numerics.Vector3.Multiply(centre, 1f / scaleFactor);
+                        }
 
                         foreach (var triangleIndice in triangleIndices)
                         {
                             var triangleIndiceA = System.Numerics.Vector3.Transform(positionArray[triangleIndice.A], rotation);
                             var triangleIndiceB = System.Numerics.Vector3.Transform(positionArray[triangleIndice.B], rotation);
                             var triangleIndiceC = System.Numerics.Vector3.Transform(positionArray[triangleIndice.C], rotation);
-
                             triangleIndiceA = System.Numerics.Vector3.Multiply(triangleIndiceA, scale);
                             triangleIndiceB = System.Numerics.Vector3.Multiply(triangleIndiceB, scale);
                             triangleIndiceC = System.Numerics.Vector3.Multiply(triangleIndiceC, scale);
@@ -406,9 +418,10 @@ namespace Nexar.Renderer.DesignEntities
                                 triangleIndiceC.X,
                                 triangleIndiceC.Y,
                                 triangleIndiceC.Z,
-                                3.937f,
-                                posX,
-                                posY);
+                                scaleFactor,
+                                posX - centre.X,
+                                posY - centre.Y);
+ 
                             triangles.Add(triangle);
 
                             // Take the first vertice colour (fix this later)

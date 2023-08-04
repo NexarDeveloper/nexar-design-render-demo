@@ -263,11 +263,11 @@ namespace Nexar.Renderer.Managers
                         PointF? firstVertice = null;
                         PointF? lastVertice = null;
 
-                        foreach (var vertice in component.PolygonVertices)
-                        {
+                        foreach (var vertex in component.PolygonVertices)
+                        {   
                             if (firstVertice == null)
                             {
-                                firstVertice = vertice;
+                                firstVertice = vertex;
                             }
 
                             if (lastVertice != null)
@@ -275,11 +275,11 @@ namespace Nexar.Renderer.Managers
                                 PcbRenderer.Pcb.AddComponentOutline(
                                     ScalePositionMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
                                     ScalePositionMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
-                                    ScalePositionMmToGl((decimal)vertice.X, xOffset, divisor),
-                                    ScalePositionMmToGl((decimal)vertice.Y, yOffset, divisor));
+                                    ScalePositionMmToGl((decimal)vertex.X, xOffset, divisor),
+                                    ScalePositionMmToGl((decimal)vertex.Y, yOffset, divisor));
                             }
 
-                            lastVertice = vertice;
+                            lastVertice = vertex;
                         }
 
                         if (lastVertice != null && firstVertice != null)
@@ -294,9 +294,25 @@ namespace Nexar.Renderer.Managers
 
                     if (!string.IsNullOrEmpty(designItem.Mesh3D?.GlbFile?.DownloadUrl))
                     {
+                        bool bboxPositioned = false;
+                        var positionX = designItem.Position.XMm;
+                        var positionY = designItem.Position.YMm;
+                        if (designItem.Area is not null)
+                        {
+                            // Prefer BBox positioning if the design item has an area.
+                            bboxPositioned = true;
+                            positionX = (designItem.Area!.Pos1.XMm + designItem.Area!.Pos2.XMm) / 2;
+                            positionY = (designItem.Area!.Pos1.YMm + designItem.Area!.Pos2.YMm) / 2;
+                        }
+                        
+                        var xPosGl = ScalePositionMmToGl(positionX, xOffset, divisor);
+                        var yPosGl = ScalePositionMmToGl(positionY, yOffset, divisor);
+
                         await PcbRenderer.Pcb.Add3DComponentBodyAsync(
-                            ScalePositionMmToGl(designItem.Position.XMm, xOffset, divisor),
-                            ScalePositionMmToGl(designItem.Position.YMm, yOffset, divisor),
+                            designItem.Designator,
+                            xPosGl,
+                            yPosGl,
+                            bboxPositioned,
                             designItem.Mesh3D.GlbFile.DownloadUrl);
                     }
                 }
