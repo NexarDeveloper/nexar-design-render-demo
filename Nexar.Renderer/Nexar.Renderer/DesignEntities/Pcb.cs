@@ -337,7 +337,7 @@ namespace Nexar.Renderer.DesignEntities
         {
             string path = Path.GetTempFileName();
 
-            Debug.Print($"Designator: PCB 3D model load");
+            Debug.Print($"Load PCB 3D model");
 
             try
             {
@@ -370,19 +370,20 @@ namespace Nexar.Renderer.DesignEntities
 
                     var mesh = node.Mesh;
 
+                    var posX = (pos.X / scaleFactor) + offsetX;
+                    var posY = (pos.Y / scaleFactor) + offsetY;
+                    var posZ = (pos.Z / scaleFactor);
+
                     if (!meshes.Contains(mesh))
                     {
                         meshes.Add(mesh);
-                    }
+                    }                    
 
                     foreach (var prim in mesh.Primitives)
                     {
                         var triangleIndices = prim.GetTriangleIndices();
                         var positionArray = prim.GetVertices("POSITION").AsVector3Array();
                         var colorArray = prim.GetVertices("COLOR_0").AsColorArray();
-
-                        var posX = (pos.X / scaleFactor) + offsetX;
-                        var posY = (pos.Y / scaleFactor) + offsetY;
 
                         foreach (var triangleIndice in triangleIndices)
                         {
@@ -405,7 +406,8 @@ namespace Nexar.Renderer.DesignEntities
                                 triangleIndiceC.Z,
                                 scaleFactor,
                                 posX,
-                                posY);
+                                posY,
+                                posZ);
 
                             triangles.Add(triangle);
 
