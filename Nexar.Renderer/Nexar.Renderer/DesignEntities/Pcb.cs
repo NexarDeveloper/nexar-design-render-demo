@@ -1,5 +1,4 @@
 ﻿using Nexar.Client;
-using Nexar.Renderer.Forms;
 using Nexar.Renderer.Geometry;
 using Nexar.Renderer.Shaders;
 using Nexar.Renderer.Shapes;
@@ -330,6 +329,110 @@ namespace Nexar.Renderer.DesignEntities
 
             layerMappedTrackShader.Values.ToList().ForEach(x => x.Initialise());
         }
+
+        public async Task Add3DModelBodyAsync(
+            float offsetX,
+            float offsetY,
+            string downloadFileUrl)
+        {
+            string path = Path.GetTempFileName();
+
+            Debug.Print($"Designator: PCB 3D model load");
+
+            try
+            {
+                var client = new HttpClient();
+                using var response = await client.GetAsync(downloadFileUrl);
+                using var content = response.Content;
+                using var stream = await content.ReadAsStreamAsync();
+                using var fileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
+                await stream.CopyToAsync(fileStream);
+                fileStream.Seek(0, SeekOrigin.Begin);
+
+                var model = ModelRoot.ReadGLB(fileStream);
+                var scene = model.DefaultScene;
+
+                List<Triangle> triangles = new List<Triangle>();
+
+                var meshes = new List<SharpGLTF.Schema2.Mesh>();
+
+                var threeDModelShader = new TriangleShader();
+
+                const float scaleFactor = 3.937f;
+
+                foreach (var node in scene.VisualChildren)
+                {
+                    triangles.Clear();
+
+                    System.Numerics.Quaternion rotation = node.LocalTransform.GetDecomposed().Rotation;
+                    System.Numerics.Vector3 scale = node.LocalTransform.GetDecomposed().Scale;
+                    System.Numerics.Vector3 pos = node.LocalTransform.GetDecomposed().Translation;
+
+                    var mesh = node.Mesh;
+
+                    if (!meshes.Contains(mesh))
+                    {
+                        meshes.Add(mesh);
+                    }
+
+                    foreach (var prim in mesh.Primitives)
+                    {
+                        var triangleIndices = prim.GetTriangleIndices();
+                        var positionArray = prim.GetVertices("POSITION").AsVector3Array();
+                        var colorArray = prim.GetVertices("COLOR_0").AsColorArray();
+
+                        var posX = (pos.X / scaleFactor) + offsetX;
+                        var posY = (pos.Y / scaleFactor) + offsetY;
+
+                        foreach (var triangleIndice in triangleIndices)
+                        {
+                            var triangleIndiceA = System.Numerics.Vector3.Transform(positionArray[triangleIndice.A], rotation);
+                            var triangleIndiceB = System.Numerics.Vector3.Transform(positionArray[triangleIndice.B], rotation);
+                            var triangleIndiceC = System.Numerics.Vector3.Transform(positionArray[triangleIndice.C], rotation);
+                            triangleIndiceA = System.Numerics.Vector3.Multiply(triangleIndiceA, scale);
+                            triangleIndiceB = System.Numerics.Vector3.Multiply(triangleIndiceB, scale);
+                            triangleIndiceC = System.Numerics.Vector3.Multiply(triangleIndiceC, scale);
+                                
+                            Triangle triangle = new Triangle(
+                                triangleIndiceA.X,
+                                triangleIndiceA.Y,
+                                triangleIndiceA.Z,
+                                triangleIndiceB.X,
+                                triangleIndiceB.Y,
+                                triangleIndiceB.Z,
+                                triangleIndiceC.X,
+                                triangleIndiceC.Y,
+                                triangleIndiceC.Z,
+                                scaleFactor,
+                                posX,
+                                posY);
+
+                            triangles.Add(triangle);
+
+                            // Take the first vertice colour (fix this later)
+                            var colour = new Color4(
+                                colorArray[triangleIndice.A].X,
+                                colorArray[triangleIndice.A].Y,
+                                colorArray[triangleIndice.A].Z,
+                                colorArray[triangleIndice.A].W);
+
+                            threeDModelShader.AddVertices(new List<Triangle>() { triangle }, 0.0f, colour);
+                        }
+                        
+                    }
+                }
+
+                componentBodyShaders.Add(threeDModelShader);
+            }
+            finally
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+        }
+
 
         public async Task Add3DComponentBodyAsync(
             string designator,

@@ -95,6 +95,7 @@ namespace Nexar.Renderer.Managers
 
         public async Task LoadAdditionalDesignDataAsync()
         {
+            await Load3DModelAsync();
             await LoadDesignItemsAsync();
             PcbRenderer.Pcb.FinaliseAdditionalDataSetup();
         }
@@ -218,6 +219,27 @@ namespace Nexar.Renderer.Managers
             return AllComponents.FirstOrDefault(x => x.HitTest(location));
         }
 
+        private async Task Load3DModelAsync() 
+        {
+            GeneralStopwatch.Restart();
+
+            var itemResult = await nexarClient.Get3DModel.ExecuteAsync(ActiveProject.Id);
+            var pcb = itemResult.Data?.DesProjectById?.Design?.Variants.FirstOrDefault()?.Pcb;
+
+            var xOffsetGl = ScalePositionMmToGl(0, xOffset, divisor);
+            var yOffsetGl = ScalePositionMmToGl(0, yOffset, divisor);
+
+            if (!string.IsNullOrEmpty(pcb?.Mesh3D?.GlbFile?.DownloadUrl))
+            {
+                await PcbRenderer.Pcb.Add3DModelBodyAsync(
+                    xOffsetGl,
+                    yOffsetGl,
+                    pcb.Mesh3D.GlbFile.DownloadUrl);
+            }
+
+            GeneralStopwatch.Stop();
+        }
+
         private async Task LoadDesignItemsAsync()
         {
             GeneralStopwatch.Restart();
@@ -290,30 +312,6 @@ namespace Nexar.Renderer.Managers
                                 ScalePositionMmToGl((decimal)firstVertice.Value.X, xOffset, divisor),
                                 ScalePositionMmToGl((decimal)firstVertice.Value.Y, yOffset, divisor));
                         }
-                    }
-
-                    if (!string.IsNullOrEmpty(designItem.Mesh3D?.GlbFile?.DownloadUrl))
-                    {
-                        bool bboxPositioned = false;
-                        var positionX = designItem.Position.XMm;
-                        var positionY = designItem.Position.YMm;
-                        if (designItem.Area is not null)
-                        {
-                            // Prefer BBox positioning if the design item has an area.
-                            bboxPositioned = true;
-                            positionX = (designItem.Area!.Pos1.XMm + designItem.Area!.Pos2.XMm) / 2;
-                            positionY = (designItem.Area!.Pos1.YMm + designItem.Area!.Pos2.YMm) / 2;
-                        }
-                        
-                        var xPosGl = ScalePositionMmToGl(positionX, xOffset, divisor);
-                        var yPosGl = ScalePositionMmToGl(positionY, yOffset, divisor);
-
-                        await PcbRenderer.Pcb.Add3DComponentBodyAsync(
-                            designItem.Designator,
-                            xPosGl,
-                            yPosGl,
-                            bboxPositioned,
-                            designItem.Mesh3D.GlbFile.DownloadUrl);
                     }
                 }
 
