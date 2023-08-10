@@ -15,14 +15,14 @@
     <PackageReference Include="Nexar.Client.Login" Version="0.3.1" />
     <PackageReference Include="OpenTK" Version="4.7.7" />
     <PackageReference Include="OpenTK.Input" Version="4.7.7" />
+    <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0030" />
+    <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.0-alpha0030" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Nexar.Client\Nexar.Client.csproj" />
     <ProjectReference Include="..\..\OpenTK.WinForms\OpenTK.WinForms.csproj" />
-    <ProjectReference Include="..\..\SharpGLTF\SharpGLTF.Core\SharpGLTF.Core.csproj" />
-    <ProjectReference Include="..\..\SharpGLTF\SharpGLTF.Toolkit\SharpGLTF.Toolkit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

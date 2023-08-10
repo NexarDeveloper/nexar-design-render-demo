@@ -9,10 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTK.WinForms", "..\OpenT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nexar.Client", "..\Nexar.Client\Nexar.Client.csproj", "{D09E3FEB-DBBD-413A-A4C8-E0E7456C9010}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpGLTF.Core", "..\SharpGLTF\SharpGLTF.Core\SharpGLTF.Core.csproj", "{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpGLTF.Toolkit", "..\SharpGLTF\SharpGLTF.Toolkit\SharpGLTF.Toolkit.csproj", "{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,22 +41,6 @@ Global
 		{D09E3FEB-DBBD-413A-A4C8-E0E7456C9010}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D09E3FEB-DBBD-413A-A4C8-E0E7456C9010}.Release|x86.ActiveCfg = Release|Any CPU
 		{D09E3FEB-DBBD-413A-A4C8-E0E7456C9010}.Release|x86.Build.0 = Release|Any CPU
-		{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}.Debug|x86.Build.0 = Debug|Any CPU
-		{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}.Release|x86.ActiveCfg = Release|Any CPU
-		{86B7ADB0-7361-4EF6-BE07-3EE430761C7A}.Release|x86.Build.0 = Release|Any CPU
-		{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}.Debug|x86.Build.0 = Debug|Any CPU
-		{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}.Release|x86.ActiveCfg = Release|Any CPU
-		{0FEF8EC2-C87A-4BAB-96DE-61F87736C425}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
