@@ -40,20 +40,6 @@ namespace Nexar.Renderer.Managers
             GeneralStopwatch = new Stopwatch();
         }
 
-        public void Open3DComponentDemo()
-        {
-            PcbStats = new PcbStats();
-
-            //PcbRenderer.Pcb.Reset();
-
-            PcbRenderer.Pcb.AddTestPrimitive();
-            PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
-            PcbRenderer.Pcb.Add3DTestComponent();
-            PcbRenderer.Pcb.FinaliseSetup();
-            PcbRenderer.Pcb.FinaliseAdditionalDataSetup();
-
-        }
-
         public async Task OpenPcbDesignAsync(string apiUrl, Project project)
         {
             ActiveProject = project;
@@ -83,8 +69,6 @@ namespace Nexar.Renderer.Managers
             LoadBoardOutline();
             LoadNetsAndAssociatedPrimitives();
             LoadNoNetPads();
-
-            //PcbRenderer.Pcb.AddTestComponent();
 
             PcbRenderer.Pcb.FinaliseSetup();
 
