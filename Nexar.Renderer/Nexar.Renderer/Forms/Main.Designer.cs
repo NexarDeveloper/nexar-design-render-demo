@@ -28,211 +28,206 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.mainMenu = new System.Windows.Forms.MenuStrip();
-            this.workspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.layersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.primitivesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tracksMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.padsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viasMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.componentOutlinesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.commentAreaMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.commentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.refreshCommentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.currentProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.mainMenu.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
-            this.splitContainer.SuspendLayout();
-            this.statusStrip.SuspendLayout();
-            this.SuspendLayout();
+            mainMenu = new MenuStrip();
+            workspaceToolStripMenuItem = new ToolStripMenuItem();
+            openProjectMenuItem = new ToolStripMenuItem();
+            layersToolStripMenuItem = new ToolStripMenuItem();
+            primitivesToolStripMenuItem = new ToolStripMenuItem();
+            tracksMenuItem = new ToolStripMenuItem();
+            padsMenuItem = new ToolStripMenuItem();
+            viasMenuItem = new ToolStripMenuItem();
+            componentOutlinesMenuItem = new ToolStripMenuItem();
+            componentBodyMenuItem = new ToolStripMenuItem();
+            commentAreaMenuItem = new ToolStripMenuItem();
+            commentsMenuItem = new ToolStripMenuItem();
+            showCommentsMenuItem = new ToolStripMenuItem();
+            refreshCommentsMenuItem = new ToolStripMenuItem();
+            splitContainer = new SplitContainer();
+            statusStrip = new StatusStrip();
+            statusLabel = new ToolStripStatusLabel();
+            currentProgressBar = new ToolStripProgressBar();
+            mainMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer).BeginInit();
+            splitContainer.SuspendLayout();
+            statusStrip.SuspendLayout();
+            SuspendLayout();
             // 
             // mainMenu
             // 
-            this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.workspaceToolStripMenuItem,
-            this.openProjectMenuItem,
-            this.layersToolStripMenuItem,
-            this.primitivesToolStripMenuItem,
-            this.commentsMenuItem});
-            this.mainMenu.Location = new System.Drawing.Point(0, 0);
-            this.mainMenu.Name = "mainMenu";
-            this.mainMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.mainMenu.Size = new System.Drawing.Size(1184, 24);
-            this.mainMenu.TabIndex = 1;
-            this.mainMenu.Text = "mainMenu";
+            mainMenu.Items.AddRange(new ToolStripItem[] { workspaceToolStripMenuItem, openProjectMenuItem, layersToolStripMenuItem, primitivesToolStripMenuItem, commentsMenuItem });
+            mainMenu.Location = new Point(0, 0);
+            mainMenu.Name = "mainMenu";
+            mainMenu.RenderMode = ToolStripRenderMode.Professional;
+            mainMenu.Size = new Size(1184, 24);
+            mainMenu.TabIndex = 1;
+            mainMenu.Text = "mainMenu";
             // 
             // workspaceToolStripMenuItem
             // 
-            this.workspaceToolStripMenuItem.Name = "workspaceToolStripMenuItem";
-            this.workspaceToolStripMenuItem.Size = new System.Drawing.Size(154, 20);
-            this.workspaceToolStripMenuItem.Text = "Click to Load Workspaces";
-            this.workspaceToolStripMenuItem.Click += new System.EventHandler(this.WorkspaceToolStripMenuItem_Click);
+            workspaceToolStripMenuItem.Name = "workspaceToolStripMenuItem";
+            workspaceToolStripMenuItem.Size = new Size(154, 20);
+            workspaceToolStripMenuItem.Text = "Click to Load Workspaces";
+            workspaceToolStripMenuItem.Click += WorkspaceToolStripMenuItem_Click;
             // 
             // openProjectMenuItem
             // 
-            this.openProjectMenuItem.Name = "openProjectMenuItem";
-            this.openProjectMenuItem.Size = new System.Drawing.Size(88, 20);
-            this.openProjectMenuItem.Text = "Open Project";
-            this.openProjectMenuItem.Click += new System.EventHandler(this.OpenProjectMenuItem_Click);
+            openProjectMenuItem.Name = "openProjectMenuItem";
+            openProjectMenuItem.Size = new Size(88, 20);
+            openProjectMenuItem.Text = "Open Project";
+            openProjectMenuItem.Click += OpenProjectMenuItem_Click;
             // 
             // layersToolStripMenuItem
             // 
-            this.layersToolStripMenuItem.Name = "layersToolStripMenuItem";
-            this.layersToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
-            this.layersToolStripMenuItem.Text = "Layers";
+            layersToolStripMenuItem.Name = "layersToolStripMenuItem";
+            layersToolStripMenuItem.Size = new Size(52, 20);
+            layersToolStripMenuItem.Text = "Layers";
             // 
             // primitivesToolStripMenuItem
             // 
-            this.primitivesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tracksMenuItem,
-            this.padsMenuItem,
-            this.viasMenuItem,
-            this.componentOutlinesMenuItem,
-            this.commentAreaMenuItem});
-            this.primitivesToolStripMenuItem.Name = "primitivesToolStripMenuItem";
-            this.primitivesToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
-            this.primitivesToolStripMenuItem.Text = "Primitives";
+            primitivesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tracksMenuItem, padsMenuItem, viasMenuItem, componentOutlinesMenuItem, componentBodyMenuItem, commentAreaMenuItem });
+            primitivesToolStripMenuItem.Name = "primitivesToolStripMenuItem";
+            primitivesToolStripMenuItem.Size = new Size(71, 20);
+            primitivesToolStripMenuItem.Text = "Primitives";
             // 
             // tracksMenuItem
             // 
-            this.tracksMenuItem.Checked = true;
-            this.tracksMenuItem.CheckOnClick = true;
-            this.tracksMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.tracksMenuItem.Name = "tracksMenuItem";
-            this.tracksMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.tracksMenuItem.Text = "Tracks";
+            tracksMenuItem.Checked = true;
+            tracksMenuItem.CheckOnClick = true;
+            tracksMenuItem.CheckState = CheckState.Checked;
+            tracksMenuItem.Name = "tracksMenuItem";
+            tracksMenuItem.Size = new Size(185, 22);
+            tracksMenuItem.Text = "Tracks";
             // 
             // padsMenuItem
             // 
-            this.padsMenuItem.Checked = true;
-            this.padsMenuItem.CheckOnClick = true;
-            this.padsMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.padsMenuItem.Name = "padsMenuItem";
-            this.padsMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.padsMenuItem.Text = "Pads";
+            padsMenuItem.Checked = true;
+            padsMenuItem.CheckOnClick = true;
+            padsMenuItem.CheckState = CheckState.Checked;
+            padsMenuItem.Name = "padsMenuItem";
+            padsMenuItem.Size = new Size(185, 22);
+            padsMenuItem.Text = "Pads";
             // 
             // viasMenuItem
             // 
-            this.viasMenuItem.Checked = true;
-            this.viasMenuItem.CheckOnClick = true;
-            this.viasMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.viasMenuItem.Name = "viasMenuItem";
-            this.viasMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.viasMenuItem.Text = "Vias";
+            viasMenuItem.Checked = true;
+            viasMenuItem.CheckOnClick = true;
+            viasMenuItem.CheckState = CheckState.Checked;
+            viasMenuItem.Name = "viasMenuItem";
+            viasMenuItem.Size = new Size(185, 22);
+            viasMenuItem.Text = "Vias";
             // 
             // componentOutlinesMenuItem
             // 
-            this.componentOutlinesMenuItem.Checked = true;
-            this.componentOutlinesMenuItem.CheckOnClick = true;
-            this.componentOutlinesMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.componentOutlinesMenuItem.Name = "componentOutlinesMenuItem";
-            this.componentOutlinesMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.componentOutlinesMenuItem.Text = "Component Outlines";
+            componentOutlinesMenuItem.Checked = true;
+            componentOutlinesMenuItem.CheckOnClick = true;
+            componentOutlinesMenuItem.CheckState = CheckState.Checked;
+            componentOutlinesMenuItem.Name = "componentOutlinesMenuItem";
+            componentOutlinesMenuItem.Size = new Size(185, 22);
+            componentOutlinesMenuItem.Text = "Component Outlines";
+            // 
+            // componentBodyMenuItem
+            // 
+            componentBodyMenuItem.Checked = true;
+            componentBodyMenuItem.CheckOnClick = true;
+            componentBodyMenuItem.CheckState = CheckState.Checked;
+            componentBodyMenuItem.Name = "componentBodyMenuItem";
+            componentBodyMenuItem.Size = new Size(185, 22);
+            componentBodyMenuItem.Text = "Component Bodies";
             // 
             // commentAreaMenuItem
             // 
-            this.commentAreaMenuItem.Checked = true;
-            this.commentAreaMenuItem.CheckOnClick = true;
-            this.commentAreaMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.commentAreaMenuItem.Name = "commentAreaMenuItem";
-            this.commentAreaMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.commentAreaMenuItem.Text = "Comment Areas";
+            commentAreaMenuItem.Checked = true;
+            commentAreaMenuItem.CheckOnClick = true;
+            commentAreaMenuItem.CheckState = CheckState.Checked;
+            commentAreaMenuItem.Name = "commentAreaMenuItem";
+            commentAreaMenuItem.Size = new Size(185, 22);
+            commentAreaMenuItem.Text = "Comment Areas";
             // 
             // commentsMenuItem
             // 
-            this.commentsMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showCommentsMenuItem,
-            this.refreshCommentsMenuItem});
-            this.commentsMenuItem.Name = "commentsMenuItem";
-            this.commentsMenuItem.Size = new System.Drawing.Size(78, 20);
-            this.commentsMenuItem.Text = "Comments";
+            commentsMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showCommentsMenuItem, refreshCommentsMenuItem });
+            commentsMenuItem.Name = "commentsMenuItem";
+            commentsMenuItem.Size = new Size(78, 20);
+            commentsMenuItem.Text = "Comments";
             // 
             // showCommentsMenuItem
             // 
-            this.showCommentsMenuItem.CheckOnClick = true;
-            this.showCommentsMenuItem.Name = "showCommentsMenuItem";
-            this.showCommentsMenuItem.Size = new System.Drawing.Size(113, 22);
-            this.showCommentsMenuItem.Text = "Show";
+            showCommentsMenuItem.CheckOnClick = true;
+            showCommentsMenuItem.Name = "showCommentsMenuItem";
+            showCommentsMenuItem.Size = new Size(113, 22);
+            showCommentsMenuItem.Text = "Show";
             // 
             // refreshCommentsMenuItem
             // 
-            this.refreshCommentsMenuItem.Name = "refreshCommentsMenuItem";
-            this.refreshCommentsMenuItem.Size = new System.Drawing.Size(113, 22);
-            this.refreshCommentsMenuItem.Text = "Refresh";
+            refreshCommentsMenuItem.Name = "refreshCommentsMenuItem";
+            refreshCommentsMenuItem.Size = new Size(113, 22);
+            refreshCommentsMenuItem.Text = "Refresh";
             // 
             // splitContainer
             // 
-            this.splitContainer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
-            this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer.Location = new System.Drawing.Point(0, 24);
-            this.splitContainer.Name = "splitContainer";
+            splitContainer.BackColor = Color.FromArgb(45, 45, 45);
+            splitContainer.Dock = DockStyle.Fill;
+            splitContainer.FixedPanel = FixedPanel.Panel2;
+            splitContainer.Location = new Point(0, 24);
+            splitContainer.Name = "splitContainer";
             // 
             // splitContainer.Panel1
             // 
-            this.splitContainer.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            splitContainer.Panel1.BackColor = Color.FromArgb(30, 30, 30);
             // 
             // splitContainer.Panel2
             // 
-            this.splitContainer.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.splitContainer.Panel2Collapsed = true;
-            this.splitContainer.Size = new System.Drawing.Size(1184, 737);
-            this.splitContainer.SplitterDistance = 788;
-            this.splitContainer.SplitterWidth = 8;
-            this.splitContainer.TabIndex = 2;
-            this.splitContainer.TabStop = false;
+            splitContainer.Panel2.BackColor = Color.FromArgb(30, 30, 30);
+            splitContainer.Panel2Collapsed = true;
+            splitContainer.Size = new Size(1184, 737);
+            splitContainer.SplitterDistance = 788;
+            splitContainer.SplitterWidth = 8;
+            splitContainer.TabIndex = 2;
+            splitContainer.TabStop = false;
             // 
             // statusStrip
             // 
-            this.statusStrip.BackColor = System.Drawing.SystemColors.Control;
-            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusLabel,
-            this.currentProgressBar});
-            this.statusStrip.Location = new System.Drawing.Point(0, 739);
-            this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(1184, 22);
-            this.statusStrip.TabIndex = 3;
-            this.statusStrip.Text = "statusStrip1";
+            statusStrip.BackColor = SystemColors.Control;
+            statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel, currentProgressBar });
+            statusStrip.Location = new Point(0, 739);
+            statusStrip.Name = "statusStrip";
+            statusStrip.Size = new Size(1184, 22);
+            statusStrip.TabIndex = 3;
+            statusStrip.Text = "statusStrip1";
             // 
             // statusLabel
             // 
-            this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(39, 17);
-            this.statusLabel.Text = "Ready";
+            statusLabel.Name = "statusLabel";
+            statusLabel.Size = new Size(39, 17);
+            statusLabel.Text = "Ready";
             // 
             // currentProgressBar
             // 
-            this.currentProgressBar.Name = "currentProgressBar";
-            this.currentProgressBar.Size = new System.Drawing.Size(100, 16);
-            this.currentProgressBar.Visible = false;
+            currentProgressBar.Name = "currentProgressBar";
+            currentProgressBar.Size = new Size(100, 16);
+            currentProgressBar.Visible = false;
             // 
             // Main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1184, 761);
-            this.Controls.Add(this.statusStrip);
-            this.Controls.Add(this.splitContainer);
-            this.Controls.Add(this.mainMenu);
-            this.KeyPreview = true;
-            this.MainMenuStrip = this.mainMenu;
-            this.Name = "Main";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Nexar.Renderer";
-            this.mainMenu.ResumeLayout(false);
-            this.mainMenu.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
-            this.splitContainer.ResumeLayout(false);
-            this.statusStrip.ResumeLayout(false);
-            this.statusStrip.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1184, 761);
+            Controls.Add(statusStrip);
+            Controls.Add(splitContainer);
+            Controls.Add(mainMenu);
+            KeyPreview = true;
+            MainMenuStrip = mainMenu;
+            Name = "Main";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Nexar.Renderer";
+            mainMenu.ResumeLayout(false);
+            mainMenu.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer).EndInit();
+            splitContainer.ResumeLayout(false);
+            statusStrip.ResumeLayout(false);
+            statusStrip.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -253,5 +248,6 @@
         private ToolStripMenuItem componentOutlinesMenuItem;
         private ToolStripMenuItem refreshCommentsMenuItem;
         private ToolStripMenuItem commentAreaMenuItem;
+        private ToolStripMenuItem componentBodyMenuItem;
     }
 }

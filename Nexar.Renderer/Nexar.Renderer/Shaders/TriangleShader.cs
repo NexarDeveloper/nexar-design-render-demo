@@ -51,11 +51,11 @@ namespace Nexar.Renderer.Shaders
             foreach (var triangle in triangles)
             {
                 shaderVertices.AddRange(
-                    new float[] { triangle.V0X, triangle.V0Y, zCoordinate, 0.0F, 0.0F, 0.0F });
+                    new float[] { triangle.V0X, triangle.V0Y, triangle.V0Z ?? zCoordinate, 0.0F, 0.0F, 0.0F });
                 shaderVertices.AddRange(
-                    new float[] { triangle.V1X, triangle.V1Y, zCoordinate, 0.0F, 0.0F, 0.0F });
+                    new float[] { triangle.V1X, triangle.V1Y, triangle.V1Z ?? zCoordinate, 0.0F, 0.0F, 0.0F });
                 shaderVertices.AddRange(
-                    new float[] { triangle.V2X, triangle.V2Y, zCoordinate, 0.0F, 0.0F, 0.0F });
+                    new float[] { triangle.V2X, triangle.V2Y, triangle.V2Z ?? zCoordinate, 0.0F, 0.0F, 0.0F });
             }
 
             for (int verticeIndex = 0; verticeIndex < shaderVertices.Count; verticeIndex += 6)

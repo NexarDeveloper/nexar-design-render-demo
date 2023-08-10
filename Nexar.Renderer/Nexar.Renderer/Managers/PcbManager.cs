@@ -79,6 +79,7 @@ namespace Nexar.Renderer.Managers
 
         public async Task LoadAdditionalDesignDataAsync()
         {
+            await Load3DModelAsync();
             await LoadDesignItemsAsync();
             PcbRenderer.Pcb.FinaliseAdditionalDataSetup();
         }
@@ -202,6 +203,27 @@ namespace Nexar.Renderer.Managers
             return AllComponents.FirstOrDefault(x => x.HitTest(location));
         }
 
+        private async Task Load3DModelAsync() 
+        {
+            GeneralStopwatch.Restart();
+
+            var itemResult = await nexarClient.Get3DModel.ExecuteAsync(ActiveProject.Id);
+            var pcb = itemResult.Data?.DesProjectById?.Design?.Variants.FirstOrDefault()?.Pcb;
+
+            var xOffsetGl = ScalePositionMmToGl(0, xOffset, divisor);
+            var yOffsetGl = ScalePositionMmToGl(0, yOffset, divisor);
+
+            if (!string.IsNullOrEmpty(pcb?.Mesh3D?.GlbFile?.DownloadUrl))
+            {
+                await PcbRenderer.Pcb.Add3DModelBodyAsync(
+                    xOffsetGl,
+                    yOffsetGl,
+                    pcb.Mesh3D.GlbFile.DownloadUrl);
+            }
+
+            GeneralStopwatch.Stop();
+        }
+
         private async Task LoadDesignItemsAsync()
         {
             GeneralStopwatch.Restart();
@@ -247,11 +269,11 @@ namespace Nexar.Renderer.Managers
                         PointF? firstVertice = null;
                         PointF? lastVertice = null;
 
-                        foreach (var vertice in component.PolygonVertices)
-                        {
+                        foreach (var vertex in component.PolygonVertices)
+                        {   
                             if (firstVertice == null)
                             {
-                                firstVertice = vertice;
+                                firstVertice = vertex;
                             }
 
                             if (lastVertice != null)
@@ -259,11 +281,11 @@ namespace Nexar.Renderer.Managers
                                 PcbRenderer.Pcb.AddComponentOutline(
                                     ScalePositionMmToGl((decimal)lastVertice.Value.X, xOffset, divisor),
                                     ScalePositionMmToGl((decimal)lastVertice.Value.Y, yOffset, divisor),
-                                    ScalePositionMmToGl((decimal)vertice.X, xOffset, divisor),
-                                    ScalePositionMmToGl((decimal)vertice.Y, yOffset, divisor));
+                                    ScalePositionMmToGl((decimal)vertex.X, xOffset, divisor),
+                                    ScalePositionMmToGl((decimal)vertex.Y, yOffset, divisor));
                             }
 
-                            lastVertice = vertice;
+                            lastVertice = vertex;
                         }
 
                         if (lastVertice != null && firstVertice != null)

@@ -50,6 +50,26 @@ query GetProjects($workspaceUrl: String!, $cursor: String!) {
   }
 }
 
+query Get3DModel($id: ID!) {
+  desProjectById (id: $id) {
+    id
+    name
+    description
+    design {
+      variants {
+        pcb {
+          mesh3D {
+            glbFile {
+              fileName
+              downloadUrl
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
   desProjectById (id: $id) {
     name
@@ -68,6 +88,12 @@ query GetDesignItems($id: ID!, $cursor: String, $count: Int!) {
             nodes {
               id
               designator
+                position {
+                  x
+                  y
+                  xMm
+                  yMm
+                }
               area {
                 pos1 {
                   x

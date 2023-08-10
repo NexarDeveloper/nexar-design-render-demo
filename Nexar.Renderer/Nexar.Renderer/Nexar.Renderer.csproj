@@ -9,11 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AssimpNet" Version="4.1.0" />
     <PackageReference Include="Clipper2" Version="1.0.5" />
     <PackageReference Include="LibTessDotNet" Version="1.1.15" />
     <PackageReference Include="Nexar.Client.Login" Version="0.3.1" />
     <PackageReference Include="OpenTK" Version="4.7.7" />
     <PackageReference Include="OpenTK.Input" Version="4.7.7" />
+    <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0030" />
+    <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.0-alpha0030" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
   </ItemGroup>
 
@@ -81,5 +84,4 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
 </Project>

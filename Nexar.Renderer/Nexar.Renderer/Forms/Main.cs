@@ -29,7 +29,6 @@ namespace Nexar.Renderer.Forms
         private int glWidth = 1200;
         private int glHeight = 800;
 
-        private bool testPrimitiveEnabled = false;
         private bool mousePanDetected = false;
 
         private DesignItem? SelectedComponent { get; set; }
@@ -58,6 +57,7 @@ namespace Nexar.Renderer.Forms
             padsMenuItem.CheckedChanged += PadsMenuItem_CheckedChanged;
             viasMenuItem.CheckedChanged += ViasMenuItem_CheckedChanged;
             componentOutlinesMenuItem.CheckedChanged += ComponentOutlinesMenuItem_CheckedChanged;
+            componentBodyMenuItem.CheckedChanged += ComponentBodyMenuItem_CheckedChanged;
             commentAreaMenuItem.CheckedChanged += CommentAreaMenuItem_CheckedChanged;
             showCommentsMenuItem.CheckedChanged += CommentsMenuItem_CheckedChanged;
             refreshCommentsMenuItem.Click += RefreshCommentsMenuItem_Click;
@@ -73,7 +73,7 @@ namespace Nexar.Renderer.Forms
                     THREAD_PERIOD_MS,
                     new Action<object>(RenderFrameThreadSafe),
                     ThreadExceptionHandler,
-                    null, 
+                    null,
                     CloseApplication);
 
                 renderThreadHelper.StartThreads();
@@ -90,12 +90,6 @@ namespace Nexar.Renderer.Forms
             glControl.Resize += GlControl_Resize;
 
             pcbManager.PcbRenderer.OnLoad();
-
-            if (testPrimitiveEnabled)
-            {
-                pcbManager.PcbRenderer.Pcb.AddTestPrimitive();
-                pcbManager.PcbRenderer.Pcb.EnabledPcbLayers.Add("Test");
-            }
 
             GlControl_Resize(glControl, EventArgs.Empty);
         }
@@ -179,7 +173,7 @@ namespace Nexar.Renderer.Forms
 
         private async void CreateCommentWithArea(Point location)
         {
-            if (pcbManager.ActiveProject!= null &&
+            if (pcbManager.ActiveProject != null &&
                 pcbManager.GetHighlightedAreaMm() > 4.0f)
             {
                 var highlightArea = pcbManager.GetHighlightArea();
@@ -203,7 +197,7 @@ namespace Nexar.Renderer.Forms
         private async void CreateCommentThread_Click(object? sender, EventArgs e)
         {
             if (SelectedComponent != null)
-            {               
+            {
                 var createCommentThread = new CreateCommentThread(
                     NexarHelper.GetNexarClient(ActiveWorkspace?.Location.ApiServiceUrl),
                     E_CommentType.Component,
@@ -455,11 +449,11 @@ namespace Nexar.Renderer.Forms
 
                             Text = string.Format("Nexar.Renderer | {0} | {1}", (ActiveWorkspace?.Name ?? ""), projectsForm.SelectedDesignProject.Name);
                             StatusBusy(string.Format("Opening '{0}'...", projectsForm.SelectedDesignProject.Name));
-                            
+
                             await pcbManager.OpenPcbDesignAsync(
                                 workspace.ApiUrl,
                                 projectsForm.SelectedDesignProject);
-                            
+
                             StatusReady();
                             LoadLayers();
                             StatusBusy("Loading additional design data...");
@@ -586,6 +580,11 @@ namespace Nexar.Renderer.Forms
         private void ComponentOutlinesMenuItem_CheckedChanged(object? sender, EventArgs e)
         {
             pcbManager.PcbRenderer.Pcb.DisableComponentOutlines = (!componentOutlinesMenuItem.Checked);
+        }
+
+        private void ComponentBodyMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            pcbManager.PcbRenderer.Pcb.DisableComponentBodies = (!componentBodyMenuItem.Checked);
         }
 
         private void CommentAreaMenuItem_CheckedChanged(object? sender, EventArgs e)

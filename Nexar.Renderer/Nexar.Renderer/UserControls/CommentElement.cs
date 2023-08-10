@@ -179,7 +179,7 @@ namespace Nexar.Renderer.UserControls
                     var updateCommentInput = new DesUpdateCommentInput()
                     {
                         CommentThreadId = Thread.CommentThreadId,
-                        CommentId = Comment.CommentId,
+                        CommentId = Comment!.CommentId,
                         EntityId = PcbManager.ActiveProject.Id,
                         Text = commentTextBox.Text
                     };
