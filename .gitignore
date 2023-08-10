@@ -310,6 +310,3 @@ testoutput/
 artifacts/
 __mismatch__
 conferences.db
-
-# GLTF build files
-SharpGLTF/Build
